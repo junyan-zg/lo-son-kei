@@ -1,5 +1,5 @@
 /**
- * Copyright &copy; 2012-2014 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ * Copyright &copy; 2016-2017 <a>ZhangJunYan</a> All rights reserved.
  */
 package com.zjy.losonkei.common.supcan.common;
 
