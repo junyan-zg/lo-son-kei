@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjy.losonkei.test.dao.TestTreeDao">
+<mapper namespace="com.zjy.losonkei.modules.goods.dao.GoodsCategoryDao">
     
-	<sql id="testTreeColumns">
+	<sql id="goodsCategoryColumns">
 		a.id AS "id",
+		a.category_name AS "categoryName",
 		a.parent_id AS "parent.id",
 		a.parent_ids AS "parentIds",
-		a.name AS "name",
 		a.sort AS "sort",
+		a.remarks AS "remarks",
 		a.create_by AS "createBy.id",
-		a.create_date AS "createDate",
+		a.create_time AS "createTime",
 		a.update_by AS "updateBy.id",
 		a.update_date AS "updateDate",
-		a.remarks AS "remarks",
 		a.del_flag AS "delFlag"
 	</sql>
 	
-	<sql id="testTreeJoins">
+	<sql id="goodsCategoryJoins">
 	</sql>
     
-	<select id="get" resultType="TestTree">
+	<select id="get" resultType="GoodsCategory">
 		SELECT 
-			<include refid="testTreeColumns"/>
-		FROM test_tree a
-		<include refid="testTreeJoins"/>
+			<include refid="goodsCategoryColumns"/>
+		FROM goods_category a
+		<include refid="goodsCategoryJoins"/>
 		WHERE a.id = #{id}
 	</select>
 	
-	<select id="findList" resultType="TestTree">
+	<select id="findList" resultType="GoodsCategory">
 		SELECT 
-			<include refid="testTreeColumns"/>
-		FROM test_tree a
-		<include refid="testTreeJoins"/>
+			<include refid="goodsCategoryColumns"/>
+		FROM goods_category a
+		<include refid="goodsCategoryJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
 			<if test="parent != null and parent.id != null and parent.id != ''">
@@ -43,34 +43,28 @@
 					<if test="dbName == 'mssql'">'%'+#{parentIds}+'%'</if>
 					<if test="dbName == 'mysql'">concat('%',#{parentIds},'%')</if>
 			</if>
-			<if test="name != null and name != ''">
-				AND a.name LIKE 
-					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
-					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
-					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
-			</if>
 		</where>
 		ORDER BY a.sort ASC
 	</select>
 	
-	<select id="findAllList" resultType="TestTree">
+	<select id="findAllList" resultType="GoodsCategory">
 		SELECT 
-			<include refid="testTreeColumns"/>
-		FROM test_tree a
-		<include refid="testTreeJoins"/>
+			<include refid="goodsCategoryColumns"/>
+		FROM goods_category a
+		<include refid="goodsCategoryJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
 		</where>
 		ORDER BY a.sort ASC
 	</select>
 	
-	<select id="findByParentIdsLike" resultType="TestTree">
+	<select id="findByParentIdsLike" resultType="GoodsCategory">
 		SELECT
 			a.id,
 			a.parent_id AS "parent.id",
 			a.parent_ids
-		FROM test_tree a
-		<include refid="testTreeJoins"/>
+		FROM goods_category a
+		<include refid="goodsCategoryJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
 			AND a.parent_ids LIKE #{parentIds}
@@ -79,56 +73,58 @@
 	</select>
 	
 	<insert id="insert">
-		INSERT INTO test_tree(
+		INSERT INTO goods_category(
 			id,
+			category_name,
 			parent_id,
 			parent_ids,
-			name,
 			sort,
+			remarks,
 			create_by,
-			create_date,
+			create_time,
 			update_by,
 			update_date,
-			remarks,
 			del_flag
 		) VALUES (
 			#{id},
+			#{categoryName},
 			#{parent.id},
 			#{parentIds},
-			#{name},
 			#{sort},
+			#{remarks},
 			#{createBy.id},
-			#{createDate},
+			#{createTime},
 			#{updateBy.id},
 			#{updateDate},
-			#{remarks},
 			#{delFlag}
 		)
 	</insert>
 	
 	<update id="update">
-		UPDATE test_tree SET 	
+		UPDATE goods_category SET 	
+			category_name = #{categoryName},
 			parent_id = #{parent.id},
 			parent_ids = #{parentIds},
-			name = #{name},
 			sort = #{sort},
+			remarks = #{remarks},
+			create_time = #{createTime},
 			update_by = #{updateBy.id},
-			update_date = #{updateDate},
-			remarks = #{remarks}
+			update_date = #{updateDate}
 		WHERE id = #{id}
 	</update>
 	
 	<update id="updateParentIds">
-		UPDATE test_tree SET 
+		UPDATE goods_category SET 
 			parent_id = #{parent.id}, 
 			parent_ids = #{parentIds}
 		WHERE id = #{id}
 	</update>
 	
 	<update id="delete">
-		UPDATE test_tree SET 
+		UPDATE goods_category SET 
 			del_flag = #{DEL_FLAG_DELETE}
-		WHERE id = #{id} OR parent_ids LIKE '%,'||#{id}||',%'
+		WHERE id = #{id} <!--OR parent_ids LIKE '%,'||#{id}||',%'-->
+		OR parent_ids LIKE #{parentIds}
 	</update>
 	
 </mapper>

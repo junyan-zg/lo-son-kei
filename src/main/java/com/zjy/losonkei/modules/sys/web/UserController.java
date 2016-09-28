@@ -3,8 +3,10 @@
  */
 package com.zjy.losonkei.modules.sys.web;
 
+import java.net.URLDecoder;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +15,7 @@ import javax.validation.ConstraintViolationException;
 import com.zjy.losonkei.common.beanvalidator.BeanValidators;
 import com.zjy.losonkei.common.utils.DateUtils;
 import com.zjy.losonkei.modules.sys.entity.Office;
+import com.zjy.losonkei.modules.sys.service.OfficeService;
 import com.zjy.losonkei.modules.sys.service.SystemService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +52,9 @@ public class UserController extends BaseController {
 
 	@Autowired
 	private SystemService systemService;
-	
+	@Autowired
+	private OfficeService officeService;
+
 	@ModelAttribute
 	public User get(@RequestParam(required=false) String id) {
 		if (StringUtils.isNotBlank(id)){
@@ -69,6 +74,9 @@ public class UserController extends BaseController {
 	@RequestMapping(value = {"list", ""})
 	public String list(User user, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Page<User> page = systemService.findUser(new Page<User>(request, response), user);
+		if(!Objects.equals(user.getOffice(),null)){
+			user.setOffice(officeService.get(user.getOffice()));
+		}
         model.addAttribute("page", page);
 		return "modules/sys/userList";
 	}
