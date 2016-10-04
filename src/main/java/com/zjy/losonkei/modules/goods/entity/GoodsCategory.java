@@ -22,7 +22,6 @@ public class GoodsCategory extends TreeEntity<GoodsCategory> {
 	private GoodsCategory parent;		// 商品分类id上级
 	private String parentIds;		// 商品分类id所有上级
 	private Integer sort;		// 排序，根据分级排序
-	private Date createTime;		// 创建时间
 	
 	public GoodsCategory() {
 		super();
@@ -65,15 +64,6 @@ public class GoodsCategory extends TreeEntity<GoodsCategory> {
 
 	public void setSort(Integer sort) {
 		this.sort = sort;
-	}
-	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
 	}
 	
 	public String getParentId() {

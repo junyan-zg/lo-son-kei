@@ -10,7 +10,7 @@
     <packaging>war</packaging>
 
     <name>LoSonKei</name>
-    <url>https://github.com/junyan-zg/lo-son-kei-dessert</url>
+    <url>https://github.com/junyan-zg/lo-son-kei</url>
 
     <!-- 项目属性 -->
     <properties>
