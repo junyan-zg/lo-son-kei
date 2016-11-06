@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjy.losonkei.modules.goods.dao.GoodsAllDao">
+    
+	<sql id="goodsAllColumns">
+		a.id AS "id",
+		a.price AS "price",
+		a.cost_price AS "costPrice",
+		a.src_price AS "srcPrice",
+		a.stock AS "stock",
+		a.goods_id AS "goodsId",
+		a.specification_group AS "specificationGroup",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="goodsAllJoins">
+	</sql>
+    
+	<select id="get" resultType="GoodsAll">
+		SELECT 
+			<include refid="goodsAllColumns"/>
+		FROM goods_all a
+		<include refid="goodsAllJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="GoodsAll">
+		SELECT 
+			<include refid="goodsAllColumns"/>
+		FROM goods_all a
+		<include refid="goodsAllJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="stock != null and stock != ''">
+				AND a.stock = #{stock}
+			</if>
+			<if test="goodsId != null and goodsId != ''">
+				AND a.goods_id = #{goodsId}
+			</if>
+			<if test="specificationGroup != null and specificationGroup != ''">
+				AND a.specification_group = #{specificationGroup}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.specification_group ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="GoodsAll">
+		SELECT 
+			<include refid="goodsAllColumns"/>
+		FROM goods_all a
+		<include refid="goodsAllJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO goods_all(
+			id,
+			price,
+			cost_price,
+			src_price,
+			stock,
+			goods_id,
+			specification_group,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{price},
+			#{costPrice},
+			#{srcPrice},
+			#{stock},
+			#{goodsId},
+			#{specificationGroup},
+			#{remarks},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE goods_all SET 	
+			price = #{price},
+			cost_price = #{costPrice},
+			src_price = #{srcPrice},
+			stock = #{stock},
+			goods_id = #{goodsId},
+			specification_group = #{specificationGroup},
+			remarks = #{remarks},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE goods_all SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

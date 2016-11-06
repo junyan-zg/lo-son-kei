@@ -3,15 +3,14 @@
  */
 package com.zjy.losonkei.modules.goods.service;
 
-import java.util.List;
-
+import com.zjy.losonkei.common.persistence.Page;
+import com.zjy.losonkei.common.service.CrudService;
+import com.zjy.losonkei.modules.goods.dao.GoodsAttrDao;
+import com.zjy.losonkei.modules.goods.entity.GoodsAttr;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zjy.losonkei.common.persistence.Page;
-import com.zjy.losonkei.common.service.CrudService;
-import com.zjy.losonkei.modules.goods.entity.GoodsAttr;
-import com.zjy.losonkei.modules.goods.dao.GoodsAttrDao;
+import java.util.List;
 
 /**
  * 商品属性Service
@@ -43,5 +42,4 @@ public class GoodsAttrService extends CrudService<GoodsAttrDao, GoodsAttr> {
 	public void delete(GoodsAttr goodsAttr) {
 		super.delete(goodsAttr);
 	}
-	
 }

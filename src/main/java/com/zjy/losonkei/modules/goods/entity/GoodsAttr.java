@@ -19,7 +19,9 @@ public class GoodsAttr extends DataEntity<GoodsAttr> {
 	private static final long serialVersionUID = 1L;
 	private String attrName;		// 属性名称
 	private Integer sort;		// 排序
-	
+
+	private GoodsAttrValue goodsAttrValue;
+
 	public GoodsAttr() {
 		super();
 	}
@@ -45,5 +47,12 @@ public class GoodsAttr extends DataEntity<GoodsAttr> {
 		this.sort = sort;
 	}
 
-	
+
+	public GoodsAttrValue getGoodsAttrValue() {
+		return goodsAttrValue;
+	}
+
+	public void setGoodsAttrValue(GoodsAttrValue goodsAttrValue) {
+		this.goodsAttrValue = goodsAttrValue;
+	}
 }

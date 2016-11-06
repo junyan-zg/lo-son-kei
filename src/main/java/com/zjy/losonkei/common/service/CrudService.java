@@ -89,4 +89,12 @@ public abstract class CrudService<D extends CrudDao<T>, T extends DataEntity<T>>
 		dao.delete(entity);
 	}
 
+	/**
+	 * 查询所有数据列表
+	 * @param entity
+	 * @return
+	 */
+	public List<T> findAllList(T entity){
+		return dao.findAllList(entity);
+	}
 }

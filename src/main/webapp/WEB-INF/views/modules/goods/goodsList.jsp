@@ -110,7 +110,7 @@
 					${goods.keywords}
 				</td>
 				<td>
-					${goods.goodsCategoryId}
+					${goods.goodsCategory.categoryName}
 				</td>
 				<td>
 					${goods.price}

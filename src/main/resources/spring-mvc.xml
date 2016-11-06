@@ -21,17 +21,37 @@
 			<!-- 将StringHttpMessageConverter的默认编码设为UTF-8 -->
 			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
 		    	<constructor-arg value="UTF-8" />
+				<property name="supportedMediaTypes">
+					<list>
+						<value>text/plain;charset=UTF-8</value>
+						<value>text/html;charset=UTF-8</value>
+					</list>
+				</property>
 			</bean>
 			<!-- 将Jackson2HttpMessageConverter的默认格式化输出为false -->
-			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+			<!--<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
                 <property name="supportedMediaTypes">
-                	<list><value>application/json;charset=UTF-8</value></list>
+                	<list>
+						&lt;!&ndash;这里顺序不能反，一定先写text/html,不然ie下出现下载提示,但是以json后缀的非ajax一定会下载&ndash;&gt;
+						<value>text/html;charset=UTF-8</value>
+						<value>application/json;charset=UTF-8</value>
+					</list>
                 </property>
                 <property name="prettyPrint" value="false"/>
                 <property name="objectMapper">  
                     <bean class="com.zjy.losonkei.common.mapper.JsonMapper"></bean>
                 </property> 
-            </bean>
+            </bean>-->
+			<bean id="fastJsonHttpMessageConverter"
+				  class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>application/json;charset=UTF-8</value>
+						<!--这里顺序不能反，一定先写text/html,不然ie下出现下载提示-->
+						<value>text/html;charset=UTF-8</value>
+					</list>
+				</property>
+			</bean>
             <!-- 使用XML格式输出数据 -->
             <bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
 		        <constructor-arg>
@@ -93,10 +113,10 @@
 			<bean class="com.zjy.losonkei.modules.sys.interceptor.LogInterceptor" />
 		</mvc:interceptor>
 		<!-- 手机视图拦截器 -->
-		<mvc:interceptor>
+		<!--<mvc:interceptor>
 			<mvc:mapping path="/**" />
 			<bean class="com.zjy.losonkei.modules.sys.interceptor.MobileInterceptor" />
-		</mvc:interceptor>
+		</mvc:interceptor>-->
 	</mvc:interceptors>
 	
 	<!-- 支持Shiro对Controller的方法级AOP安全控制 begin-->
@@ -110,7 +130,7 @@
 				<prop key="org.apache.shiro.authz.UnauthorizedException">error/403</prop>
 				<prop key="java.lang.Throwable">error/500</prop>
 			</props>
-			</property>
+		</property>
 	</bean>
 	<!-- 支持Shiro对Controller的方法级AOP安全控制 end -->
 	

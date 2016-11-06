@@ -4,7 +4,7 @@
     
 	<sql id="goodsSpecificationValueColumns">
 		a.id AS "id",
-		a.specification_id AS "specificationId",
+		a.specification_id AS "goodsSpecification",
 		a.specification_value AS "specificationValue",
 		a.goods_id AS "goodsId",
 		a.specification_group AS "specificationGroup",
@@ -14,7 +14,10 @@
 		a.create_date AS "createDate",
 		a.update_by AS "updateBy.id",
 		a.update_date AS "updateDate",
-		a.del_flag AS "delFlag"
+		a.del_flag AS "delFlag",
+
+		b.id AS "goodsSpecification.id",
+		b.specification_name AS "goodsSpecification.specificationName"
 	</sql>
 	
 	<sql id="goodsSpecificationValueJoins">
@@ -36,8 +39,8 @@
 		<include refid="goodsSpecificationValueJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
-			<if test="specificationId != null and specificationId != ''">
-				AND a.specification_id = #{specificationId}
+			<if test="goodsSpecification != null and goodsSpecification != ''">
+				AND a.specification_id = #{goodsSpecification.id}
 			</if>
 			<if test="goodsId != null and goodsId != ''">
 				AND a.goods_id = #{goodsId}
@@ -88,7 +91,7 @@
 			del_flag
 		) VALUES (
 			#{id},
-			#{specificationId},
+			#{goodsSpecification.id},
 			#{specificationValue},
 			#{goodsId},
 			#{specificationGroup},
@@ -104,7 +107,7 @@
 	
 	<update id="update">
 		UPDATE goods_specification_value SET 	
-			specification_id = #{specificationId},
+			specification_id = #{goodsSpecification.id},
 			specification_value = #{specificationValue},
 			goods_id = #{goodsId},
 			specification_group = #{specificationGroup},
@@ -124,7 +127,7 @@
 				WHERE id = #{id}
 			</when>
 			<otherwise>
-				WHERE specification_id = #{specificationId}
+				WHERE specification_id = #{goodsSpecification.id}
 			</otherwise>
 		</choose>
 	</update>
