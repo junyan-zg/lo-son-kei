@@ -5,14 +5,17 @@
 	<sql id="goodsAttrValueColumns">
 		a.id AS "id",
 		a.goods_id AS "goodsId",
-		a.attr_id AS "attrId",
+		a.attr_id AS "goodsAttr.id",
 		a.attr_value AS "attrValue",
 		a.remarks AS "remarks",
 		a.create_by AS "createBy.id",
 		a.create_date AS "createDate",
 		a.update_by AS "updateBy.id",
 		a.update_date AS "updateDate",
-		a.del_flag AS "delFlag"
+		a.del_flag AS "delFlag",
+
+		b.id AS "goodsAttr.id",
+		b.attr_name AS "goodsAttr.attrName"
 	</sql>
 	
 	<sql id="goodsAttrValueJoins">
@@ -37,8 +40,8 @@
 			<if test="goodsId != null and goodsId != ''">
 				AND a.goods_id = #{goodsId}
 			</if>
-			<if test="attrId != null and attrId != ''">
-				AND a.attr_id = #{attrId}
+			<if test="goodsAttr != null and goodsAttr.id != null and goodsAttr.id != ''">
+				AND a.attr_id = #{goodsAttr.id}
 			</if>
 		</where>
 		<choose>
@@ -82,7 +85,7 @@
 		) VALUES (
 			#{id},
 			#{goodsId},
-			#{attrId},
+			#{goodsAttr.id},
 			#{attrValue},
 			#{remarks},
 			#{createBy.id},
@@ -96,7 +99,7 @@
 	<update id="update">
 		UPDATE goods_attr_value SET 	
 			goods_id = #{goodsId},
-			attr_id = #{attrId},
+			attr_id = #{goodsAttr.id},
 			attr_value = #{attrValue},
 			remarks = #{remarks},
 			update_by = #{updateBy.id},
@@ -112,7 +115,7 @@
 				WHERE id = #{id}
 			</when>
 			<otherwise>
-				WHERE attr_id = #{attrId}
+				WHERE attr_id = #{goodsAttr.id}
 			</otherwise>
 		</choose>
 	</update>

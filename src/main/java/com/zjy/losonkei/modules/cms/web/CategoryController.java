@@ -139,7 +139,7 @@ public class CategoryController extends BaseController {
 	@ResponseBody
 	@RequestMapping(value = "treeData")
 	public List<Map<String, Object>> treeData(String module, @RequestParam(required=false) String extId, HttpServletResponse response) {
-		response.setContentType("application/json; charset=UTF-8");
+		response.setContentType("application/json;charset=UTF-8");
 		List<Map<String, Object>> mapList = Lists.newArrayList();
 		List<Category> list = categoryService.findByUser(true, module);
 		for (int i=0; i<list.size(); i++){

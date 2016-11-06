@@ -4,7 +4,11 @@
 package com.zjy.losonkei.modules.goods.entity;
 
 import org.hibernate.validator.constraints.Length;
+
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -25,19 +29,20 @@ public class Goods extends DataEntity<Goods> {
 	private String keywords;		// 关键词
 	private GoodsCategory goodsCategory;		// 商品分类 父类
 	private Goods parent;		// 父商品id,字段不为空时该商品作为配件
-	private String price;		// 现价
-	private String srcPrice;		// 原价
+	private BigDecimal price = new BigDecimal(0);		// 现价
+	private BigDecimal srcPrice = new BigDecimal(0);		// 原价
 	private String state;		// 状态
 	private String thumbImgUrl;		// 缩略图url
 
+	private List<GoodsAll> goodsAlls;
 
 	//SEACH
 	private Date beginOnShelfTime;		// 开始 上架时间
 	private Date endOnShelfTime;		// 结束 上架时间
-	private String beginPrice;		// 开始 现价
-	private String endPrice;		// 结束 现价
-	private String beginSrcPrice;		// 开始 原价
-	private String endSrcPrice;		// 结束 原价
+	private BigDecimal beginPrice;		// 开始 现价
+	private BigDecimal endPrice;		// 结束 现价
+	private BigDecimal beginSrcPrice;		// 开始 原价
+	private BigDecimal endSrcPrice;		// 结束 原价
 
 	public static final String STATE_ONSALE = "0";	//在售
 	public static final String STATE_OFFSALE = "1";	//下架
@@ -129,19 +134,19 @@ public class Goods extends DataEntity<Goods> {
 		this.parent = parent;
 	}
 	
-	public String getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
 
-	public void setPrice(String price) {
+	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
 	
-	public String getSrcPrice() {
+	public BigDecimal getSrcPrice() {
 		return srcPrice;
 	}
 
-	public void setSrcPrice(String srcPrice) {
+	public void setSrcPrice(BigDecimal srcPrice) {
 		this.srcPrice = srcPrice;
 	}
 	
@@ -179,36 +184,43 @@ public class Goods extends DataEntity<Goods> {
 		this.endOnShelfTime = endOnShelfTime;
 	}
 		
-	public String getBeginPrice() {
+	public BigDecimal getBeginPrice() {
 		return beginPrice;
 	}
 
-	public void setBeginPrice(String beginPrice) {
+	public void setBeginPrice(BigDecimal beginPrice) {
 		this.beginPrice = beginPrice;
 	}
 	
-	public String getEndPrice() {
+	public BigDecimal getEndPrice() {
 		return endPrice;
 	}
 
-	public void setEndPrice(String endPrice) {
+	public void setEndPrice(BigDecimal endPrice) {
 		this.endPrice = endPrice;
 	}
 		
-	public String getBeginSrcPrice() {
+	public BigDecimal getBeginSrcPrice() {
 		return beginSrcPrice;
 	}
 
-	public void setBeginSrcPrice(String beginSrcPrice) {
+	public void setBeginSrcPrice(BigDecimal beginSrcPrice) {
 		this.beginSrcPrice = beginSrcPrice;
 	}
 	
-	public String getEndSrcPrice() {
+	public BigDecimal getEndSrcPrice() {
 		return endSrcPrice;
 	}
 
-	public void setEndSrcPrice(String endSrcPrice) {
+	public void setEndSrcPrice(BigDecimal endSrcPrice) {
 		this.endSrcPrice = endSrcPrice;
 	}
-		
+
+	public List<GoodsAll> getGoodsAlls() {
+		return goodsAlls;
+	}
+
+	public void setGoodsAlls(List<GoodsAll> goodsAlls) {
+		this.goodsAlls = goodsAlls;
+	}
 }

@@ -3,7 +3,7 @@
 <mapper namespace="com.zjy.losonkei.modules.act.dao.ActDao">
     
 	<update id="updateProcInsIdByBusinessId">
-		UPDATE ${businessTable} SET 
+		UPDATE ${businessTable} SET
 			proc_ins_id = #{procInsId}
 		WHERE id = #{businessId}
 	</update>

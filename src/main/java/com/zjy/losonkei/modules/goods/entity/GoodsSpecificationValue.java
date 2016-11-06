@@ -4,8 +4,6 @@
 package com.zjy.losonkei.modules.goods.entity;
 
 import org.hibernate.validator.constraints.Length;
-import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import com.zjy.losonkei.common.persistence.DataEntity;
 
@@ -17,7 +15,7 @@ import com.zjy.losonkei.common.persistence.DataEntity;
 public class GoodsSpecificationValue extends DataEntity<GoodsSpecificationValue> {
 	
 	private static final long serialVersionUID = 1L;
-	private GoodsSpecification specificationId;		// 规格id 父类
+	private GoodsSpecification goodsSpecification;		// 规格id 父类
 	private String specificationValue;		// 规格值
 	private String goodsId;		// 商品id
 	private Integer specificationGroup;		// 多个规格值为一组，一个goods对应多个组
@@ -31,17 +29,17 @@ public class GoodsSpecificationValue extends DataEntity<GoodsSpecificationValue>
 		super(id);
 	}
 
-	public GoodsSpecificationValue(GoodsSpecification specificationId){
-		this.specificationId = specificationId;
+	public GoodsSpecificationValue(GoodsSpecification goodsSpecification){
+		this.goodsSpecification = goodsSpecification;
 	}
 
 	@Length(min=0, max=64, message="规格id长度必须介于 0 和 64 之间")
-	public GoodsSpecification getSpecificationId() {
-		return specificationId;
+	public GoodsSpecification getGoodsSpecification() {
+		return goodsSpecification;
 	}
 
-	public void setSpecificationId(GoodsSpecification specificationId) {
-		this.specificationId = specificationId;
+	public void setGoodsSpecification(GoodsSpecification goodsSpecification) {
+		this.goodsSpecification = goodsSpecification;
 	}
 	
 	@Length(min=0, max=64, message="规格值长度必须介于 0 和 64 之间")

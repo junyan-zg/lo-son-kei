@@ -18,19 +18,20 @@ public class GoodsAttrValue extends DataEntity<GoodsAttrValue> {
 	
 	private static final long serialVersionUID = 1L;
 	private String goodsId;		// 商品id
-	private GoodsAttr attrId;		// 属性id 父类
+	private GoodsAttr goodsAttr;		// 属性id 父类
 	private String attrValue;		// 属性值
 	
 	public GoodsAttrValue() {
 		super();
 	}
 
-	public GoodsAttrValue(String id){
-		super(id);
+	public GoodsAttrValue(String goodsId){
+		super();
+		this.goodsId = goodsId;
 	}
 
-	public GoodsAttrValue(GoodsAttr attrId){
-		this.attrId = attrId;
+	public GoodsAttrValue(GoodsAttr goodsAttr){
+		this.goodsAttr = goodsAttr;
 	}
 
 	@Length(min=0, max=64, message="商品id长度必须介于 0 和 64 之间")
@@ -41,16 +42,7 @@ public class GoodsAttrValue extends DataEntity<GoodsAttrValue> {
 	public void setGoodsId(String goodsId) {
 		this.goodsId = goodsId;
 	}
-	
-	@Length(min=0, max=64, message="属性id长度必须介于 0 和 64 之间")
-	public GoodsAttr getAttrId() {
-		return attrId;
-	}
 
-	public void setAttrId(GoodsAttr attrId) {
-		this.attrId = attrId;
-	}
-	
 	@Length(min=0, max=64, message="属性值长度必须介于 0 和 64 之间")
 	public String getAttrValue() {
 		return attrValue;
@@ -60,5 +52,12 @@ public class GoodsAttrValue extends DataEntity<GoodsAttrValue> {
 		this.attrValue = attrValue;
 	}
 
-	
+
+	public GoodsAttr getGoodsAttr() {
+		return goodsAttr;
+	}
+
+	public void setGoodsAttr(GoodsAttr goodsAttr) {
+		this.goodsAttr = goodsAttr;
+	}
 }
