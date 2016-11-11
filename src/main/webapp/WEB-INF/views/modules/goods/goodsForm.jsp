@@ -1,6 +1,9 @@
-<%@ page contentType="text/html;charset=UTF-8" import="com.zjy.losonkei.modules.goods.entity.Goods" %>
+<%@ page contentType="text/html;charset=UTF-8"
+         import="com.zjy.losonkei.modules.goods.entity.Goods,com.zjy.losonkei.common.persistence.BaseEntity" %>
 <%@ include file="/WEB-INF/views/include/taglib.jsp" %>
 <c:set var="requiredYes" value="<%=Goods.REQUIRED_YES%>"></c:set>
+<c:set var="DEL_FLAG_NORMAL" value="<%=BaseEntity.DEL_FLAG_NORMAL%>"></c:set>
+<c:set var="DEL_FLAG_DELETE" value="<%=BaseEntity.DEL_FLAG_DELETE%>"></c:set>
 <html>
 <head>
     <title>商品管理</title>
@@ -13,17 +16,17 @@
     <script type="text/javascript">
         var tagIndex;
         $(document).ready(function () {
-           $.validator.prototype.elements = function() {
-                    return $(this.currentForm)
-                            .find("input, select, textarea")
-                            .not(":submit, :reset, :image, [disabled]")
-                            .not(this.settings.ignore);
+            $.validator.prototype.elements = function () {
+                return $(this.currentForm)
+                        .find("input, select, textarea")
+                        .not(":submit, :reset, :image, [disabled]")
+                        .not(this.settings.ignore);
             };
 
             $("#inputForm").validate({
                 submitHandler: function (form) {
                     loading('正在提交，请稍等...');
-                    console.log($("#inputForm").serialize());
+               //     console.log($("#inputForm").serialize());
 
                     form.submit();
                 },
@@ -38,17 +41,29 @@
                 }
             });
             tagIndex = $('tbody tr').length - 1;//有一个tr按钮
-            if(tagIndex == 0){
+            if (tagIndex == 0) {
                 addRow();
             }
         });
         function addRow() {
             var html = template('row-tmp', {index: tagIndex});
             $("#tr-btn").before(html);
-            tagIndex ++;
+            tagIndex++;
         }
         function delRow(id) {
             $(id).remove();
+        }
+        function goodsAllDisabled(id, bt) {
+            var val = $(id).val();
+            if (val == '${DEL_FLAG_NORMAL}') {
+                $(id).val('${DEL_FLAG_DELETE}');
+                $(bt).val('启用');
+                $(bt).removeClass("btn-info").addClass("btn-warning");
+            } else {
+                $(id).val('${DEL_FLAG_NORMAL}');
+                $(bt).val('禁用');
+                $(bt).removeClass("btn-warning").addClass("btn-info");
+            }
         }
     </script>
 </head>
@@ -59,7 +74,7 @@
             name="goods:goods:edit">${not empty goods.id?'修改':'添加'}</shiro:hasPermission><shiro:lacksPermission
             name="goods:goods:edit">查看</shiro:lacksPermission></a></li>
 </ul>
-<form:form id="inputForm" modelAttribute="goods" action="${ctx}/goods/goods/save1" method="post"
+<form:form id="inputForm" modelAttribute="goods" action="${ctx}/goods/goods/save" method="post"
            class="form-horizontal">
     <form:hidden path="id"/>
     <sys:message content="${message}"/>
@@ -67,10 +82,10 @@
         <label class="control-label">商品分类：</label>
 
         <div class="controls">
-            <sys:treeselect id="goodsCategory" name="goodsCategory.id" value="${goodsCategory.id}"
+            <sys:treeselect id="goodsCategory" name="goodsCategory.id" value="${goods.goodsCategory.id}"
                             labelName="goodsCategory.categoryName"
-                            labelValue="${goodsCategory.categoryName}"
-                            title="商品分类" url="/goods/goodsCategory/treeData" extId="${goodsCategory.id}" cssClass=""
+                            labelValue="${goods.goodsCategory.categoryName}"
+                            title="商品分类" url="/goods/goodsCategory/treeData"  notAllowSelectParent="true" cssClass=""
                             allowClear="true"/>
         </div>
     </div>
@@ -98,7 +113,7 @@
 
         <div class="controls">
             <form:select path="sex" class="input-medium ">
-                <form:option value="" label="不限"/>
+                <form:option value="2" label="不限"/>
                 <form:options items="${fns:getDictList('sex')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
             </form:select>
         </div>
@@ -130,7 +145,7 @@
                 <label class="control-label">${list.attrName}：</label>
 
                 <div class="controls">
-                    <input id="attr${status.index}" data-attrId="${list.id}" name="goodsAttrValues"
+                    <input id="attr${status.index}" data-attrId="${list.id}" name="goodsAttrValues${list.id}"
                            value="${list.goodsAttrValue.attrValue}" class="input-medium"/><span style="color: #9f9f9f;">（无此属性请留空）</span>
                 </div>
             </div>
@@ -150,16 +165,15 @@
         <label class="control-label">原价：</label>
 
         <div class="controls">
-            <form:input path="srcPrice" htmlEscape="false" class="input-small " readonly="true"/><span
-                style="color: #9f9f9f;margin-left: 10px;">自动生成，取决于下面第一个具体商品原价</span>
+            <form:input path="srcPrice" htmlEscape="false" class="number input-small "/><span
+                style="color: #9f9f9f;">（可不填）</span>
         </div>
     </div>
     <div class="control-group">
         <label class="control-label">现价：</label>
 
         <div class="controls">
-            <form:input path="price" htmlEscape="false" class="input-small " readonly="true"/><span
-                style="color: #9f9f9f;margin-left: 10px;">自动生成，取决于下面第一个具体商品现价</span>
+            <form:input path="price" htmlEscape="false" class="number input-small"/>
         </div>
     </div>
     <div class="control-group">
@@ -190,7 +204,7 @@
             <th>原价</th>
             <th>成本价</th>
             <th>库存</th>
-                <%--<th>备注</th>--%>
+            <th>排序</th>
             <shiro:hasPermission name="goods:goods:edit">
                 <th>操作</th>
             </shiro:hasPermission>
@@ -207,28 +221,33 @@
                                    value="<c:forEach items="${goodsAll.goodsSpecificationValues}" var="val"><c:if test="${val.goodsSpecification.id eq list.id}">${val.specificationValue}</c:if></c:forEach>">
                         </td>
                     </c:forEach>
-                    <td><input name="price" class="number l-width" <c:if test="${status.index == 0}">onchange="$('#price').val(this.value);"</c:if> >
+                    <td><input name="m-price" class="number l-width" value="${goodsAll.price}">
                     </td>
-                    <td><input name="srcPrice" class="number l-width" <c:if test="${status.index == 0}">onchange="$('#srcPrice').val(this.value);"</c:if> >
+                    <td><input name="m-srcPrice" class="number l-width" value="${goodsAll.srcPrice}">
                     </td>
-                    <td><input name="costPrice" class="number l-width">
+                    <td><input name="costPrice" class="number l-width" value="${goodsAll.costPrice}">
                     </td>
-                    <td><input name="stock" class="number l-width">
+                    <td><input name="stock" class="number l-width" value="${goodsAll.stock}">
                     </td>
-                        <%--<td><input name="" class="required" style="width: auto;">
-                    </td>--%>
+                    <td><input name="srcSpecificationGroup" type="hidden" value="${goodsAll.specificationGroup}">
+                        <input name="specificationGroup" class="number required l-width"
+                               value="${goodsAll.specificationGroup}" id="specificationGroup${status.index}"></td>
                     <td>
-                        <c:if test="${status.index != 0}">
-                            <a href="javascript:;" onclick="delRow('#no-tag-${status.index}')">删除</a>
+                        <input name="goodsAllId" value="${goodsAll.id}" type="hidden"/>
+                        <input name="delFlag" value="${goodsAll.delFlag}" type="hidden" id="delFlag${goodsAll.id}">
+                        <c:if test="${goodsAll.delFlag == DEL_FLAG_NORMAL}">
+                            <input type="button" class="btn btn-info" onclick="goodsAllDisabled('#delFlag${goodsAll.id}',this);" value="禁用">
                         </c:if>
-                        <input type="hidden" name="specificationGroup">
+                        <c:if test="${goodsAll.delFlag == DEL_FLAG_DELETE}">
+                            <input type="button" class="btn btn-warning" onclick="goodsAllDisabled('#delFlag${goodsAll.id}',this);" value="启用">
+                        </c:if>
                     </td>
                 </tr>
             </c:forEach>
         </c:if>
 
         <tr id="tr-btn">
-            <td colspan="9"><a href="javascript:"
+            <td colspan="${fn:length(goodsSpecificationList) + 6}"><a href="javascript:"
                                onclick="addRow();"
                                class="btn btn-primary">新增一行</a></td>
         </tr>
@@ -253,29 +272,23 @@
                 </c:if>
             </td>
         </c:forEach>
-        {{if index == 0 }}
-        <td><input name="price" class="number l-width" onchange="$('#price').val(this.value);">
+        <td><input name="m-srcPrice" class="number l-width">
         </td>
-        <td><input name="srcPrice" class="number l-width" onchange="$('#srcPrice').val(this.value);">
+        <td><input name="m-price" class="number l-width">
         </td>
-        {{/if}}
-        {{if index != 0 }}
-        <td><input name="srcPrice" class="number l-width">
-        </td>
-        <td><input name="price" class="number l-width">
-        </td>
-        {{/if}}
         <td><input name="costPrice" class="number l-width">
         </td>
         <td><input name="stock" class="number l-width">
         </td>
-        <%--<td><input name="" class="required" style="width: auto;">
-        </td>--%>
+        <td><input name="srcSpecificationGroup" type="hidden" value="">
+            <input name="specificationGroup" id="specificationGroup{{index}}"  class="number required l-width">
+        </td>
         <td>
+            <input name="goodsAllId" value="" type="hidden"/>
+            <input name="delFlag" value="${DEL_FLAG_NORMAL}" type="hidden"/>
             {{ if index != 0 }}
-            <a href="javascript:;" onclick="delRow('#no-tag-{{index}}')">删除</a>
+            <input type="button" class="btn btn-danger" onclick="delRow('#no-tag-{{index}}');" value="删除">
             {{ /if }}
-            <input type="hidden" name="specificationGroup">
         </td>
     </tr>
 </script>

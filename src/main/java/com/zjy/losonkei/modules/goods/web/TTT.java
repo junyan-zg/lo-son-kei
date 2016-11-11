@@ -14,6 +14,7 @@ import java.util.List;
 @Controller
 public class TTT {
 
+
     @RequestMapping("/t1")
     public void t1(ArrayList<String> aa){
         System.out.println(aa);

@@ -8,10 +8,7 @@ import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.goods.entity.*;
-import com.zjy.losonkei.modules.goods.service.GoodsAttrService;
-import com.zjy.losonkei.modules.goods.service.GoodsAttrValueService;
-import com.zjy.losonkei.modules.goods.service.GoodsService;
-import com.zjy.losonkei.modules.goods.service.GoodsSpecificationService;
+import com.zjy.losonkei.modules.goods.service.*;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +42,12 @@ public class GoodsController extends BaseController {
 	private GoodsAttrValueService goodsAttrValueService;
 	@Autowired
 	private GoodsSpecificationService goodsSpecificationService;
+	@Autowired
+	private GoodsSpecificationValueService goodsSpecificationValueService;
 
-	
+	@Autowired
+	private GoodsCoreService goodsCoreService;
+
 	@ModelAttribute
 	public Goods get(@RequestParam(required=false) String id) {
 		Goods entity = null;
@@ -95,11 +96,11 @@ public class GoodsController extends BaseController {
 
 	@RequiresPermissions("goods:goods:edit")
 	@RequestMapping(value = "save")
-	public String save(Goods goods, Model model, RedirectAttributes redirectAttributes) {
-		if (!beanValidator(model, goods)){
+	public String save(Goods goods,RedirectAttributes redirectAttributes,HttpServletRequest request) {
+		/*if (!beanValidator(model, goods)){
 			return form(goods, model);
-		}
-		goodsService.save(goods);
+		}*/
+		goodsCoreService.save(goods,request);
 		addMessage(redirectAttributes, "保存商品成功");
 		return "redirect:"+Global.getAdminPath()+"/goods/goods/?repage";
 	}

@@ -12,6 +12,7 @@ import com.zjy.losonkei.modules.act.dao.ActDao;
 import com.zjy.losonkei.modules.act.entity.Act;
 import com.zjy.losonkei.modules.act.utils.ActUtils;
 import com.zjy.losonkei.modules.act.utils.ProcessDefCache;
+import com.zjy.losonkei.modules.product.utils.ActivitiUtils;
 import com.zjy.losonkei.modules.sys.entity.User;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.activiti.bpmn.model.BpmnModel;
@@ -63,7 +64,26 @@ public class ActivitiTaskService extends BaseService {
 	private HistoryService historyService;
 	@Autowired
 	private RepositoryService repositoryService;
-	
+
+
+	/**
+	 * 开始研发新产品流程
+	 * todo 1.保存商品细节 2.开启流程
+	 * @param managerId 通常为公司经理id
+	 * @param orderId   该为生产订单id
+	 * @param producters 生产者
+	 * @param auditors	  审核者
+     */
+	@Transactional(readOnly = false)
+	public void startInventProcess(String managerId,String orderId,List<String> producters,List<String> auditors){
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put(ActivitiUtils.VAR_MANAGER,managerId);
+		variables.put(ActivitiUtils.VAR_PRODUCTERS,producters);
+		variables.put(ActivitiUtils.VAR_AUDITORS,auditors);
+		runtimeService.startProcessInstanceByKey(ActivitiUtils.PROCESS_KEY_INVENT,orderId,variables);
+	}
+
+
 	/**
 	 * 获取待办列表
 	 * @param procDefKey 流程定义标识

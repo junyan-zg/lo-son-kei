@@ -35,7 +35,10 @@
 		FROM goods_all a
 		<include refid="goodsAllJoins"/>
 		<where>
-			a.del_flag = #{DEL_FLAG_NORMAL}
+			1 = 1
+			<if test="delFlag != null and delFlag != ''">
+				AND a.del_flag = #{delFlag}
+			</if>
 			<if test="stock != null and stock != ''">
 				AND a.stock = #{stock}
 			</if>
@@ -116,7 +119,8 @@
 			specification_group = #{specificationGroup},
 			remarks = #{remarks},
 			update_by = #{updateBy.id},
-			update_date = #{updateDate}
+			update_date = #{updateDate},
+			del_flag = #{delFlag}
 		WHERE id = #{id}
 	</update>
 	

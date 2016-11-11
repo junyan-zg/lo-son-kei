@@ -18,9 +18,9 @@ import java.util.List;
 public class GoodsAll extends DataEntity<GoodsAll> {
 	
 	private static final long serialVersionUID = 1L;
-	private BigDecimal price = new BigDecimal(0);		// 当前价格
-	private BigDecimal costPrice = new BigDecimal(0);		// 成本价
-	private BigDecimal srcPrice = new BigDecimal(0);		// 原价
+	private BigDecimal price;		// 当前价格
+	private BigDecimal costPrice;		// 成本价
+	private BigDecimal srcPrice;		// 原价
 	private Integer stock;		// 库存
 	private String goodsId;		// 商品id
 	private Integer specificationGroup;		// 规格值分组，该值可以与goods_id唯一确定几个规格

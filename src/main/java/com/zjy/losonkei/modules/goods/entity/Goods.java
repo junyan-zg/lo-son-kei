@@ -29,8 +29,8 @@ public class Goods extends DataEntity<Goods> {
 	private String keywords;		// 关键词
 	private GoodsCategory goodsCategory;		// 商品分类 父类
 	private Goods parent;		// 父商品id,字段不为空时该商品作为配件
-	private BigDecimal price = new BigDecimal(0);		// 现价
-	private BigDecimal srcPrice = new BigDecimal(0);		// 原价
+	private BigDecimal price;		// 现价
+	private BigDecimal srcPrice;		// 原价
 	private String state;		// 状态
 	private String thumbImgUrl;		// 缩略图url
 

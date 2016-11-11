@@ -41,6 +41,7 @@ public class GoodsAllUtils {
     public static List<GoodsAll> getGoodsAllByGoodsId(String goodsId){
         GoodsAll goodsAll = new GoodsAll();
         goodsAll.setGoodsId(goodsId);
+        goodsAll.setDelFlag(null);
         return goodsAllService.findList(goodsAll);
     }
 }

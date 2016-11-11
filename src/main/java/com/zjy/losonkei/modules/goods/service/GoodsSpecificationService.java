@@ -43,7 +43,7 @@ public class GoodsSpecificationService extends CrudService<GoodsSpecificationDao
 	public void save(GoodsSpecification goodsSpecification) {
 		super.save(goodsSpecification);
 	}
-	
+
 	@Transactional(readOnly = false)
 	public void delete(GoodsSpecification goodsSpecification) {
 		super.delete(goodsSpecification);

@@ -6,6 +6,8 @@ package com.zjy.losonkei.modules.goods.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zjy.losonkei.modules.goods.entity.GoodsSpecificationValue;
+import com.zjy.losonkei.modules.goods.service.GoodsSpecificationValueService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +24,8 @@ import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.modules.goods.entity.GoodsSpecification;
 import com.zjy.losonkei.modules.goods.service.GoodsSpecificationService;
 
+import java.util.List;
+
 /**
  * 商品规格值表(参与购买)Controller
  * @author zjy
@@ -33,7 +37,10 @@ public class GoodsSpecificationController extends BaseController {
 
 	@Autowired
 	private GoodsSpecificationService goodsSpecificationService;
-	
+
+	@Autowired
+	private GoodsSpecificationValueService goodsSpecificationValueService;
+
 	@ModelAttribute
 	public GoodsSpecification get(@RequestParam(required=false) String id) {
 		GoodsSpecification entity = null;
@@ -49,7 +56,7 @@ public class GoodsSpecificationController extends BaseController {
 	@RequiresPermissions("goods:goodsSpecification:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(GoodsSpecification goodsSpecification, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<GoodsSpecification> page = goodsSpecificationService.findPage(new Page<GoodsSpecification>(request, response), goodsSpecification); 
+		Page<GoodsSpecification> page = goodsSpecificationService.findPage(new Page<GoodsSpecification>(request, response), goodsSpecification);
 		model.addAttribute("page", page);
 		return "modules/goods/goodsSpecificationList";
 	}
@@ -75,6 +82,10 @@ public class GoodsSpecificationController extends BaseController {
 	@RequiresPermissions("goods:goodsSpecification:edit")
 	@RequestMapping(value = "delete")
 	public String delete(GoodsSpecification goodsSpecification, RedirectAttributes redirectAttributes) {
+		GoodsSpecificationValue goodsSpecificationValue = new GoodsSpecificationValue();
+		goodsSpecificationValue.setGoodsSpecification(goodsSpecification);
+		goodsSpecificationValueService.delete(goodsSpecificationValue);
+
 		goodsSpecificationService.delete(goodsSpecification);
 		addMessage(redirectAttributes, "删除商品规格值成功");
 		return "redirect:"+Global.getAdminPath()+"/goods/goodsSpecification/?repage";
