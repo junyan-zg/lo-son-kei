@@ -4,6 +4,7 @@
 package com.zjy.losonkei.common.web;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,16 +41,21 @@ public class CKFinderConnectorServlet extends ConnectorServlet {
 	}
 	
 	private void prepareGetResponse(final HttpServletRequest request,
-			final HttpServletResponse response, final boolean post) throws ServletException {
+			final HttpServletResponse response, final boolean post) throws ServletException, UnsupportedEncodingException {
 		Principal principal = (Principal) UserUtils.getPrincipal();
 		if (principal == null){
 			return;
 		}
 		String command = request.getParameter("command");
+		command = new String(command.getBytes("ISO-8859-1"), "utf-8");
 		String type = request.getParameter("type");
+		if(type != null) {
+			type = new String(type.getBytes("ISO-8859-1"), "utf-8");
+		}
 		// 初始化时，如果startupPath文件夹不存在，则自动创建startupPath文件夹
 		if ("Init".equals(command)){
 			String startupPath = request.getParameter("startupPath");// 当前文件夹可指定为模块名
+			startupPath = new String(startupPath.getBytes("ISO-8859-1"), "utf-8");
 			if (startupPath!=null){
 				String[] ss = startupPath.split(":");
 				if (ss.length==2){
@@ -62,14 +68,16 @@ public class CKFinderConnectorServlet extends ConnectorServlet {
 		// 快捷上传，自动创建当前文件夹，并上传到该路径
 		else if ("QuickUpload".equals(command) && type!=null){
 			String currentFolder = request.getParameter("currentFolder");// 当前文件夹可指定为模块名
+			currentFolder = new String(currentFolder.getBytes("ISO-8859-1"), "utf-8");
 			String realPath = Global.getUserfilesBaseDir() + Global.USERFILES_BASE_URL
 					+ principal + "/" + type + (currentFolder != null ? currentFolder : "");
 			FileUtils.createDirectory(FileUtils.path(realPath));
 		}
 //		System.out.println("------------------------");
 //		for (Object key : request.getParameterMap().keySet()){
-//			System.out.println(key + ": " + request.getParameter(key.toString()));
+//			System.out.println(key + ": " + new String(request.getParameter(key.toString()).getBytes("ISO-8859-1"),"utf-8"));
 //		}
+
 	}
 	
 }

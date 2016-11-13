@@ -13,15 +13,16 @@ import java.util.List;
  */
 @Controller
 public class TTT {
-
+    public final static String AA = "";
 
     @RequestMapping("/t1")
-    public void t1(ArrayList<String> aa){
+    public void t1(ArrayList<String> aa, HttpServletRequest request){
+        System.out.println(request.getQueryString());
         System.out.println(aa);
     }
 
     @RequestMapping("/t2")
-    public void t2(ArrayList<B> c){
+    public void t2(B c){
         System.out.println(c);
     }
     @RequestMapping("/t3")
@@ -57,10 +58,11 @@ public class TTT {
 class B{
     private String aa;
     private String bb;
+    private List<String> dd;
 
     @Override
     public String toString() {
-        return "aa:"+aa+"--bb:"+bb;
+        return "aa:"+aa+"--bb:"+bb + "--dd" + dd;
     }
 
     public void setAa(String aa) {
@@ -69,5 +71,9 @@ class B{
 
     public void setBb(String bb) {
         this.bb = bb;
+    }
+
+    public void setDd(List<String> dd) {
+        this.dd = dd;
     }
 }

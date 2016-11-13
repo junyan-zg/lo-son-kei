@@ -7,9 +7,9 @@
 	<imgWidth>1024</imgWidth>
 	<imgHeight>768</imgHeight>
 	<imgQuality>80</imgQuality>
-	<uriEncoding>UTF-8</uriEncoding>
+	<uriEncoding>ISO-8859-1</uriEncoding>
 	<forceASCII>false</forceASCII>
-    <disallowUnsafeCharacters>false</disallowUnsafeCharacters>
+    <disallowUnsafeCharacters>true</disallowUnsafeCharacters>
 	<userRoleSessionVar>CKFinder_UserRole</userRoleSessionVar>
 	<checkDoubleExtension>true</checkDoubleExtension>
 	<checkSizeAfterScaling>true</checkSizeAfterScaling>

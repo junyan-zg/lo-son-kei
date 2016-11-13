@@ -36,6 +36,11 @@
 		<div class="control-group">
 			<label class="control-label">头像:</label>
 			<div class="controls">
+				<style>
+					ol{
+						list-style-type:none;
+					}
+				</style>
 				<form:hidden id="nameImage" path="photo" htmlEscape="false" maxlength="255" class="input-xlarge"/>
 				<sys:ckfinder input="nameImage" type="images" uploadPath="/photo" selectMultiple="false" maxWidth="100" maxHeight="100"/>
 			</div>

@@ -176,13 +176,38 @@
             <form:input path="price" htmlEscape="false" class="number input-small"/>
         </div>
     </div>
-    <div class="control-group">
+    <c:if test="${not empty goods.id}">
+    <div class="control-group" id="ol-thumb-img">
         <label class="control-label">缩略图：</label>
 
         <div class="controls">
-            <form:input path="thumbImgUrl" htmlEscape="false" maxlength="512" class="input-xlarge "/>
+            <form:hidden path="thumbImgUrl" htmlEscape="false" maxlength="255" class="input-xlarge"/>
+            <sys:ckfinder input="thumbImgUrl" type="images" uploadPath="/goods/${goods.id}" selectMultiple="false" maxWidth="100" maxHeight="100"/>
         </div>
+        <style>
+            #ol-thumb-img li{
+                list-style: none;
+            }
+        </style>
     </div>
+    <div class="control-group" id="ol-img">
+        <label class="control-label">画廊图：</label>
+
+        <div class="controls">
+            <form:hidden path="imgUrl" htmlEscape="false" maxlength="255" class="input-xlarge"/>
+            <sys:ckfinder input="imgUrl" type="images" uploadPath="/goods/${goods.id}" selectMultiple="true" maxWidth="100" maxHeight="100"/>
+        </div>
+        <style>
+            #ol-img li{
+                list-style: none;
+                float: left;
+            }
+            #ol-img ol:after{
+                display: table; content: ""; width: 0; clear: both;
+            }
+        </style>
+    </div>
+    </c:if>
     <div class="control-group">
         <label class="control-label">备注：</label>
 

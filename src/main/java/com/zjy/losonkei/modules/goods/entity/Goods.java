@@ -3,6 +3,11 @@
  */
 package com.zjy.losonkei.modules.goods.entity;
 
+import com.zjy.losonkei.common.utils.IdGen;
+import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
+import com.zjy.losonkei.modules.sys.entity.User;
+import com.zjy.losonkei.modules.sys.utils.UserUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
@@ -33,6 +38,7 @@ public class Goods extends DataEntity<Goods> {
 	private BigDecimal srcPrice;		// 原价
 	private String state;		// 状态
 	private String thumbImgUrl;		// 缩略图url
+	private String imgUrl;		// 图片展示url
 
 	private List<GoodsAll> goodsAlls;
 
@@ -44,9 +50,11 @@ public class Goods extends DataEntity<Goods> {
 	private BigDecimal beginSrcPrice;		// 开始 原价
 	private BigDecimal endSrcPrice;		// 结束 原价
 
-	public static final String STATE_ONSALE = "0";	//在售
-	public static final String STATE_OFFSALE = "1";	//下架
-	public static final String STATE_NOPUSH = "2";	//未上市
+	public static final String STATE_ON_SALE = "0";	//在售
+	public static final String STATE_OFF_SALE = "1";	//下架
+	public static final String STATE_NO_PUSH = "2";	//未上市
+	public static final String STATE_OUT_OF_STOCK = "3";	//暂不供货
+	public static final String STATE_INVENTING = "4";	//待研发
 
 	public static final String SEASON_SPRING = "0";
 	public static final String STATE_SUMMER = "1";
@@ -222,5 +230,27 @@ public class Goods extends DataEntity<Goods> {
 
 	public void setGoodsAlls(List<GoodsAll> goodsAlls) {
 		this.goodsAlls = goodsAlls;
+	}
+
+	public String getImgUrl() {
+		return imgUrl;
+	}
+
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
+
+	@Override
+	public void preInsert() {
+		if (!this.isNewRecord){
+			setId(GoodsAllUtils.createId("GD"));
+		}
+		User user = UserUtils.getUser();
+		if (StringUtils.isNotBlank(user.getId())){
+			this.updateBy = user;
+			this.createBy = user;
+		}
+		this.updateDate = new Date();
+		this.createDate = this.updateDate;
 	}
 }

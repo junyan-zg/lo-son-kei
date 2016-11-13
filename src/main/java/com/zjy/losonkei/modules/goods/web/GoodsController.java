@@ -94,6 +94,32 @@ public class GoodsController extends BaseController {
 		return "modules/goods/goodsForm";
 	}
 
+	@RequiresPermissions("goods:goods:view")
+	@RequestMapping(value = "view")
+	public String view(Goods goods, Model model) {
+		List<GoodsAttr> goodsAttrs = goodsAttrService.findList(new GoodsAttr());
+		Map<String,GoodsAttrValue> goodsAttrValuesMap = goodsAttrValueService.findMapByGoodId(goods.getId());
+		if (!Objects.equals(goodsAttrs,null)){
+			for (GoodsAttr goodsAttr:goodsAttrs){
+				goodsAttr.setGoodsAttrValue(goodsAttrValuesMap.get(goodsAttr.getId()));
+			}
+		}
+		model.addAttribute("goodsAttrList",goodsAttrs);
+		model.addAttribute("goodsSpecificationList",goodsSpecificationService.findList(new GoodsSpecification()));
+
+		if (StringUtils.isNotBlank(goods.getId())){
+			goods = goodsService.get(goods.getId());
+			List<GoodsAll> goodsAlls = GoodsAllUtils.getGoodsAllByGoodsId(goods.getId());
+			for(GoodsAll goodsAll:goodsAlls){
+				GoodsAllUtils.fillProperty(goodsAll,false);
+			}
+			goods.setGoodsAlls(goodsAlls);
+		}
+
+		model.addAttribute("goods", goods);
+		return "modules/goods/goodsView";
+	}
+
 	@RequiresPermissions("goods:goods:edit")
 	@RequestMapping(value = "save")
 	public String save(Goods goods,RedirectAttributes redirectAttributes,HttpServletRequest request) {

@@ -3,11 +3,16 @@
  */
 package com.zjy.losonkei.modules.goods.entity;
 
+import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
+import com.zjy.losonkei.modules.sys.entity.User;
+import com.zjy.losonkei.modules.sys.utils.UserUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
 import com.zjy.losonkei.common.persistence.DataEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -100,5 +105,19 @@ public class GoodsAll extends DataEntity<GoodsAll> {
 
 	public void setGoods(Goods goods) {
 		this.goods = goods;
+	}
+
+	@Override
+	public void preInsert() {
+		if (!this.isNewRecord){
+			setId(GoodsAllUtils.createId("GA"));
+		}
+		User user = UserUtils.getUser();
+		if (StringUtils.isNotBlank(user.getId())){
+			this.updateBy = user;
+			this.createBy = user;
+		}
+		this.updateDate = new Date();
+		this.createDate = this.updateDate;
 	}
 }
