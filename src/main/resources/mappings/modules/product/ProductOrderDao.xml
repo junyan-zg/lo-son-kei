@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjy.losonkei.modules.product.dao.ProductOrderDao">
+    
+	<sql id="productOrderColumns">
+		a.id AS "id",
+		a.order_name AS "orderName",
+		a.goods_name AS "goodsName",
+		a.goods_id AS "goodsId",
+		a.process_instance_id AS "processInstanceId",
+		a.process_state AS "processState",
+		a.budget AS "budget",
+		a.cost_all AS "costAll",
+		a.state AS "state",
+		a.product_type AS "productType",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="productOrderJoins">
+	</sql>
+    
+	<select id="get" resultType="ProductOrder">
+		SELECT 
+			<include refid="productOrderColumns"/>
+		FROM product_order a
+		<include refid="productOrderJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ProductOrder">
+		SELECT 
+			<include refid="productOrderColumns"/>
+		FROM product_order a
+		<include refid="productOrderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="orderName != null and orderName != ''">
+				AND a.order_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{orderName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{orderName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{orderName},'%')</if>
+			</if>
+			<if test="goodsName != null and goodsName != ''">
+				AND a.goods_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{goodsName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goodsName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goodsName},'%')</if>
+			</if>
+			<if test="goodsId != null and goodsId != ''">
+				AND a.goods_id = #{goodsId}
+			</if>
+			<if test="processInstanceId != null and processInstanceId != ''">
+				AND a.process_instance_id = #{processInstanceId}
+			</if>
+			<if test="state != null and state != ''">
+				AND a.state = #{state}
+			</if>
+			<if test="productType != null and productType != ''">
+				AND a.product_type = #{productType}
+			</if>
+			<if test="createBy != null and createBy.id != null and createBy.id != ''">
+				AND a.create_by = #{createBy.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ProductOrder">
+		SELECT 
+			<include refid="productOrderColumns"/>
+		FROM product_order a
+		<include refid="productOrderJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO product_order(
+			id,
+			order_name,
+			goods_name,
+			goods_id,
+			process_instance_id,
+			process_state,
+			budget,
+			cost_all,
+			state,
+			product_type,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{orderName},
+			#{goodsName},
+			#{goodsId},
+			#{processInstanceId},
+			#{processState},
+			#{budget},
+			#{costAll},
+			#{state},
+			#{productType},
+			#{remarks},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE product_order SET 	
+			order_name = #{orderName},
+			goods_name = #{goodsName},
+			goods_id = #{goodsId},
+			process_instance_id = #{processInstanceId},
+			process_state = #{processState},
+			budget = #{budget},
+			cost_all = #{costAll},
+			state = #{state},
+			product_type = #{productType},
+			remarks = #{remarks},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE product_order SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

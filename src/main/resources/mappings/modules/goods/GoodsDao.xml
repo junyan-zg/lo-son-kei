@@ -45,6 +45,12 @@
 		<include refid="goodsJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id LIKE
+				<if test="dbName == 'oracle'">'%'||#{id}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{id}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{id},'%')</if>
+			</if>
 			<if test="goodsName != null and goodsName != ''">
 				AND a.goods_name LIKE 
 					<if test="dbName == 'oracle'">'%'||#{goodsName}||'%'</if>
@@ -78,9 +84,14 @@
 			<if test="beginSrcPrice != null and endSrcPrice != null and beginSrcPrice != '' and endSrcPrice != ''">
 				AND a.src_price BETWEEN #{beginSrcPrice} AND #{endSrcPrice}
 			</if>
-			<if test="state != null and state != ''">
-				AND a.state = #{state}
-			</if>
+			<choose>
+				<when test="state != null and state != ''">
+					AND a.state = #{state}
+				</when>
+				<otherwise>
+					AND a.state != #{STATE_INVENTING}
+				</otherwise>
+			</choose>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">

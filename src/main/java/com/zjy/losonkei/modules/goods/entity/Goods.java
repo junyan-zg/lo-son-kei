@@ -57,9 +57,9 @@ public class Goods extends DataEntity<Goods> {
 	public static final String STATE_INVENTING = "4";	//待研发
 
 	public static final String SEASON_SPRING = "0";
-	public static final String STATE_SUMMER = "1";
-	public static final String STATE_AUTUMN = "2";
-	public static final String STATE_WINTER = "3";
+	public static final String SEASON_SUMMER = "1";
+	public static final String SEASON_AUTUMN = "2";
+	public static final String SEASON_WINTER = "3";
 
 	public static final String SEX_WOMAN = "0";
 	public static final String SEX_MAN = "1";

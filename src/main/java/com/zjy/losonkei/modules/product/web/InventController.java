@@ -17,7 +17,7 @@ public class InventController {
 
     @RequestMapping("/act/current/invent/list")
     public String currentInventList(Act act){
-        
+
         return "modules/product/invent/actCurrentInventList";
     }
 }
