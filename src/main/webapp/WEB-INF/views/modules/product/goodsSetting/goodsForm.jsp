@@ -4,6 +4,7 @@
 <c:set var="requiredYes" value="<%=Goods.REQUIRED_YES%>"></c:set>
 <c:set var="DEL_FLAG_NORMAL" value="<%=BaseEntity.DEL_FLAG_NORMAL%>"></c:set>
 <c:set var="DEL_FLAG_DELETE" value="<%=BaseEntity.DEL_FLAG_DELETE%>"></c:set>
+<c:set var="DEL_FLAG_TURE_DELETE" value="<%=Goods.DEL_FLAG_TURE_DELETE%>"></c:set>
 <html>
 <head>
     <title>商品管理</title>
@@ -53,17 +54,8 @@
         function delRow(id) {
             $(id).remove();
         }
-        function goodsAllDisabled(id, bt) {
-            var val = $(id).val();
-            if (val == '${DEL_FLAG_NORMAL}') {
-                $(id).val('${DEL_FLAG_DELETE}');
-                $(bt).val('启用');
-                $(bt).removeClass("btn-info").addClass("btn-warning");
-            } else {
-                $(id).val('${DEL_FLAG_NORMAL}');
-                $(bt).val('禁用');
-                $(bt).removeClass("btn-warning").addClass("btn-info");
-            }
+        function goodsAllDisabled(id) {
+            $(id).val('${DEL_FLAG_TURE_DELETE}');
         }
     </script>
 </head>
@@ -209,7 +201,7 @@
             <th>原价</th>
             <th>成本价</th>
             <th>库存</th>
-            <th>排序</th>
+            <th>排序<span class="help-inline"><font color="red">*</font></span></th>
             <shiro:hasPermission name="product:newGoodsSetting:edit">
                 <th>操作</th>
             </shiro:hasPermission>
@@ -218,7 +210,7 @@
         <tbody>
         <c:if test="${not empty goods.goodsAlls}">
             <c:forEach varStatus="status" var="goodsAll" items="${goods.goodsAlls}">
-                <tr id="no-tag-${status.index}"<c:if test="${goodsAll.delFlag == DEL_FLAG_DELETE}">style="display:none;"</c:if>>
+                <tr id="no-tag-${status.index}">
                     <c:forEach var="list" items="${goodsSpecificationList}">
                         <td>
                             <input id="${list.id}${status.index}" name="goodsSpecification${list.id}"
@@ -240,9 +232,7 @@
                     <td>
                         <input name="goodsAllId" value="${goodsAll.id}" type="hidden"/>
                         <input name="delFlag" value="${goodsAll.delFlag}" type="hidden" id="delFlag${goodsAll.id}">
-                        <c:if test="${goodsAll.delFlag == DEL_FLAG_NORMAL}">
-                            <input type="button" class="btn btn-danger" onclick="goodsAllDisabled('#delFlag${goodsAll.id}',this);$('#no-tag-${status.index}').hide();" value="删除">
-                        </c:if>
+                        <input type="button" class="btn btn-danger" onclick="goodsAllDisabled('#delFlag${goodsAll.id}');$('#no-tag-${status.index}').hide();" value="删除">
                     </td>
                 </tr>
             </c:forEach>

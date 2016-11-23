@@ -35,6 +35,7 @@ public class GoodsCoreService{
     public void save(Goods goods, HttpServletRequest request){
 
         //保存goods
+        goods.setDelFlag(Goods.DEL_FLAG_NORMAL);
         goodsService.save(goods);
 
         Map<String, String[]> parameterMap = request.getParameterMap();
@@ -70,7 +71,11 @@ public class GoodsCoreService{
             //是否新纪录
             boolean isNewRecord = StringUtils.isBlank(goodsAll.getId());
 
-            goodsAllService.save(goodsAll);
+            if (Goods.DEL_FLAG_TURE_DELETE.equals(goodsAll.getDelFlag())){
+                goodsAllService.trueDelete(goodsAll.getId());
+            }else{
+                goodsAllService.save(goodsAll);
+            }
 
             for (int j = 0 ;j < goodsSpecificationList.size();j++){
                 String value = goodsSpecificationValuesStringArray[j][i];
@@ -87,7 +92,11 @@ public class GoodsCoreService{
                 }
                 goodsSpecificationValue.setSpecificationGroup(Integer.valueOf(specificationGroups[i]));
                 goodsSpecificationValue.setSpecificationValue(value);
-                goodsSpecificationValueService.save(goodsSpecificationValue);
+                if (Goods.DEL_FLAG_TURE_DELETE.equals(goodsAll.getDelFlag())){
+                    goodsSpecificationValueService.trueDelete(goodsSpecificationValue.getId());
+                }else{
+                    goodsSpecificationValueService.save(goodsSpecificationValue);
+                }
             }
         }
         //属性值

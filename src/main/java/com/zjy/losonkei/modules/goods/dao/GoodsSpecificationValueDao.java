@@ -14,5 +14,5 @@ import com.zjy.losonkei.modules.goods.entity.GoodsSpecificationValue;
  */
 @MyBatisDao
 public interface GoodsSpecificationValueDao extends CrudDao<GoodsSpecificationValue> {
-	
+    public void trueDelete(String id);
 }

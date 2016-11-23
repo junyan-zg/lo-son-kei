@@ -67,6 +67,8 @@ public class Goods extends DataEntity<Goods> {
 	public static final String REQUIRED_NO = "0";
 	public static final String REQUIRED_YES = "1";
 
+	public static final String DEL_FLAG_TURE_DELETE = "3";
+
 	public Goods() {
 		super();
 	}

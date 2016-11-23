@@ -165,7 +165,7 @@
             <th>原价</th>
             <th>成本价</th>
             <th>库存</th>
-            <th>排序</th>
+            <th>排序<span class="help-inline"><font color="red">*</font></span></th>
             <th>状态</th>
         </tr>
         </thead>

@@ -2,8 +2,6 @@
          import="com.zjy.losonkei.modules.goods.entity.Goods,com.zjy.losonkei.common.persistence.BaseEntity" %>
 <%@ include file="/WEB-INF/views/include/taglib.jsp" %>
 <c:set var="requiredYes" value="<%=Goods.REQUIRED_YES%>"></c:set>
-<c:set var="DEL_FLAG_NORMAL" value="<%=BaseEntity.DEL_FLAG_NORMAL%>"></c:set>
-<c:set var="DEL_FLAG_DELETE" value="<%=BaseEntity.DEL_FLAG_DELETE%>"></c:set>
 <html>
 <head>
     <title>商品管理</title>
@@ -155,13 +153,12 @@
             <th>原价</th>
             <th>成本价</th>
             <th>库存</th>
-            <th>排序</th>
+            <th>排序<span class="help-inline"><font color="red">*</font></span></th>
         </tr>
         </thead>
         <tbody>
         <c:if test="${not empty goods.goodsAlls}">
             <c:forEach varStatus="status" var="goodsAll" items="${goods.goodsAlls}">
-                <c:if test="${goodsAll.delFlag == DEL_FLAG_NORMAL}">
                 <tr>
                     <c:forEach var="list" items="${goodsSpecificationList}">
                         <td>
@@ -178,7 +175,6 @@
                     </td>
                     <td>${goodsAll.specificationGroup}</td>
                 </tr>
-                </c:if>
             </c:forEach>
         </c:if>
         </tbody>

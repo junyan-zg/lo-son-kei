@@ -129,5 +129,9 @@
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
-	
+
+	<delete id="trueDelete">
+		DELETE FROM goods_all
+		 WHERE id = #{id}
+	</delete>
 </mapper>

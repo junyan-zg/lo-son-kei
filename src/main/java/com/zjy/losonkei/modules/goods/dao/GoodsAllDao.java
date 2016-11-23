@@ -14,5 +14,5 @@ import com.zjy.losonkei.modules.goods.entity.GoodsAll;
  */
 @MyBatisDao
 public interface GoodsAllDao extends CrudDao<GoodsAll> {
-	
+	public void trueDelete(String id);
 }

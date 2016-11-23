@@ -43,5 +43,9 @@ public class GoodsSpecificationValueService extends CrudService<GoodsSpecificati
 	public void delete(GoodsSpecificationValue goodsSpecificationValue) {
 		super.delete(goodsSpecificationValue);
 	}
-	
+
+	@Transactional(readOnly = false)
+	public void trueDelete(String id){
+		dao.trueDelete(id);
+	}
 }
