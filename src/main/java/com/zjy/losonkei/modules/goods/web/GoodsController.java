@@ -10,11 +10,13 @@ import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.goods.entity.*;
 import com.zjy.losonkei.modules.goods.service.*;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
+import com.zjy.losonkei.modules.product.entity.ProductOrder;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -118,6 +120,17 @@ public class GoodsController extends BaseController {
 		goodsService.delete(goods);
 		addMessage(redirectAttributes, "删除商品成功");
 		return "redirect:"+Global.getAdminPath()+"/goods/goods/?repage";
+	}
+
+
+	@RequiresPermissions("goods:goods:view")
+	@RequestMapping("iframe/list/{type}")
+	public String iframeList(@PathVariable("type") String type, Goods goods, HttpServletRequest request, HttpServletResponse response, Model model) {
+		if(ProductOrder.PRODUCT_TYPE_NEW.equals(type)){
+			goods.setState(Goods.STATE_INVENTING);
+		}
+		list(goods,request,response,model);
+		return "modules/product/goodsSetting/goodsIframeList";
 	}
 
 }

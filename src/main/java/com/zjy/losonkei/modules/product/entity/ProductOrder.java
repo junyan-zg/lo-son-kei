@@ -26,7 +26,16 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 	private BigDecimal costAll;		// 实际花费：根据product_log更新
 	private String state;		// 状态0进行中1成功2失败
 	private String productType;		// 0已有产品生产，1新产品生产
-	
+
+	public final static String PRODUCT_TYPE_OLD = "0";
+	public final static String PRODUCT_TYPE_NEW = "1";
+
+	public final static String PRODUCT_STATE_ING = "0";
+	public final static String PRODUCT_STATE_SUCCESS = "1";
+	public final static String PRODUCT_STATE_FAILED = "2";
+
+	public final static String FLAG_NEW_INVENT = "flagNewInvent";
+
 	public ProductOrder() {
 		super();
 	}

@@ -18,10 +18,10 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/product/productOrder/">生产订单列表</a></li>
-		<shiro:hasPermission name="product:productOrder:edit"><li><a href="${ctx}/product/productOrder/form">生产订单添加</a></li></shiro:hasPermission>
+		<li class="active"><a href="${ctx}/product/productOrder/list<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>">生产订单列表</a></li>
+		<shiro:hasPermission name="product:productOrder:edit"><li><a href="${ctx}/product/productOrder/form<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>">生产订单添加</a></li></shiro:hasPermission>
 	</ul>
-	<form:form id="searchForm" modelAttribute="productOrder" action="${ctx}/product/productOrder/" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="productOrder" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
