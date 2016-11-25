@@ -8,10 +8,14 @@
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			//$("#name").focus();
 			$("#inputForm").validate({
 				submitHandler: function(form){
 					if($("#inputForm").attr("action") == "${ctx}/product/productOrder/save"){
+						preSubmit();
+						if($("#goodsAllIds").val()==""){
+							alertx("至少选择一件商品！")
+							return;
+						}
 						loading('正在提交，请稍等...');
 					}
 					form.submit();
@@ -49,6 +53,9 @@
 						$(".number").each(function () {
 							$(this).removeClass("number");
 						});
+						$(".digits").each(function () {
+							$(this).removeClass("digits");
+						});
 						$('#inputForm').attr('action','${ctx}/product/productOrder/form<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>').submit();
 					}
 				},loaded:function(h){
@@ -85,53 +92,87 @@
 		</div>
 		<c:if test="${not empty productOrder.goodsId}">
 		<div class="control-group">
-			<table id="contentTable" class="table table-striped table-bordered table-condensed">
-				<thead>
-				<tr>
-					<c:forEach var="list" items="${goodsSpecificationList}">
-						<th>
-							${list.specificationName}
-						</th>
-					</c:forEach>
-					<th>现价</th>
-					<th>原价</th>
-					<th>成本价</th>
-					<th>库存</th>
-					<th>排序</th>
-					<th>状态</th>
-				</tr>
-				</thead>
-				<tbody>
-				<c:if test="${not empty goodsAlls}">
-					<c:forEach varStatus="status" var="i" items="${goodsAlls}">
-						<tr>
-							<c:forEach var="list" items="${goodsSpecificationList}">
-								<td>
-									<c:forEach items="${i.goodsSpecificationValues}" var="val"><c:if test="${val.goodsSpecification.id eq list.id}">${val.specificationValue}</c:if></c:forEach>
-								</td>
-							</c:forEach>
-							<td>${i.price}
-							</td>
-							<td>${i.srcPrice}
-							</td>
-							<td>${i.costPrice}
-							</td>
-							<td>${i.stock}
-							</td>
-							<td>${i.specificationGroup}</td>
-							<td>
-								<c:if test="${i.delFlag == DEL_FLAG_NORMAL}">
-									<input type="button" class="btn btn-info" value="禁用">
-								</c:if>
-								<c:if test="${i.delFlag == DEL_FLAG_DELETE}">
-									<input type="button" class="btn btn-warning" value="启用">
-								</c:if>
-							</td>
-						</tr>
-					</c:forEach>
-				</c:if>
-				</tbody>
-			</table>
+			<label class="control-label">选择生产：</label>
+			<input type="hidden" id="goodsAllIds" name="goodsAllIds">
+			<input type="hidden" id="productsAmounts" name="productsAmounts">
+			<div class="controls">
+				<table style="width: 80%;" id="contentTable" class="table table-striped table-bordered table-condensed">
+					<thead>
+					<tr>
+						<th style="width: 20px;"><input id="productDetailsAll" onclick="selectAll(this);" type="checkbox"></th>
+						<c:forEach var="list" items="${goodsSpecificationList}">
+							<th>
+								${list.specificationName}
+							</th>
+						</c:forEach>
+						<th class="sort-column">生产数量</th>
+					</tr>
+					</thead>
+					<tbody>
+					<c:if test="${not empty goodsAlls}">
+						<c:forEach varStatus="status" var="i" items="${goodsAlls}">
+							<tr>
+								<td><input onclick="selectSingle();" data-name="productDetails" type="checkbox" data-good-all-id="${i.id}" data-stock-id="stock-${status.index}"></td>
+								<c:forEach var="list" items="${goodsSpecificationList}">
+									<td>
+										<c:forEach items="${i.goodsSpecificationValues}" var="val"><c:if test="${val.goodsSpecification.id eq list.id}">${val.specificationValue}</c:if></c:forEach>
+									</td>
+								</c:forEach>
+								<td><input style="width: 50px;" data-css="required digits" name="stock-${status.index}" id="stock-${status.index}"></td>
+							</tr>
+						</c:forEach>
+					</c:if>
+					</tbody>
+				</table><a href="javascript:openDetails();">详情</a>
+				<script>
+					function openDetails(){
+						$.jBox($('#showGoodsDetails').html(), {title:'商品详情',
+							width: 800,
+							height: 350,
+							buttons:{'关闭':true}
+						});
+					}
+					function selectAll(ele){
+						var val = ele.checked;
+						$("input[data-name='productDetails']").each(function(){
+							this.checked = val;
+							var stockId = $(this).attr("data-stock-id");
+							if(val){
+								$('#' + stockId).attr("class",$('#' + stockId).attr("data-css"));
+							}else{
+								$('#' + stockId).attr("class","");
+							}
+						});
+					}
+					function selectSingle(){
+						var all = true;
+						$("input[data-name='productDetails']").each(function(){
+							var stockId = $(this).attr("data-stock-id");
+							if(this.checked){
+								$('#' + stockId).attr("class",$('#' + stockId).attr("data-css"));
+							}else{
+								$('#' + stockId).attr("class","");
+								all = false;
+							}
+						});
+						document.getElementById("productDetailsAll").checked = all;
+					}
+
+					function preSubmit(){
+						var goodsAllIds = "";
+						var productsAmounts = "";
+						$("input[data-name='productDetails']").each(function(){
+							if(this.checked){
+								goodsAllIds += $(this).attr("data-good-all-id") + ",";
+								var stockId = $(this).attr("data-stock-id");
+								productsAmounts += $("#" + stockId).val() + ",";
+							}
+						});
+						$("#goodsAllIds").val(goodsAllIds != "" ? goodsAllIds.substring(0,goodsAllIds.length-1):"");
+						$("#productsAmounts").val(productsAmounts != "" ? productsAmounts.substring(0,productsAmounts.length-1):"");
+					}
+				</script>
+			</div>
 		</div>
 		</c:if>
 		<form:hidden path="processInstanceId"/>
@@ -146,7 +187,7 @@
 		<div class="control-group">
 			<label class="control-label">预算：</label>
 			<div class="controls">
-				<form:input path="budget" htmlEscape="false" class="input-xlarge  number"/>
+				<form:input path="budget" htmlEscape="false" class="input-xlarge number"/>
 			</div>
 		</div>
 		<c:if test="${not empty id}">
@@ -164,7 +205,7 @@
 		</div>
 		</c:if>
 		<c:if test="${empty id}">
-			<input type="hidden" name="state" value="<%=ProductOrder.PRODUCT_STATE_ING%>">
+			<input type="hidden" name="state" value="<%=ProductOrder.PRODUCT_STATE_INIT%>">
 		</c:if>
 		<input type="hidden" name="productType" value="<c:if test="${not empty flagNewInvent}"><%=ProductOrder.PRODUCT_TYPE_NEW%></c:if><c:if test="${empty flagNewInvent}"><%=ProductOrder.PRODUCT_TYPE_OLD%></c:if>"/>
 
@@ -179,5 +220,56 @@
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
 		</div>
 	</form:form>
+	<c:if test="${not empty productOrder.goodsId}">
+	<script type="text/template" id="showGoodsDetails">
+		<table class="table table-striped table-bordered table-condensed">
+			<thead>
+			<tr>
+				<c:forEach var="list" items="${goodsSpecificationList}">
+					<th>
+						${list.specificationName}
+					</th>
+				</c:forEach>
+				<th>现价</th>
+				<th>原价</th>
+				<th>成本价</th>
+				<th>库存</th>
+				<th>排序</th>
+				<th>状态</th>
+			</tr>
+			</thead>
+			<tbody>
+			<c:if test="${not empty goodsAlls}">
+				<c:forEach varStatus="status" var="i" items="${goodsAlls}">
+					<tr>
+						<c:forEach var="list" items="${goodsSpecificationList}">
+							<td>
+								<c:forEach items="${i.goodsSpecificationValues}" var="val"><c:if test="${val.goodsSpecification.id eq list.id}">${val.specificationValue}</c:if></c:forEach>
+							</td>
+						</c:forEach>
+						<td>${i.price}
+						</td>
+						<td>${i.srcPrice}
+						</td>
+						<td>${i.costPrice}
+						</td>
+						<td>${i.stock}
+						</td>
+						<td>${i.specificationGroup}</td>
+						<td>
+							<c:if test="${i.delFlag == DEL_FLAG_NORMAL}">
+								<a disabled="true">禁用</a>
+							</c:if>
+							<c:if test="${i.delFlag == DEL_FLAG_DELETE}">
+								<a disabled="true">启用</a>
+							</c:if>
+						</td>
+					</tr>
+				</c:forEach>
+			</c:if>
+			</tbody>
+		</table>
+	</script>
+	</c:if>
 </body>
 </html>

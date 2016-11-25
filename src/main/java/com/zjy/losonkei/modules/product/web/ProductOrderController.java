@@ -109,13 +109,16 @@ public class ProductOrderController extends BaseController {
 
 	@RequiresPermissions("product:productOrder:edit")
 	@RequestMapping(value = "save")
-	public String save(ProductOrder productOrder, Model model, RedirectAttributes redirectAttributes) {
+	public String save(ProductOrder productOrder,HttpServletRequest request, Model model, RedirectAttributes redirectAttributes) {
 		/*if (!beanValidator(model, productOrder)){
 			return form(productOrder, model);
 		}*/
-		productOrderService.save(productOrder);
+		productOrderService.save(productOrder,request);
 		addMessage(redirectAttributes, "保存生产订单成功");
-		return "redirect:"+Global.getAdminPath()+"/product/productOrder/?repage";
+		if(ProductOrder.PRODUCT_TYPE_NEW.equals(productOrder.getProductType())){
+			return "redirect:"+Global.getAdminPath()+"/product/productOrder/listNew?repage";
+		}
+		return "redirect:"+Global.getAdminPath()+"/product/productOrder/listOld?repage";
 	}
 	
 	@RequiresPermissions("product:productOrder:edit")

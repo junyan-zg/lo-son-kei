@@ -15,10 +15,10 @@ import com.zjy.losonkei.common.persistence.DataEntity;
 public class ProductOrderDetails extends DataEntity<ProductOrderDetails> {
 	
 	private static final long serialVersionUID = 1L;
-	private String productAmount;		// 生产数量
+	private Integer productAmount;		// 生产数量
 	private String goodsNo;		// goods_all的goods_no
 	private String productOrderId;		// 生产订单表
-	private String state;		// 状态0进行中1成功2失败
+	private String state;		// 状态0待研发1进行中2成功3失败
 	
 	public ProductOrderDetails() {
 		super();
@@ -28,12 +28,21 @@ public class ProductOrderDetails extends DataEntity<ProductOrderDetails> {
 		super(id);
 	}
 
+	public ProductOrderDetails(String goodsAllId,Integer productAmount,String productOrderId){
+		super();
+		this.goodsNo = goodsAllId;
+		this.productAmount = productAmount;
+		this.productOrderId = productOrderId;
+		this.state = ProductOrder.PRODUCT_STATE_INIT;
+	}
+
+
 	@Length(min=0, max=11, message="生产数量长度必须介于 0 和 11 之间")
-	public String getProductAmount() {
+	public Integer getProductAmount() {
 		return productAmount;
 	}
 
-	public void setProductAmount(String productAmount) {
+	public void setProductAmount(Integer productAmount) {
 		this.productAmount = productAmount;
 	}
 	

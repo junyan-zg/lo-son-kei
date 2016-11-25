@@ -270,10 +270,10 @@
         </td>
         <td><input name="costPrice" class="number l-width">
         </td>
-        <td><input name="stock" class="number l-width">
+        <td><input name="stock" class="digits l-width">
         </td>
         <td><input name="srcSpecificationGroup" type="hidden" value="">
-            <input name="specificationGroup" id="specificationGroup{{index}}"  class="number required l-width">
+            <input name="specificationGroup" id="specificationGroup{{index}}"  class="digits required l-width">
         </td>
         <td>
             <input name="goodsAllId" value="" type="hidden"/>

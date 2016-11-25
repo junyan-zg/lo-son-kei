@@ -3,11 +3,17 @@
  */
 package com.zjy.losonkei.modules.product.entity;
 
+import com.zjy.losonkei.modules.goods.entity.Goods;
+import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
+import com.zjy.losonkei.modules.sys.entity.User;
+import com.zjy.losonkei.modules.sys.utils.UserUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
 import com.zjy.losonkei.common.persistence.DataEntity;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 生产订单Entity
@@ -30,9 +36,10 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 	public final static String PRODUCT_TYPE_OLD = "0";
 	public final static String PRODUCT_TYPE_NEW = "1";
 
-	public final static String PRODUCT_STATE_ING = "0";
-	public final static String PRODUCT_STATE_SUCCESS = "1";
-	public final static String PRODUCT_STATE_FAILED = "2";
+	public final static String PRODUCT_STATE_INIT = "0";
+	public final static String PRODUCT_STATE_ING = "1";
+	public final static String PRODUCT_STATE_SUCCESS = "2";
+	public final static String PRODUCT_STATE_FAILED = "3";
 
 	public final static String FLAG_NEW_INVENT = "flagNewInvent";
 
@@ -122,5 +129,18 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 	public void setProductType(String productType) {
 		this.productType = productType;
 	}
-	
+
+	@Override
+	public void preInsert() {
+		if (!this.isNewRecord){
+			setId(GoodsAllUtils.createId("PO"));
+		}
+		User user = UserUtils.getUser();
+		if (StringUtils.isNotBlank(user.getId())){
+			this.updateBy = user;
+			this.createBy = user;
+		}
+		this.updateDate = new Date();
+		this.createDate = this.updateDate;
+	}
 }

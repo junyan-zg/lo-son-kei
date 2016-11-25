@@ -39,12 +39,28 @@
 				<shiro:hasPermission name="sys:dict:edit"><td>
     				<a href="${ctx}/sys/dict/form?id=${dict.id}">修改</a>
 					<a href="${ctx}/sys/dict/delete?id=${dict.id}&type=${dict.type}" onclick="return confirmx('确认要删除该字典吗？', this.href)">删除</a>
+<%--
     				<a href="<c:url value='${fns:getAdminPath()}/sys/dict/form?type=${dict.type}&sort=${dict.sort+10}'><c:param name='description' value='${dict.description}'/></c:url>">添加键值</a>
+--%>
+					<a href="javascript:formSubmit('${dict.type}','${dict.sort+10}','${dict.description}');">添加键值</a>
 				</td></shiro:hasPermission>
 			</tr>
 		</c:forEach>
 		</tbody>
 	</table>
+	<form id="inputForm" action="${ctx}/sys/dict/form" method="post">
+		<input name="type" id="type1" type="hidden">
+		<input name="sort" id="sort1" type="hidden">
+		<input name="description" id="description1" type="hidden">
+	</form>
+	<script>
+		function formSubmit(type,sort,description){
+			$("#type1").val(type);
+			$("#sort1").val(sort);
+			$("#description1").val(description);
+			$("#inputForm").submit();
+		}
+	</script>
 	<div class="pagination">${page}</div>
 </body>
 </html>

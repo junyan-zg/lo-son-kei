@@ -252,10 +252,10 @@
                     </td>
                     <td><input name="costPrice" class="number l-width" value="${goodsAll.costPrice}">
                     </td>
-                    <td><input name="stock" class="number l-width" value="${goodsAll.stock}">
+                    <td><input name="stock" class="digits l-width" value="${goodsAll.stock}">
                     </td>
                     <td><input name="srcSpecificationGroup" type="hidden" value="${goodsAll.specificationGroup}">
-                        <input name="specificationGroup" class="number required l-width"
+                        <input name="specificationGroup" class="digits required l-width"
                                value="${goodsAll.specificationGroup}" id="specificationGroup${status.index}"></td>
                     <td>
                         <input name="goodsAllId" value="${goodsAll.id}" type="hidden"/>
@@ -303,10 +303,10 @@
         </td>
         <td><input name="costPrice" class="number l-width">
         </td>
-        <td><input name="stock" class="number l-width">
+        <td><input name="stock" class="digits l-width">
         </td>
         <td><input name="srcSpecificationGroup" type="hidden" value="">
-            <input name="specificationGroup" id="specificationGroup{{index}}"  class="number required l-width">
+            <input name="specificationGroup" id="specificationGroup{{index}}"  class="digits required l-width">
         </td>
         <td>
             <input name="goodsAllId" value="" type="hidden"/>
