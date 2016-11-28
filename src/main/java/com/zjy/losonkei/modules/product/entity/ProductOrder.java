@@ -14,6 +14,7 @@ import com.zjy.losonkei.common.persistence.DataEntity;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 生产订单Entity
@@ -42,6 +43,24 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 	public final static String PRODUCT_STATE_FAILED = "3";
 
 	public final static String FLAG_NEW_INVENT = "flagNewInvent";
+
+
+	//form字段
+	private String goodsAllIds;
+
+	private String productsAmounts;
+
+	private boolean belongsMe = false;
+
+	private String managerId;
+
+	private String productorsIds;
+	private String productorsNames;
+
+	private String auditorsIds;
+	private String auditorsNames;
+
+	private List<ProductOrderDetails> productOrderDetailses;
 
 	public ProductOrder() {
 		super();
@@ -132,15 +151,82 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 
 	@Override
 	public void preInsert() {
+		super.preInsert();
 		if (!this.isNewRecord){
 			setId(GoodsAllUtils.createId("PO"));
 		}
+	}
+
+
+	public String getGoodsAllIds() {
+		return goodsAllIds;
+	}
+
+	public void setGoodsAllIds(String goodsAllIds) {
+		this.goodsAllIds = goodsAllIds;
+	}
+
+	public String getProductsAmounts() {
+		return productsAmounts;
+	}
+
+	public void setProductsAmounts(String productsAmounts) {
+		this.productsAmounts = productsAmounts;
+	}
+
+	public String getProductorsIds() {
+		return productorsIds;
+	}
+
+	public void setProductorsIds(String productorsIds) {
+		this.productorsIds = productorsIds;
+	}
+
+	public String getAuditorsIds() {
+		return auditorsIds;
+	}
+
+	public void setAuditorsIds(String auditorsIds) {
+		this.auditorsIds = auditorsIds;
+	}
+
+	public String getProductorsNames() {
+		return productorsNames;
+	}
+
+	public void setProductorsNames(String productorsNames) {
+		this.productorsNames = productorsNames;
+	}
+
+	public String getAuditorsNames() {
+		return auditorsNames;
+	}
+
+	public void setAuditorsNames(String auditorsNames) {
+		this.auditorsNames = auditorsNames;
+	}
+
+	public List<ProductOrderDetails> getProductOrderDetailses() {
+		return productOrderDetailses;
+	}
+
+	public void setProductOrderDetailses(List<ProductOrderDetails> productOrderDetailses) {
+		this.productOrderDetailses = productOrderDetailses;
+	}
+
+	public String getManagerId() {
+		return managerId;
+	}
+
+	public void setManagerId(String managerId) {
+		this.managerId = managerId;
+	}
+
+	public boolean getBelongsMe() {
 		User user = UserUtils.getUser();
-		if (StringUtils.isNotBlank(user.getId())){
-			this.updateBy = user;
-			this.createBy = user;
-		}
-		this.updateDate = new Date();
-		this.createDate = this.updateDate;
+		String id = user.getId();
+		return id.equals(managerId) ||
+				(StringUtils.isNotBlank(productorsIds)&& productorsIds.contains(id))
+				|| (StringUtils.isNotBlank(auditorsIds)&& auditorsIds.contains(id));
 	}
 }

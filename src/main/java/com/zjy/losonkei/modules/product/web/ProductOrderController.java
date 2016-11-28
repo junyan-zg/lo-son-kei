@@ -93,6 +93,9 @@ public class ProductOrderController extends BaseController {
 	public String formOld(ProductOrder productOrder, Model model) {
 		model.addAttribute("productOrder", productOrder);
 		showGoodsSpecification(productOrder,model);
+		if (StringUtils.isNotBlank(productOrder.getId())){
+			productOrderService.loadEntity(productOrder);
+		}
 		return "modules/product/productOrderForm";
 	}
 

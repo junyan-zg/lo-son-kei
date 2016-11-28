@@ -12,8 +12,6 @@ public class ActivitiUtils {
 
     public final static String VAR_AUDITORS = "auditors";
 
-    public final static String CONDITION_CREATE_ORDERS_AGAIN = "createOrdersAgain";
-
     public final static String CONDITION_AUDIT_OK = "auditOk";
 
 }

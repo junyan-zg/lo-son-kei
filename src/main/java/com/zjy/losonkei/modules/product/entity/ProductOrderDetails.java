@@ -3,6 +3,7 @@
  */
 package com.zjy.losonkei.modules.product.entity;
 
+import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import org.hibernate.validator.constraints.Length;
 
 import com.zjy.losonkei.common.persistence.DataEntity;
@@ -19,6 +20,8 @@ public class ProductOrderDetails extends DataEntity<ProductOrderDetails> {
 	private String goodsNo;		// goods_all的goods_no
 	private String productOrderId;		// 生产订单表
 	private String state;		// 状态0待研发1进行中2成功3失败
+
+	private GoodsAll goodsAll;
 	
 	public ProductOrderDetails() {
 		super();
@@ -72,5 +75,12 @@ public class ProductOrderDetails extends DataEntity<ProductOrderDetails> {
 	public void setState(String state) {
 		this.state = state;
 	}
-	
+
+	public GoodsAll getGoodsAll() {
+		return goodsAll;
+	}
+
+	public void setGoodsAll(GoodsAll goodsAll) {
+		this.goodsAll = goodsAll;
+	}
 }

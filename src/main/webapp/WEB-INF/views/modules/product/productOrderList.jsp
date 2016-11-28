@@ -100,7 +100,7 @@
 					<fmt:formatDate value="${productOrder.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>
 				<shiro:hasPermission name="product:productOrder:edit"><td>
-    				<a href="${ctx}/product/productOrder/form?id=${productOrder.id}">修改</a>
+    				<a href="${ctx}/product/productOrder/form<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>?id=${productOrder.id}">修改</a>
 					<a href="${ctx}/product/productOrder/delete?id=${productOrder.id}" onclick="return confirmx('确认要删除该生产订单吗？', this.href)">删除</a>
 				</td></shiro:hasPermission>
 			</tr>

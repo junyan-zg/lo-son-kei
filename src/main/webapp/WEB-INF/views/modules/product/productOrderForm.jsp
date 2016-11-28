@@ -93,13 +93,13 @@
 		<c:if test="${not empty productOrder.goodsId}">
 		<div class="control-group">
 			<label class="control-label">选择生产：</label>
-			<input type="hidden" id="goodsAllIds" name="goodsAllIds">
-			<input type="hidden" id="productsAmounts" name="productsAmounts">
+			<form:hidden path="goodsAllIds"/>
+			<form:hidden path="productsAmounts"/>
 			<div class="controls">
 				<table style="width: 80%;" id="contentTable" class="table table-striped table-bordered table-condensed">
 					<thead>
 					<tr>
-						<th style="width: 20px;"><input id="productDetailsAll" onclick="selectAll(this);" type="checkbox"></th>
+						<th style="width: 20px;"><input id="productDetailsAll" <c:if test="${not empty goodsAlls && not empty productOrder.productOrderDetailses && fn:length(productOrder.productOrderDetailses) == fn:length(goodsAlls)}">checked="true"</c:if> onclick="selectAll(this);" type="checkbox"></th>
 						<c:forEach var="list" items="${goodsSpecificationList}">
 							<th>
 								${list.specificationName}
@@ -112,13 +112,13 @@
 					<c:if test="${not empty goodsAlls}">
 						<c:forEach varStatus="status" var="i" items="${goodsAlls}">
 							<tr>
-								<td><input onclick="selectSingle();" data-name="productDetails" type="checkbox" data-good-all-id="${i.id}" data-stock-id="stock-${status.index}"></td>
+								<td><input onclick="selectSingle();" <c:if test="${not empty productOrder.productOrderDetailses}"><c:forEach var="pod" items="${productOrder.productOrderDetailses}"><c:if test="${pod.goodsNo == i.id}">checked="true"</c:if></c:forEach></c:if> data-name="productDetails" type="checkbox" data-good-all-id="${i.id}" data-stock-id="stock-${status.index}"></td>
 								<c:forEach var="list" items="${goodsSpecificationList}">
 									<td>
 										<c:forEach items="${i.goodsSpecificationValues}" var="val"><c:if test="${val.goodsSpecification.id eq list.id}">${val.specificationValue}</c:if></c:forEach>
 									</td>
 								</c:forEach>
-								<td><input style="width: 50px;" data-css="required digits" name="stock-${status.index}" id="stock-${status.index}"></td>
+								<td><input style="width: 50px;" <c:if test="${not empty productOrder.productOrderDetailses}"><c:forEach var="pod" items="${productOrder.productOrderDetailses}"><c:if test="${pod.goodsNo == i.id}">value="${pod.productAmount}"</c:if></c:forEach></c:if> data-css="required digits" name="stock-${status.index}" id="stock-${status.index}"></td>
 							</tr>
 						</c:forEach>
 					</c:if>
@@ -185,6 +185,23 @@
 		</div>
 		</c:if>
 		<div class="control-group">
+			<label class="control-label">生产人员：</label>
+			<div class="controls">
+				<sys:treeselect id="productorsIds" name="productorsIds" value="${productOrder.productorsIds}" labelName="productorsNames" labelValue="${productOrder.productorsNames}"
+								title="生产人员" url="/sys/office/treeData?type=3"
+								checked="true" dataMsgRequired="至少选择一个用户"
+								cssClass="required input-xxlarge" allowClear="true" notAllowSelectParent="true"/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">审核人员：</label>
+			<div class="controls">
+				<sys:treeselect id="auditorsIds" name="auditorsIds" value="${productOrder.auditorsIds}" labelName="auditorsNames" labelValue="${productOrder.auditorsNames}"
+								title="审核人员" url="/sys/office/treeData?type=3" checked="true" dataMsgRequired="至少选择一个用户"
+								cssClass="required input-xxlarge" allowClear="true" notAllowSelectParent="true"/>
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label">预算：</label>
 			<div class="controls">
 				<form:input path="budget" htmlEscape="false" class="input-xlarge number"/>
@@ -194,7 +211,7 @@
 		<div class="control-group">
 			<label class="control-label">实际花费：</label>
 			<div class="controls">
-				<form:input path="costAll" htmlEscape="false" class="input-xlarge  number"/>
+				<form:input path="costAll" readonly="true" htmlEscape="false"/>
 			</div>
 		</div>
 		<div class="control-group">

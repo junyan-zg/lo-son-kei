@@ -244,15 +244,9 @@ public class Goods extends DataEntity<Goods> {
 
 	@Override
 	public void preInsert() {
+		super.preInsert();
 		if (!this.isNewRecord){
 			setId(GoodsAllUtils.createId("GD"));
 		}
-		User user = UserUtils.getUser();
-		if (StringUtils.isNotBlank(user.getId())){
-			this.updateBy = user;
-			this.createBy = user;
-		}
-		this.updateDate = new Date();
-		this.createDate = this.updateDate;
 	}
 }

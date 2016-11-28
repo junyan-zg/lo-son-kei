@@ -45,6 +45,10 @@ public class GoodsAllUtils {
         return goodsAll;
     }
 
+    public static GoodsAll getGoodAllById(String id){
+        return goodsAllService.get(id);
+    }
+
     public static List<GoodsAll> getGoodsAllByGoodsId(String goodsId){
         GoodsAll goodsAll = new GoodsAll();
         goodsAll.setGoodsId(goodsId);

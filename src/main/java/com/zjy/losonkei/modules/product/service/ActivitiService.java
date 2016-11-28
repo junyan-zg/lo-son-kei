@@ -8,7 +8,6 @@ import com.google.common.collect.Maps;
 import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.service.BaseService;
 import com.zjy.losonkei.common.utils.StringUtils;
-import com.zjy.losonkei.modules.act.dao.ActDao;
 import com.zjy.losonkei.modules.act.entity.Act;
 import com.zjy.losonkei.modules.act.utils.ActUtils;
 import com.zjy.losonkei.modules.act.utils.ProcessDefCache;
@@ -16,16 +15,15 @@ import com.zjy.losonkei.modules.product.utils.ActivitiUtils;
 import com.zjy.losonkei.modules.sys.entity.User;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.*;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.history.HistoricTaskInstanceQuery;
+import org.activiti.engine.history.*;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
-import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
@@ -38,7 +36,6 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
-import org.activiti.spring.ProcessEngineFactoryBean;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +51,7 @@ import java.util.*;
  */
 @Service
 @Transactional(readOnly = true)
-public class ActivitiTaskService extends BaseService {
+public class ActivitiService extends BaseService {
 
 	@Autowired
 	private RuntimeService runtimeService;
@@ -68,19 +65,40 @@ public class ActivitiTaskService extends BaseService {
 
 	/**
 	 * 开始研发新产品流程
-	 * todo 1.保存商品细节 2.开启流程
 	 * @param managerId 通常为公司经理id
 	 * @param orderId   该为生产订单id
 	 * @param producters 生产者
 	 * @param auditors	  审核者
      */
 	@Transactional(readOnly = false)
-	public void startInventProcess(String managerId,String orderId,List<String> producters,List<String> auditors){
+	public ProcessInstance startInventProcess(String managerId,String orderId,List<String> producters,List<String> auditors){
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put(ActivitiUtils.VAR_MANAGER,managerId);
 		variables.put(ActivitiUtils.VAR_PRODUCTERS,producters);
 		variables.put(ActivitiUtils.VAR_AUDITORS,auditors);
-		runtimeService.startProcessInstanceByKey(ActivitiUtils.PROCESS_KEY_INVENT,orderId,variables);
+		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ActivitiUtils.PROCESS_KEY_INVENT, orderId, variables);
+		return processInstance;
+	}
+
+	public Task getCurrentTaskByInstanceId(String processInstanceId){
+		return taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+	}
+
+	public ProcessInstance getProcessInstanceById(String processInstanceId) {
+		return runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+	}
+
+	public void updateVariablesByProcessInstanceId(String processInstanceId,String varName,Object object){
+		String executionId = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).singleResult().getId();
+		runtimeService.setVariable(executionId,varName,object);
+	}
+	public void updateVariablesByProcessInstanceId(String processInstanceId,Map<String,Object> vars){
+		String executionId = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).singleResult().getId();
+		runtimeService.setVariables(executionId,vars);
+	}
+
+	public HistoricVariableInstance getVariablesByProcessInstanceId(String processInstanceId,String varName) {
+		return historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).variableName(varName).singleResult();
 	}
 
 
@@ -90,14 +108,14 @@ public class ActivitiTaskService extends BaseService {
 	 * @return
 	 */
 	public List<Act> todoList(Act act){
-		String userId = UserUtils.getUser().getLoginName();//ObjectUtils.toString(UserUtils.getUser().getId());
+		String userId = UserUtils.getUser().getId();
 		
 		List<Act> result = new ArrayList<Act>();
 		
 		// =============== 已经签收的任务  ===============
-		TaskQuery todoTaskQuery = taskService.createTaskQuery().taskAssignee(userId).active()
+		TaskQuery todoTaskQuery = taskService.createTaskQuery().taskCandidateUser(userId)
 				.includeProcessVariables().orderByTaskCreateTime().desc();
-		
+
 		// 设置查询条件
 		if (StringUtils.isNotBlank(act.getProcDefKey())){
 			todoTaskQuery.processDefinitionKey(act.getProcDefKey());
@@ -115,44 +133,10 @@ public class ActivitiTaskService extends BaseService {
 			Act e = new Act();
 			e.setTask(task);
 			e.setVars(task.getProcessVariables());
-//			e.setTaskVars(task.getTaskLocalVariables());
-//			System.out.println(task.getId()+"  =  "+task.getProcessVariables() + "  ========== " + task.getTaskLocalVariables());
 			e.setProcDef(ProcessDefCache.get(task.getProcessDefinitionId()));
-//			e.setProcIns(runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult());
-//			e.setProcExecUrl(ActUtils.getProcExeUrl(task.getProcessDefinitionId()));
-			e.setStatus("todo");
 			result.add(e);
 		}
-		
-		// =============== 等待签收的任务  ===============
-		TaskQuery toClaimQuery = taskService.createTaskQuery().taskCandidateUser(userId)
-				.includeProcessVariables().active().orderByTaskCreateTime().desc();
-		
-		// 设置查询条件
-		if (StringUtils.isNotBlank(act.getProcDefKey())){
-			toClaimQuery.processDefinitionKey(act.getProcDefKey());
-		}
-		if (act.getBeginDate() != null){
-			toClaimQuery.taskCreatedAfter(act.getBeginDate());
-		}
-		if (act.getEndDate() != null){
-			toClaimQuery.taskCreatedBefore(act.getEndDate());
-		}
-		
-		// 查询列表
-		List<Task> toClaimList = toClaimQuery.list();
-		for (Task task : toClaimList) {
-			Act e = new Act();
-			e.setTask(task);
-			e.setVars(task.getProcessVariables());
-//			e.setTaskVars(task.getTaskLocalVariables());
-//			System.out.println(task.getId()+"  =  "+task.getProcessVariables() + "  ========== " + task.getTaskLocalVariables());
-			e.setProcDef(ProcessDefCache.get(task.getProcessDefinitionId()));
-//			e.setProcIns(runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult());
-//			e.setProcExecUrl(ActUtils.getProcExeUrl(task.getProcessDefinitionId()));
-			e.setStatus("claim");
-			result.add(e);
-		}
+
 		return result;
 	}
 	
@@ -702,5 +686,18 @@ public class ActivitiTaskService extends BaseService {
 		activityInfo.put("x", activity.getX());
 		activityInfo.put("y", activity.getY());
 	}
-	
+
+	public TaskService getTaskService() {
+		return taskService;
+	}
+	public RuntimeService getRuntimeService() {
+		return runtimeService;
+	}
+	public HistoryService getHistoryService() {
+		return historyService;
+	}
+
+	public RepositoryService getRepositoryService() {
+		return repositoryService;
+	}
 }

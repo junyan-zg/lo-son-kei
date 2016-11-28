@@ -26,7 +26,15 @@
 		<include refid="productOrderDetailsJoins"/>
 		WHERE a.id = #{id}
 	</select>
-	
+
+	<select id="getByGoodsNoAndOrderId" resultType="ProductOrderDetails">
+		SELECT
+		<include refid="productOrderDetailsColumns"/>
+		FROM product_order_details a
+		<include refid="productOrderDetailsJoins"/>
+		WHERE a.goods_no = #{goodsNo} AND a.product_order_id = #{productOrderId}
+	</select>
+
 	<select id="findList" resultType="ProductOrderDetails">
 		SELECT 
 			<include refid="productOrderDetailsColumns"/>
@@ -111,7 +119,8 @@
 			state = #{state},
 			remarks = #{remarks},
 			update_by = #{updateBy.id},
-			update_date = #{updateDate}
+			update_date = #{updateDate},
+			del_flag = #{delFlag}
 		WHERE id = #{id}
 	</update>
 	

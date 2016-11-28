@@ -14,5 +14,5 @@ import com.zjy.losonkei.modules.product.entity.ProductOrderDetails;
  */
 @MyBatisDao
 public interface ProductOrderDetailsDao extends CrudDao<ProductOrderDetails> {
-	
+	public ProductOrderDetails getByGoodsNoAndOrderId(ProductOrderDetails productOrderDetails);
 }
