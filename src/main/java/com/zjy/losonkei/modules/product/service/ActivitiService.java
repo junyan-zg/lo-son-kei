@@ -24,6 +24,7 @@ import org.activiti.engine.history.*;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
+import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
@@ -34,14 +35,17 @@ import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
+import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
+import org.activiti.spring.ProcessEngineFactoryBean;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
 
@@ -61,7 +65,8 @@ public class ActivitiService extends BaseService {
 	private HistoryService historyService;
 	@Autowired
 	private RepositoryService repositoryService;
-
+	@Autowired
+	private ProcessEngineFactoryBean processEngine;
 
 	/**
 	 * 开始研发新产品流程
@@ -126,7 +131,7 @@ public class ActivitiService extends BaseService {
 		if (act.getEndDate() != null){
 			todoTaskQuery.taskCreatedBefore(act.getEndDate());
 		}
-		
+
 		// 查询列表
 		List<Task> todoList = todoTaskQuery.list();
 		for (Task task : todoList) {
@@ -134,6 +139,7 @@ public class ActivitiService extends BaseService {
 			e.setTask(task);
 			e.setVars(task.getProcessVariables());
 			e.setProcDef(ProcessDefCache.get(task.getProcessDefinitionId()));
+			e.setCandidateUsers(taskService.getIdentityLinksForTask(task.getId()));
 			result.add(e);
 		}
 
@@ -473,57 +479,23 @@ public class ActivitiService extends BaseService {
 		}
 	}
 
-//	/**
-//	 * 委派任务
-//	 * @param taskId 任务ID
-//	 * @param userId 被委派人
-//	 */
-//	public void delegateTask(String taskId, String userId){
-//		taskService.delegateTask(taskId, userId);
-//	}
-//	
-//	/**
-//	 * 被委派人完成任务
-//	 * @param taskId 任务ID
-//	 */
-//	public void resolveTask(String taskId){
-//		taskService.resolveTask(taskId);
-//	}
-//	
-//	/**
-//	 * 回退任务
-//	 * @param taskId
-//	 */
-//	public void backTask(String taskId){
-//		taskService.
-//	}
-	
-	////////////////////////////////////////////////////////////////////
-	
 	/**
 	 * 读取带跟踪的图片
 	 * @param executionId	环节ID
 	 * @return	封装了各种节点信息
 	 */
 	public InputStream tracePhoto(String processDefinitionId, String executionId) {
-		// ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(executionId).singleResult();
 		BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
 		
-		List<String> activeActivityIds = Lists.newArrayList();
+		List<String> activeActivityIds = new ArrayList<String>();
 		if (runtimeService.createExecutionQuery().executionId(executionId).count() > 0){
 			activeActivityIds = runtimeService.getActiveActivityIds(executionId);
 		}
-		
-		// 不使用spring请使用下面的两行代码
-		// ProcessEngineImpl defaultProcessEngine = (ProcessEngineImpl)ProcessEngines.getDefaultProcessEngine();
-		// Context.setProcessEngineConfiguration(defaultProcessEngine.getProcessEngineConfiguration());
 
-		// 使用spring注入引擎请使用下面的这行代码
-		//Context.setProcessEngineConfiguration(processEngine.getProcessEngineConfiguration());
+		Context.setProcessEngineConfiguration(processEngine.getProcessEngineConfiguration());
 
 		return ProcessDiagramGenerator.generateDiagram(bpmnModel, "png", activeActivityIds);
 	}
-	
 	/**
 	 * 流程跟踪图信息
 	 * @param processInstanceId		流程实例ID

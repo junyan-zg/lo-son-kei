@@ -11,6 +11,7 @@ import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -64,6 +65,8 @@ public class Act extends BaseEntity<Act> {
 	private Date endDate;	// 结束查询日期
 
 	private List<Act> list; // 任务列表
+
+	private List<IdentityLink> candidateUsers;//参与者
 
 	public Act() {
 		super();
@@ -379,6 +382,13 @@ public class Act extends BaseEntity<Act> {
 		
 	}
 
+	public List<IdentityLink> getCandidateUsers() {
+		return candidateUsers;
+	}
+
+	public void setCandidateUsers(List<IdentityLink> candidateUsers) {
+		this.candidateUsers = candidateUsers;
+	}
 }
 
 

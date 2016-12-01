@@ -21,6 +21,18 @@
 				}
 		    });
 		}
+		function tracePhoto(url){
+			$("#tmp-trace-photo img").attr("src",url);
+			top.$.jBox($("#tmp-trace-photo").html(), {
+				title: "查看进度",
+				width: 800,
+				height: 500,
+				buttons:{"确定":"ok","关闭":true},
+				loaded:function(h){
+					$(".jbox-content",top.document).css("overflow-y","hidden");
+				}
+			});
+		}
 	</script>
 </head>
 <body>
@@ -55,7 +67,7 @@
 				<th>当前环节</th><%--
 				<th>任务内容</th> --%>
 				<th>流程名称</th>
-				<th>流程版本</th>
+				<th>参与者</th>
 				<th>创建时间</th>
 				<th>操作</th>
 			</tr>
@@ -81,28 +93,30 @@
 					</td><%--
 					<td>${task.description}</td> --%>
 					<td>${procDef.name}</td>
-					<td><b title='流程版本号'>V: ${procDef.version}</b></td>
+					<td><c:forEach items="${act.candidateUsers}" var="candidateUser" varStatus="status">
+						${fns:getUserById(candidateUser.userId).name}<c:if test="${status.index < fn:length(act.candidateUsers)-1}">,</c:if>
+					</c:forEach></td>
 					<td><fmt:formatDate value="${task.createTime}" type="both"/></td>
 					<td>
-						<c:if test="${empty task.assignee}">
-							<a href="javascript:claim('${task.id}');">签收任务</a>
-						</c:if>
 						<c:if test="${not empty task.assignee}"><%--
 							<a href="${ctx}${procExecUrl}/exec/${task.taskDefinitionKey}?procInsId=${task.processInstanceId}&act.taskId=${task.id}">办理</a> --%>
 							<a href="${ctx}/act/task/form?taskId=${task.id}&taskName=${fns:urlEncode(task.name)}&taskDefKey=${task.taskDefinitionKey}&procInsId=${task.processInstanceId}&procDefId=${task.processDefinitionId}&status=${status}">任务办理</a>
 						</c:if>
-						<shiro:hasPermission name="act:process:edit">
 							<c:if test="${empty task.executionId}">
 								<a href="${ctx}/act/task/deleteTask?taskId=${task.id}&reason=" onclick="return promptx('删除任务','删除原因',this.href);">删除任务</a>
-							</c:if>
-						</shiro:hasPermission>
-						<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${task.processDefinitionId}&processInstanceId=${task.processInstanceId}">跟踪1</a>
-						<a target="_blank" href="${ctx}/act/task/trace/photo/${task.processDefinitionId}/${task.executionId}">跟踪2</a><%--  
-						<a target="_blank" href="${ctx}/act/task/trace/info/${task.processInstanceId}">跟踪信息</a> --%>
+						</c:if>
+						<a href="javascript:;" onclick="tracePhoto('${ctx}/product/act/trace/photo/${task.processDefinitionId}/${task.executionId}');">进度</a>
+
+
 					</td>
 				</tr>
 			</c:forEach>
 		</tbody>
 	</table>
+	<div style="display:none;" id="tmp-trace-photo">
+		<div style="background-color:whitesmoke; padding-left:30px;padding-top: 10px;">
+			<img src=""/>
+		</div>
+	</div>
 </body>
 </html>

@@ -99,6 +99,13 @@ public class ProductOrderController extends BaseController {
 		return "modules/product/productOrderForm";
 	}
 
+	@RequiresPermissions("product:productOrder:viewNew")
+	@RequestMapping(value = "viewNew")
+	public String viewNew(ProductOrder productOrder, Model model) {
+		formNew(productOrder,model);
+		return "modules/product/productOrderView";
+	}
+
 	private void showGoodsSpecification(ProductOrder productOrder, Model model){
 		if (StringUtils.isNotBlank(productOrder.getGoodsId())){
 			model.addAttribute("goodsSpecificationList",goodsSpecificationService.findList(new GoodsSpecification()));

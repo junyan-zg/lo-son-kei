@@ -189,10 +189,10 @@
                     <td>${goodsAll.specificationGroup}</td>
                     <td>
                         <c:if test="${goodsAll.delFlag == DEL_FLAG_NORMAL}">
-                            <input type="button" class="btn btn-info" value="禁用">
+                            <input type="button" class="btn btn-warning btn-mini" disabled="true" value="启用">
                         </c:if>
                         <c:if test="${goodsAll.delFlag == DEL_FLAG_DELETE}">
-                            <input type="button" class="btn btn-warning" value="启用">
+                            <input type="button" class="btn btn-info btn-mini" disabled="true" value="禁用">
                         </c:if>
                     </td>
                 </tr>

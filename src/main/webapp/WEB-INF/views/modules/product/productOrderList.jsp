@@ -72,7 +72,7 @@
 		<tbody>
 		<c:forEach items="${page.list}" var="productOrder">
 			<tr>
-				<td><a href="${ctx}/product/productOrder/form?id=${productOrder.id}">
+				<td><a href="${ctx}/product/productOrder/view<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>?id=${productOrder.id}">
 					${productOrder.orderName}
 				</a></td>
 				<td>
