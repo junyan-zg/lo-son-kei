@@ -3,7 +3,6 @@
  */
 package com.zjy.losonkei.modules.product.entity;
 
-import com.zjy.losonkei.modules.goods.entity.Goods;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import com.zjy.losonkei.modules.sys.entity.User;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
@@ -13,13 +12,12 @@ import org.hibernate.validator.constraints.Length;
 import com.zjy.losonkei.common.persistence.DataEntity;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 /**
  * 生产订单Entity
  * @author zjy
- * @version 2016-11-21
+ * @version 2016-12-3
  */
 public class ProductOrder extends DataEntity<ProductOrder> {
 	
@@ -31,16 +29,17 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 	private String processState;		// 当前流程状态
 	private BigDecimal budget;		// 预算
 	private BigDecimal costAll;		// 实际花费：根据product_log更新
-	private String state;		// 状态0进行中1成功2失败
+	private String state;		// 状态0待发布1生产中2审核中3已完成
+	private BigDecimal successRate;//成功率
 	private String productType;		// 0已有产品生产，1新产品生产
 
 	public final static String PRODUCT_TYPE_OLD = "0";
 	public final static String PRODUCT_TYPE_NEW = "1";
 
 	public final static String PRODUCT_STATE_INIT = "0";
-	public final static String PRODUCT_STATE_ING = "1";
-	public final static String PRODUCT_STATE_SUCCESS = "2";
-	public final static String PRODUCT_STATE_FAILED = "3";
+	public final static String PRODUCT_STATE_PRODUCTING = "1";
+	public final static String PRODUCT_STATE_AUDITING = "2";
+	public final static String PRODUCT_STATE_FINISHED = "3";
 
 	public final static String FLAG_NEW_INVENT = "flagNewInvent";
 
@@ -52,15 +51,15 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 
 	private boolean belongsMe = false;
 
-	private String managerId;
+	private String startUserId;
 
-	private String productorsIds;
-	private String productorsNames;
+	private String producersIds;
+	private String producersNames;
 
 	private String auditorsIds;
 	private String auditorsNames;
 
-	private List<ProductOrderDetails> productOrderDetailses;
+	private List<ProductOrderDetails> productOrderDetailsList;
 
 	public ProductOrder() {
 		super();
@@ -174,12 +173,12 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 		this.productsAmounts = productsAmounts;
 	}
 
-	public String getProductorsIds() {
-		return productorsIds;
+	public String getProducersIds() {
+		return producersIds;
 	}
 
-	public void setProductorsIds(String productorsIds) {
-		this.productorsIds = productorsIds;
+	public void setProducersIds(String producersIds) {
+		this.producersIds = producersIds;
 	}
 
 	public String getAuditorsIds() {
@@ -190,12 +189,12 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 		this.auditorsIds = auditorsIds;
 	}
 
-	public String getProductorsNames() {
-		return productorsNames;
+	public String getProducersNames() {
+		return producersNames;
 	}
 
-	public void setProductorsNames(String productorsNames) {
-		this.productorsNames = productorsNames;
+	public void setProducersNames(String producersNames) {
+		this.producersNames = producersNames;
 	}
 
 	public String getAuditorsNames() {
@@ -206,27 +205,43 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 		this.auditorsNames = auditorsNames;
 	}
 
-	public List<ProductOrderDetails> getProductOrderDetailses() {
-		return productOrderDetailses;
+	public List<ProductOrderDetails> getProductOrderDetailsList() {
+		return productOrderDetailsList;
 	}
 
-	public void setProductOrderDetailses(List<ProductOrderDetails> productOrderDetailses) {
-		this.productOrderDetailses = productOrderDetailses;
+	public void setProductOrderDetailsList(List<ProductOrderDetails> productOrderDetailsList) {
+		this.productOrderDetailsList = productOrderDetailsList;
 	}
 
-	public String getManagerId() {
-		return managerId;
+	public String getStartUserId() {
+		return startUserId;
 	}
 
-	public void setManagerId(String managerId) {
-		this.managerId = managerId;
+	public void setStartUserId(String startUserId) {
+		this.startUserId = startUserId;
 	}
 
 	public boolean getBelongsMe() {
 		User user = UserUtils.getUser();
 		String id = user.getId();
-		return id.equals(managerId) ||
-				(StringUtils.isNotBlank(productorsIds)&& productorsIds.contains(id))
-				|| (StringUtils.isNotBlank(auditorsIds)&& auditorsIds.contains(id));
+		return belongsMe = (id.equals(startUserId) ||
+				belongsUtils(id,producersIds) || belongsUtils(id,auditorsIds));
+	}
+
+	private boolean belongsUtils(String userId,String ids){
+		if(StringUtils.isNotBlank(ids)){
+			for (String id : ids.split(","))
+				if (userId.equals(id))
+					return true;
+		}
+		return false;
+	}
+
+	public BigDecimal getSuccessRate() {
+		return successRate;
+	}
+
+	public void setSuccessRate(BigDecimal successRate) {
+		this.successRate = successRate;
 	}
 }

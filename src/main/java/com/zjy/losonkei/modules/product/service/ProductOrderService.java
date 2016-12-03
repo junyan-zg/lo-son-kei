@@ -94,8 +94,8 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 		}
 
 		if (isNewRecord){
-			ProcessInstance processInstance = activitiService.startInventProcess(UserUtils.getUser().getId(), productOrder.getId(),
-					Arrays.asList(productOrder.getProductorsIds().split(",")),
+			ProcessInstance processInstance = activitiService.startProductProcess(UserUtils.getUser().getId(), productOrder.getId(),
+					Arrays.asList(productOrder.getProducersIds().split(",")),
 					Arrays.asList(productOrder.getAuditorsIds().split(",")));
 			productOrder.setProcessInstanceId(processInstance.getId());
 			productOrder.setProcessState(activitiService.getCurrentTaskByInstanceId(processInstance.getId()).getName());
@@ -104,7 +104,7 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 			productOrder.preUpdate();
 			dao.update(productOrder);
 			activitiService.updateVariablesByProcessInstanceId(productOrder.getProcessInstanceId(),
-					ActivitiUtils.VAR_PRODUCTERS, Arrays.asList(productOrder.getProductorsIds().split(",")));
+					ActivitiUtils.VAR_PRODUCERS, Arrays.asList(productOrder.getProducersIds().split(",")));
 			activitiService.updateVariablesByProcessInstanceId(productOrder.getProcessInstanceId(),
 					ActivitiUtils.VAR_AUDITORS, Arrays.asList(productOrder.getAuditorsIds().split(",")));
 		}
@@ -117,12 +117,14 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 	}
 
 	public void loadEntity(ProductOrder productOrder) {
-		productOrder.setManagerId((String) activitiService.getVariablesByProcessInstanceId(productOrder.getProcessInstanceId(),ActivitiUtils.VAR_MANAGER).getValue());
+		productOrder.setStartUserId(activitiService.getStartUserIdByProcessInstanceId(productOrder.getProcessInstanceId()));
 
-		List<String> productors = (List<String>) activitiService.getVariablesByProcessInstanceId(productOrder.getProcessInstanceId(),ActivitiUtils.VAR_PRODUCTERS).getValue();
-		String[] infos = fillUserInfo(productors);
-		productOrder.setProductorsIds(infos[0]);
-		productOrder.setProductorsNames(infos[1]);
+		//activitiService.getVariablesByProcessInstanceId(productOrder.getProcessInstanceId(),ActivitiUtils.VAR_STARTER).getValue();
+
+		List<String> producers = (List<String>) activitiService.getVariablesByProcessInstanceId(productOrder.getProcessInstanceId(),ActivitiUtils.VAR_PRODUCERS).getValue();
+		String[] infos = fillUserInfo(producers);
+		productOrder.setProducersIds(infos[0]);
+		productOrder.setProducersNames(infos[1]);
 		
 		List<String> auditors = (List<String>) activitiService.getVariablesByProcessInstanceId(productOrder.getProcessInstanceId(),ActivitiUtils.VAR_AUDITORS).getValue();
 		infos = fillUserInfo(auditors);
@@ -131,11 +133,11 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 
 		ProductOrderDetails productOrderDetails = new ProductOrderDetails();
 		productOrderDetails.setProductOrderId(productOrder.getId());
-		productOrder.setProductOrderDetailses(productOrderDetailsDao.findList(productOrderDetails));
+		productOrder.setProductOrderDetailsList(productOrderDetailsDao.findList(productOrderDetails));
 
 		StringBuffer goodsAllIds = new StringBuffer();
 		StringBuffer productsAmounts = new StringBuffer();
-		for (ProductOrderDetails p:productOrder.getProductOrderDetailses()){
+		for (ProductOrderDetails p:productOrder.getProductOrderDetailsList()){
 			p.setGoodsAll(GoodsAllUtils.fillProperty(GoodsAllUtils.getGoodAllById(p.getGoodsNo()),false));
 			goodsAllIds.append(p.getGoodsNo() + ",");
 			productsAmounts.append(p.getProductAmount() + ",");

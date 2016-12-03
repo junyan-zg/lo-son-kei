@@ -15,10 +15,7 @@ import com.zjy.losonkei.modules.product.utils.ActivitiUtils;
 import com.zjy.losonkei.modules.sys.entity.User;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import org.activiti.engine.*;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.history.*;
 import org.activiti.engine.impl.RepositoryServiceImpl;
@@ -35,7 +32,6 @@ import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.spring.ProcessEngineFactoryBean;
@@ -45,7 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
 
@@ -68,19 +63,23 @@ public class ActivitiService extends BaseService {
 	@Autowired
 	private ProcessEngineFactoryBean processEngine;
 
+	@Autowired
+	private IdentityService identityService;
+
 	/**
 	 * 开始研发新产品流程
-	 * @param managerId 通常为公司经理id
+	 * @param startUserId 创建者id
 	 * @param orderId   该为生产订单id
-	 * @param producters 生产者
+	 * @param producers 生产者
 	 * @param auditors	  审核者
      */
 	@Transactional(readOnly = false)
-	public ProcessInstance startInventProcess(String managerId,String orderId,List<String> producters,List<String> auditors){
+	public ProcessInstance startProductProcess(String startUserId, String orderId, List<String> producers, List<String> auditors){
 		Map<String, Object> variables = new HashMap<String, Object>();
-		variables.put(ActivitiUtils.VAR_MANAGER,managerId);
-		variables.put(ActivitiUtils.VAR_PRODUCTERS,producters);
+		variables.put(ActivitiUtils.VAR_STARTER, startUserId);
+		variables.put(ActivitiUtils.VAR_PRODUCERS, producers);
 		variables.put(ActivitiUtils.VAR_AUDITORS,auditors);
+		identityService.setAuthenticatedUserId(startUserId);
 		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ActivitiUtils.PROCESS_KEY_INVENT, orderId, variables);
 		return processInstance;
 	}
@@ -104,6 +103,10 @@ public class ActivitiService extends BaseService {
 
 	public HistoricVariableInstance getVariablesByProcessInstanceId(String processInstanceId,String varName) {
 		return historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).variableName(varName).singleResult();
+	}
+
+	public String getStartUserIdByProcessInstanceId(String processInstanceId) {
+		return historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult().getStartUserId();
 	}
 
 

@@ -71,7 +71,7 @@
                             <thead>
                             <tr>
                                 <th style="width: 20px;"><input disabled="true"
-                                                                <c:if test="${not empty goodsAlls && not empty productOrder.productOrderDetailses && fn:length(productOrder.productOrderDetailses) == fn:length(goodsAlls)}">checked="true"</c:if>
+                                                                <c:if test="${not empty goodsAlls && not empty productOrder.productOrderDetailsList && fn:length(productOrder.productOrderDetailsList) == fn:length(goodsAlls)}">checked="true"</c:if>
                                                                 type="checkbox"></th>
                                 <c:forEach var="list" items="${goodsSpecificationList}">
                                     <th>
@@ -86,8 +86,8 @@
                                 <c:forEach varStatus="status" var="i" items="${goodsAlls}">
                                     <tr>
                                         <td><input disabled="true"
-                                        <c:if test="${not empty productOrder.productOrderDetailses}">
-                                        <c:forEach var="pod" items="${productOrder.productOrderDetailses}">
+                                        <c:if test="${not empty productOrder.productOrderDetailsList}">
+                                        <c:forEach var="pod" items="${productOrder.productOrderDetailsList}">
                                                    <c:if test="${pod.goodsNo == i.id}">checked="true"</c:if>
                                         </c:forEach>
                                         </c:if> type="checkbox"></td>
@@ -97,8 +97,8 @@
                                                         test="${val.goodsSpecification.id eq list.id}">${val.specificationValue}</c:if></c:forEach>
                                             </td>
                                         </c:forEach>
-                                        <td><c:if test="${not empty productOrder.productOrderDetailses}"><c:forEach
-                                                var="pod" items="${productOrder.productOrderDetailses}"><c:if
+                                        <td><c:if test="${not empty productOrder.productOrderDetailsList}"><c:forEach
+                                                var="pod" items="${productOrder.productOrderDetailsList}"><c:if
                                                 test="${pod.goodsNo == i.id}">${pod.productAmount}</c:if></c:forEach></c:if></td>
                                     </tr>
                                 </c:forEach>
@@ -132,8 +132,8 @@
     <div class="control-group">
         <label class="control-label">生产人员：</label>
 
-        <div class="controls" title="${productOrder.productorsNames}">
-            <input readonly="true" value="${productOrder.productorsNames}" type="text" class="input-xxlarge">
+        <div class="controls" title="${productOrder.producersNames}">
+            <input readonly="true" value="${productOrder.producersNames}" type="text" class="input-xxlarge">
         </div>
     </div>
     <div class="control-group">

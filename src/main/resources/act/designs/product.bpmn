@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="product" name="产品生产流程" isExecutable="true">
+    <startEvent id="开始流程" name="开始流程"></startEvent>
+    <userTask id="生产产品" name="生产产品" activiti:candidateUsers="${producers}">
+      <documentation>使用用户组任务</documentation>
+    </userTask>
+    <userTask id="审核产品" name="审核产品" activiti:candidateUsers="${auditors}">
+      <documentation>使用用户组任务</documentation>
+    </userTask>
+    <endEvent id="结束流程" name="结束流程"></endEvent>
+    <userTask id="发布产品订单" name="发布产品订单" activiti:candidateUsers="${starter}"></userTask>
+    <sequenceFlow id="发布" sourceRef="发布产品订单" targetRef="生产产品"></sequenceFlow>
+    <sequenceFlow id="审核" sourceRef="审核产品" targetRef="结束流程"></sequenceFlow>
+    <sequenceFlow id="flow" sourceRef="开始流程" targetRef="发布产品订单"></sequenceFlow>
+    <sequenceFlow id="完成" sourceRef="生产产品" targetRef="审核产品"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_product">
+    <bpmndi:BPMNPlane bpmnElement="product" id="BPMNPlane_product">
+      <bpmndi:BPMNShape bpmnElement="开始流程" id="BPMNShape_开始流程">
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="97.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="生产产品" id="BPMNShape_生产产品">
+        <omgdc:Bounds height="55.0" width="105.0" x="410.0" y="87.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="审核产品" id="BPMNShape_审核产品">
+        <omgdc:Bounds height="55.0" width="105.0" x="410.0" y="224.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="结束流程" id="BPMNShape_结束流程">
+        <omgdc:Bounds height="35.0" width="35.0" x="445.0" y="360.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="发布产品订单" id="BPMNShape_发布产品订单">
+        <omgdc:Bounds height="55.0" width="105.0" x="195.0" y="87.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="发布" id="BPMNEdge_发布">
+        <omgdi:waypoint x="300.0" y="114.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="114.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="审核" id="BPMNEdge_审核">
+        <omgdi:waypoint x="462.0" y="279.0"></omgdi:waypoint>
+        <omgdi:waypoint x="462.0" y="360.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow" id="BPMNEdge_flow">
+        <omgdi:waypoint x="95.0" y="114.0"></omgdi:waypoint>
+        <omgdi:waypoint x="195.0" y="114.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="完成" id="BPMNEdge_完成">
+        <omgdi:waypoint x="462.0" y="142.0"></omgdi:waypoint>
+        <omgdi:waypoint x="462.0" y="224.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

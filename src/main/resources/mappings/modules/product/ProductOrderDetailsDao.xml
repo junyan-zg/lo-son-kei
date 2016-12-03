@@ -7,7 +7,7 @@
 		a.product_amount AS "productAmount",
 		a.goods_no AS "goodsNo",
 		a.product_order_id AS "productOrderId",
-		a.state AS "state",
+		a.success_amount AS "successAmount",
 		a.remarks AS "remarks",
 		a.create_by AS "createBy.id",
 		a.create_date AS "createDate",
@@ -51,9 +51,6 @@
 			<if test="productOrderId != null and productOrderId != ''">
 				AND a.product_order_id = #{productOrderId}
 			</if>
-			<if test="state != null and state != ''">
-				AND a.state = #{state}
-			</if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
@@ -89,7 +86,7 @@
 			product_amount,
 			goods_no,
 			product_order_id,
-			state,
+			success_amount,
 			remarks,
 			create_by,
 			create_date,
@@ -101,7 +98,7 @@
 			#{productAmount},
 			#{goodsNo},
 			#{productOrderId},
-			#{state},
+			#{successAmount},
 			#{remarks},
 			#{createBy.id},
 			#{createDate},
@@ -116,7 +113,7 @@
 			product_amount = #{productAmount},
 			goods_no = #{goodsNo},
 			product_order_id = #{productOrderId},
-			state = #{state},
+			success_amount = #{successAmount},
 			remarks = #{remarks},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},

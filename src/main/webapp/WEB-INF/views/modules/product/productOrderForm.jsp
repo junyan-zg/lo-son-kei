@@ -114,7 +114,7 @@
                             <thead>
                             <tr>
                                 <th style="width: 20px;"><input id="productDetailsAll"
-                                                                <c:if test="${not empty goodsAlls && not empty productOrder.productOrderDetailses && fn:length(productOrder.productOrderDetailses) == fn:length(goodsAlls)}">checked="true"</c:if>
+                                                                <c:if test="${not empty goodsAlls && not empty productOrder.productOrderDetailsList && fn:length(productOrder.productOrderDetailsList) == fn:length(goodsAlls)}">checked="true"</c:if>
                                                                 onclick="selectAll(this);" type="checkbox"></th>
                                 <c:forEach var="list" items="${goodsSpecificationList}">
                                     <th>
@@ -129,8 +129,8 @@
                                 <c:forEach varStatus="status" var="i" items="${goodsAlls}">
                                     <tr>
                                         <td><input onclick="selectSingle();"
-                                                   <c:if test="${not empty productOrder.productOrderDetailses}">
-                                                   <c:forEach var="pod" items="${productOrder.productOrderDetailses}">
+                                                   <c:if test="${not empty productOrder.productOrderDetailsList}">
+                                                   <c:forEach var="pod" items="${productOrder.productOrderDetailsList}">
                                                    <c:if test="${pod.goodsNo == i.id}">checked="true"</c:if>
                                         </c:forEach>
                                         </c:if> data-name="productDetails" type="checkbox" data-good-all-id="${i.id}"
@@ -142,8 +142,8 @@
                                             </td>
                                         </c:forEach>
                                         <td><input style="width: 50px;"
-                                                   <c:if test="${not empty productOrder.productOrderDetailses}">
-                                                   <c:forEach var="pod" items="${productOrder.productOrderDetailses}">
+                                                   <c:if test="${not empty productOrder.productOrderDetailsList}">
+                                                   <c:forEach var="pod" items="${productOrder.productOrderDetailsList}">
                                                    <c:if test="${pod.goodsNo == i.id}">value="${pod.productAmount}"</c:if>
                                         </c:forEach>
                                         </c:if> data-css="required digits" name="stock-${status.index}"
@@ -222,9 +222,9 @@
     <div class="control-group">
         <label class="control-label">生产人员：</label>
 
-        <div class="controls" title="${productOrder.productorsNames}">
-            <sys:treeselect id="productorsIds" name="productorsIds" value="${productOrder.productorsIds}"
-                            labelName="productorsNames" labelValue="${productOrder.productorsNames}"
+        <div class="controls" title="${productOrder.producersNames}">
+            <sys:treeselect id="producersIds" name="producersIds" value="${productOrder.producersIds}"
+                            labelName="producersNames" labelValue="${productOrder.producersNames}"
                             title="生产人员" url="/sys/office/treeData?type=3"
                             checked="true" dataMsgRequired="至少选择一个用户"
                             cssClass="required input-xxlarge" allowClear="true" notAllowSelectParent="true"/>

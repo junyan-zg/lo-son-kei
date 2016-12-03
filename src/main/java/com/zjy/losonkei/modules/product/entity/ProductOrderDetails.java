@@ -19,7 +19,7 @@ public class ProductOrderDetails extends DataEntity<ProductOrderDetails> {
 	private Integer productAmount;		// 生产数量
 	private String goodsNo;		// goods_all的goods_no
 	private String productOrderId;		// 生产订单表
-	private String state;		// 状态0待研发1进行中2成功3失败
+	private Integer successAmount;		// 状态0待研发1进行中2成功3失败
 
 	private GoodsAll goodsAll;
 	
@@ -36,7 +36,6 @@ public class ProductOrderDetails extends DataEntity<ProductOrderDetails> {
 		this.goodsNo = goodsAllId;
 		this.productAmount = productAmount;
 		this.productOrderId = productOrderId;
-		this.state = ProductOrder.PRODUCT_STATE_INIT;
 	}
 
 
@@ -67,13 +66,12 @@ public class ProductOrderDetails extends DataEntity<ProductOrderDetails> {
 		this.productOrderId = productOrderId;
 	}
 	
-	@Length(min=0, max=1, message="状态0进行中1成功2失败长度必须介于 0 和 1 之间")
-	public String getState() {
-		return state;
+	public Integer getSuccessAmount() {
+		return successAmount;
 	}
 
-	public void setState(String state) {
-		this.state = state;
+	public void setSuccessAmount(Integer successAmount) {
+		this.successAmount = successAmount;
 	}
 
 	public GoodsAll getGoodsAll() {
