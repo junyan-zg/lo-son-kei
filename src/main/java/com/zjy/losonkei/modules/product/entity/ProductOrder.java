@@ -3,9 +3,11 @@
  */
 package com.zjy.losonkei.modules.product.entity;
 
+import com.zjy.losonkei.modules.act.entity.Act;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import com.zjy.losonkei.modules.sys.entity.User;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
+import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
@@ -44,12 +46,18 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 	public final static String FLAG_NEW_INVENT = "flagNewInvent";
 
 
+	private Act act;
+
 	//form字段
 	private String goodsAllIds;
 
 	private String productsAmounts;
 
 	private boolean belongsMe = false;
+
+	private boolean nextStepBelongsMe = false;
+
+	private String nextStep;
 
 	private String startUserId;
 
@@ -243,5 +251,29 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 
 	public void setSuccessRate(BigDecimal successRate) {
 		this.successRate = successRate;
+	}
+
+	public Act getAct() {
+		return act;
+	}
+
+	public void setAct(Act act) {
+		this.act = act;
+	}
+
+	public String getNextStep() {
+		return nextStep;
+	}
+
+	public void setNextStep(String nextStep) {
+		this.nextStep = nextStep;
+	}
+
+	public boolean isNextStepBelongsMe() {
+		return nextStepBelongsMe;
+	}
+
+	public void setNextStepBelongsMe(boolean nextStepBelongsMe) {
+		this.nextStepBelongsMe = nextStepBelongsMe;
 	}
 }

@@ -1,7 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" import="com.zjy.losonkei.modules.product.entity.ProductOrder" %>
+<%@ page import="com.zjy.losonkei.common.config.Global" %>
 <%@ include file="/WEB-INF/views/include/taglib.jsp" %>
 <c:set var="DEL_FLAG_NORMAL" value="<%=ProductOrder.DEL_FLAG_NORMAL%>"></c:set>
 <c:set var="DEL_FLAG_DELETE" value="<%=ProductOrder.DEL_FLAG_DELETE%>"></c:set>
+<c:set var="PRODUCT_STATE_INIT" value="<%=ProductOrder.PRODUCT_STATE_INIT%>"></c:set>
+<c:if test="${not empty productOrder.state && productOrder.state != PRODUCT_STATE_INIT}">
+    <%request.getRequestDispatcher(Global.getAdminPath()+"/product/productOrder/view?id=PO161204004303076288").forward(request,response);%>
+</c:if>
 <html>
 <head>
     <title>生产订单管理</title>

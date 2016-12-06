@@ -23,6 +23,7 @@ import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
@@ -32,6 +33,7 @@ import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
+import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.spring.ProcessEngineFactoryBean;
@@ -142,7 +144,16 @@ public class ActivitiService extends BaseService {
 			e.setTask(task);
 			e.setVars(task.getProcessVariables());
 			e.setProcDef(ProcessDefCache.get(task.getProcessDefinitionId()));
-			e.setCandidateUsers(taskService.getIdentityLinksForTask(task.getId()));
+
+			List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+			List<String> candidateUsers = Lists.newArrayList();
+			for (IdentityLink identityLink:identityLinks){
+				candidateUsers.add(identityLink.getUserId());
+			}
+			e.setCandidateUsers(candidateUsers);
+
+			e.setStartUserId(getStartUserIdByProcessInstanceId(task.getProcessInstanceId()));
+			e.setProcIns(getProcessInstanceById(task.getProcessInstanceId()));
 			result.add(e);
 		}
 
@@ -195,93 +206,72 @@ public class ActivitiService extends BaseService {
 		page.setList(actList);
 		return page;
 	}
+
+
+	public String getOutGoingTransNamesSingleResult(String taskId) {
+		List<String> outGoingTransNames = getOutGoingTransNames(taskId);
+		return outGoingTransNames.isEmpty() ? "" : outGoingTransNames.get(0);
+	}
+
+	public List<String> getOutGoingTransNames(String taskId) {
+		List<String> transNames = new ArrayList<String>();
+		// 1.获取流程定义
+		Task task = getTask(taskId);
+		ProcessDefinitionEntity pd = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+		// 2.获取流程实例
+		ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+		// 3.通过流程实例查找当前活动的ID
+		String activitiId = pi.getActivityId();
+		// 4.通过活动的ID在流程定义中找到对应的活动对象
+		ActivityImpl activity = pd.findActivity(activitiId);
+		// 5.通过活动对象找当前活动的所有出口
+		List<PvmTransition> transitions =  activity.getOutgoingTransitions();
+		// 6.提取所有出口的名称，封装成集合
+		for (PvmTransition trans : transitions) {
+			String transName = trans.getId();
+			if(StringUtils.isNotBlank(transName)){
+				transNames.add(transName);
+			}
+		}
+		return transNames;
+	}
+
 	
 	/**
 	 * 获取流转历史列表
 	 * @param procInsId 流程实例
-	 * @param startAct 开始活动节点名称
-	 * @param endAct 结束活动节点名称
 	 */
-	public List<Act> histoicFlowList(String procInsId, String startAct, String endAct){
+	public List<Act> histoicFlowList(String procInsId){
 		List<Act> actList = Lists.newArrayList();
 		List<HistoricActivityInstance> list = historyService.createHistoricActivityInstanceQuery().processInstanceId(procInsId)
 				.orderByHistoricActivityInstanceStartTime().asc().orderByHistoricActivityInstanceEndTime().asc().list();
-		
-		boolean start = false;
-		Map<String, Integer> actMap = Maps.newHashMap();
-		
+
 		for (int i=0; i<list.size(); i++){
 			
 			HistoricActivityInstance histIns = list.get(i);
-			
-			// 过滤开始节点前的节点
-			if (StringUtils.isNotBlank(startAct) && startAct.equals(histIns.getActivityId())){
-				start = true;
-			}
-			if (StringUtils.isNotBlank(startAct) && !start){
-				continue;
-			}
-			
-			// 只显示开始节点和结束节点，并且执行人不为空的任务
-			if (StringUtils.isNotBlank(histIns.getAssignee())
-					 || "startEvent".equals(histIns.getActivityType())
-					 || "endEvent".equals(histIns.getActivityType())){
-				
-				// 给节点增加一个序号
-				Integer actNum = actMap.get(histIns.getActivityId());
-				if (actNum == null){
-					actMap.put(histIns.getActivityId(), actMap.size());
-				}
-				
+
+			// 不显示开始节点和结束节点
+			if (!"startEvent".equals(histIns.getActivityType()) &&
+					 ! "endEvent".equals(histIns.getActivityType())){
 				Act e = new Act();
 				e.setHistIns(histIns);
 				// 获取流程发起人名称
-				if ("startEvent".equals(histIns.getActivityType())){
-					List<HistoricProcessInstance> il = historyService.createHistoricProcessInstanceQuery().processInstanceId(procInsId).orderByProcessInstanceStartTime().asc().list();
-//					List<HistoricIdentityLink> il = historyService.getHistoricIdentityLinksForProcessInstance(procInsId);
-					if (il.size() > 0){
-						if (StringUtils.isNotBlank(il.get(0).getStartUserId())){
-							User user = UserUtils.getByLoginName(il.get(0).getStartUserId());
-							if (user != null){
-								e.setAssignee(histIns.getAssignee());
-								e.setAssigneeName(user.getName());
-							}
-						}
-					}
+				e.setStartUserId(getStartUserIdByProcessInstanceId(procInsId));
+				// 获取任务参与者名称
+				List<HistoricIdentityLink> historicIdentityLinks = historyService.getHistoricIdentityLinksForTask(histIns.getTaskId());
+				List<String> candidateUsers = Lists.newArrayList();
+				for (HistoricIdentityLink identityLink:historicIdentityLinks){
+					candidateUsers.add(identityLink.getUserId());
 				}
-				// 获取任务执行人名称
-				if (StringUtils.isNotEmpty(histIns.getAssignee())){
-					User user = UserUtils.getByLoginName(histIns.getAssignee());
-					if (user != null){
-						e.setAssignee(histIns.getAssignee());
-						e.setAssigneeName(user.getName());
-					}
-				}
+				e.setCandidateUsers(candidateUsers);
 				// 获取意见评论内容
 				if (StringUtils.isNotBlank(histIns.getTaskId())){
 					List<Comment> commentList = taskService.getTaskComments(histIns.getTaskId());
-					if (commentList.size()>0){
+					if (commentList.size() > 0){
 						e.setComment(commentList.get(0).getFullMessage());
 					}
 				}
 				actList.add(e);
-			}
-			
-			// 过滤结束节点后的节点
-			if (StringUtils.isNotBlank(endAct) && endAct.equals(histIns.getActivityId())){
-				boolean bl = false;
-				Integer actNum = actMap.get(histIns.getActivityId());
-				// 该活动节点，后续节点是否在结束节点之前，在后续节点中是否存在
-				for (int j=i+1; j<list.size(); j++){
-					HistoricActivityInstance hi = list.get(j);
-					Integer actNumA = actMap.get(hi.getActivityId());
-					if ((actNumA != null && actNumA < actNum) || StringUtils.equals(hi.getActivityId(), histIns.getActivityId())){
-						bl = true;
-					}
-				}
-				if (!bl){
-					break;
-				}
 			}
 		}
 		return actList;
@@ -314,79 +304,7 @@ public class ActivitiService extends BaseService {
 	}
 	
 
-	/**
-	 * 获取流程实例对象
-	 * @param procInsId
-	 * @return
-	 */
-	@Transactional(readOnly = false)
-	public ProcessInstance getProcIns(String procInsId) {
-		return runtimeService.createProcessInstanceQuery().processInstanceId(procInsId).singleResult();
-	}
 
-	/**
-	 * 启动流程
-	 * @param procDefKey 流程定义KEY
-	 * @param businessTable 业务表表名
-	 * @param businessId	业务表编号
-	 * @return 流程实例ID
-	 */
-	@Transactional(readOnly = false)
-	public String startProcess(String procDefKey, String businessTable, String businessId) {
-		return startProcess(procDefKey, businessTable, businessId, "");
-	}
-	
-	/**
-	 * 启动流程
-	 * @param procDefKey 流程定义KEY
-	 * @param businessTable 业务表表名
-	 * @param businessId	业务表编号
-	 * @param title			流程标题，显示在待办任务标题
-	 * @return 流程实例ID
-	 */
-	@Transactional(readOnly = false)
-	public String startProcess(String procDefKey, String businessTable, String businessId, String title) {
-		Map<String, Object> vars = Maps.newHashMap();
-		return startProcess(procDefKey, businessTable, businessId, title, vars);
-	}
-	
-	/**
-	 * 启动流程
-	 * @param procDefKey 流程定义KEY
-	 * @param businessTable 业务表表名
-	 * @param businessId	业务表编号
-	 * @param title			流程标题，显示在待办任务标题
-	 * @param vars			流程变量
-	 * @return 流程实例ID
-	 */
-	@Transactional(readOnly = false)
-	public String startProcess(String procDefKey, String businessTable, String businessId, String title, Map<String, Object> vars) {
-		String userId = UserUtils.getUser().getLoginName();//ObjectUtils.toString(UserUtils.getUser().getId())
-		
-		// 用来设置启动流程的人员ID，引擎会自动把用户ID保存到activiti:initiator中
-		//identityService.setAuthenticatedUserId(userId);
-		
-		// 设置流程变量
-		if (vars == null){
-			vars = Maps.newHashMap();
-		}
-		
-		// 设置流程标题
-		if (StringUtils.isNotBlank(title)){
-			vars.put("title", title);
-		}
-		
-		// 启动流程
-		ProcessInstance procIns = runtimeService.startProcessInstanceByKey(procDefKey, businessTable+":"+businessId, vars);
-		
-		// 更新业务表流程实例ID
-		Act act = new Act();
-		act.setBusinessTable(businessTable);// 业务表名
-		act.setBusinessId(businessId);	// 业务表ID
-		act.setProcInsId(procIns.getId());
-		//actDao.updateProcInsIdByBusinessId(act);
-		return act.getProcInsId();
-	}
 
 	/**
 	 * 获取任务

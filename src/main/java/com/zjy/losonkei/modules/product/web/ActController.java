@@ -4,6 +4,7 @@ package com.zjy.losonkei.modules.product.web;
  * Created by zjy on 2016/11/13.
  */
 
+import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.act.entity.Act;
 import com.zjy.losonkei.modules.product.service.ActivitiService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping("${adminPath}/product/act/")
-public class ActController {
+public class ActController extends BaseController{
 
     //taskName,forward
     private static final Map<String,String> rounter = new HashMap<String, String>();
@@ -35,9 +36,9 @@ public class ActController {
     private ActivitiService activitiService;
 
     @RequestMapping("ready/todo/list")
-    public String currentInventList(Act act,Model model){
+    public String readyTodoList(Act act,Model model){
         model.addAttribute("list",activitiService.todoList(act));
-        return "modules/product/invent/actCurrentInventList";
+        return "modules/product/act/readyToDoList";
     }
 
 
@@ -54,6 +55,11 @@ public class ActController {
         while ((len = imageStream.read(b, 0, 1024)) != -1) {
             response.getOutputStream().write(b, 0, len);
         }
+    }
+
+    public String doTask(String taskId){
+
+        return null;
     }
 
 }

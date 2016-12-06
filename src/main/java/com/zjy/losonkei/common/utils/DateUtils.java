@@ -33,7 +33,15 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 	public static String getDate(String pattern) {
 		return DateFormatUtils.format(new Date(), pattern);
 	}
-	
+	/**
+	 * 得到时间戳日期字符串 格式（yyyy-MM-dd） pattern可以为："yyyy-MM-dd" "HH:mm:ss" "E"
+	 */
+	public static String getDateByTimestamp(Long timestamp,String pattern) {
+		if (timestamp != null && timestamp > 0){
+			return DateFormatUtils.format(new Date(timestamp), pattern);
+		}
+		return null;
+	}
 	/**
 	 * 得到日期字符串 默认格式（yyyy-MM-dd） pattern可以为："yyyy-MM-dd" "HH:mm:ss" "E"
 	 */

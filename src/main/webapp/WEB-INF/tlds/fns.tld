@@ -63,7 +63,15 @@
     <function-signature>com.zjy.losonkei.modules.sys.entity.User get(java.lang.String)</function-signature>
     <example>${fns:getUserById(id)}</example>  
   </function>
-  
+
+  <function>
+    <description>根据订单编号或businesskey获取生产订单对象</description>
+    <name>getProductOrderById</name>
+    <function-class>com.zjy.losonkei.modules.product.utils.ProductOrderUtils</function-class>
+    <function-signature>com.zjy.losonkei.modules.product.entity.ProductOrder getProductOrderById(java.lang.String)</function-signature>
+    <example>${fns:getProductOrderById(id)}</example>
+  </function>
+
   <function>
     <description>获取授权用户信息</description>
     <name>getPrincipal</name>
@@ -226,6 +234,13 @@
     <function-class>com.zjy.losonkei.common.utils.DateUtils</function-class>
     <function-signature>java.lang.String getDate(java.lang.String)</function-signature>
     <example>${fns:getDate(pattern)}</example>  
+  </function>
+  <function>
+    <description>获取时间戳日期</description>
+    <name>getDateByTimestamp</name>
+    <function-class>com.zjy.losonkei.common.utils.DateUtils</function-class>
+    <function-signature>java.lang.String getDateByTimestamp(java.lang.Long,java.lang.String)</function-signature>
+    <example>${fns:getDateByTimestamp(timestamp,pattern)}</example>
   </function>
   <function>
     <description>获取过去的天数</description>

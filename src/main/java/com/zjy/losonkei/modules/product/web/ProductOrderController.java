@@ -6,12 +6,15 @@ package com.zjy.losonkei.modules.product.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zjy.losonkei.modules.act.entity.Act;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import com.zjy.losonkei.modules.goods.entity.GoodsSpecification;
 import com.zjy.losonkei.modules.goods.service.GoodsService;
 import com.zjy.losonkei.modules.goods.service.GoodsSpecificationService;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
+import com.zjy.losonkei.modules.product.service.ActivitiService;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +45,13 @@ import java.util.List;
 public class ProductOrderController extends BaseController {
 
 	@Autowired
-	private GoodsService goodsService;
-
-	@Autowired
 	private GoodsSpecificationService goodsSpecificationService;
 
 	@Autowired
 	private ProductOrderService productOrderService;
+
+	@Autowired
+	private ActivitiService activitiService;
 	
 	@ModelAttribute
 	public ProductOrder get(@RequestParam(required=false) String id) {
@@ -99,10 +102,15 @@ public class ProductOrderController extends BaseController {
 		return "modules/product/productOrderForm";
 	}
 
-	@RequiresPermissions("product:productOrder:viewNew")
-	@RequestMapping(value = "viewNew")
-	public String viewNew(ProductOrder productOrder, Model model) {
-		formNew(productOrder,model);
+	@RequiresPermissions(value = {"product:productOrder:viewNew","product:productOrder:viewOld"}, logical = Logical.OR)
+	@RequestMapping(value = "view")
+	public String view(ProductOrder productOrder, Model model) {
+		if (ProductOrder.PRODUCT_TYPE_NEW.equals(productOrder.getProductType())){
+			formNew(productOrder,model);
+		}else {
+			formOld(productOrder,model);
+		}
+		model.addAttribute("histoicFlowList",activitiService.histoicFlowList(productOrder.getProcessInstanceId()));
 		return "modules/product/productOrderView";
 	}
 

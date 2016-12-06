@@ -3,6 +3,7 @@
  */
 package com.zjy.losonkei.modules.product.service;
 
+import com.google.common.collect.Lists;
 import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.service.CrudService;
 import com.zjy.losonkei.common.utils.StringUtils;
@@ -15,6 +16,8 @@ import com.zjy.losonkei.modules.product.utils.ActivitiUtils;
 import com.zjy.losonkei.modules.sys.entity.User;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.IdentityLink;
+import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -148,7 +151,21 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 		if (productsAmounts.length() > 0){
 			productOrder.setProductsAmounts(productsAmounts.substring(0,productsAmounts.length()-1));
 		}
+		if (!ProductOrder.PRODUCT_STATE_FINISHED.equals(productOrder.getState())){
+			Task task = activitiService.getCurrentTaskByInstanceId(productOrder.getProcessInstanceId());
+			if (task != null){
+				productOrder.setNextStep(activitiService.getOutGoingTransNamesSingleResult(task.getId()));
 
+				List<IdentityLink> identityLinks = activitiService.getTaskService().getIdentityLinksForTask(task.getId());
+				String meId = UserUtils.getUser().getId();
+				for (IdentityLink identityLink:identityLinks){
+					if (meId.equals(identityLink.getUserId())){
+						productOrder.setNextStepBelongsMe(true);
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	private String[] fillUserInfo(List<String> idsList){

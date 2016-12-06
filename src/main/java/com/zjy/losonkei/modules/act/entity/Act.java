@@ -11,7 +11,6 @@ import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -66,7 +65,9 @@ public class Act extends BaseEntity<Act> {
 
 	private List<Act> list; // 任务列表
 
-	private List<IdentityLink> candidateUsers;//参与者
+	private List<String> candidateUsers;//执行者
+
+	private String startUserId;//发起者
 
 	public Act() {
 		super();
@@ -150,11 +151,11 @@ public class Act extends BaseEntity<Act> {
 
 	public void setProcIns(ProcessInstance procIns) {
 		this.procIns = procIns;
-		if (procIns != null && procIns.getBusinessKey() != null){
+		/*if (procIns != null && procIns.getBusinessKey() != null){
 			String[] ss = procIns.getBusinessKey().split(":");
 			setBusinessTable(ss[0]);
 			setBusinessId(ss[1]);
-		}
+		}*/
 	}
 
 //	public String getProcExecUrl() {
@@ -382,12 +383,20 @@ public class Act extends BaseEntity<Act> {
 		
 	}
 
-	public List<IdentityLink> getCandidateUsers() {
+	public List<String> getCandidateUsers() {
 		return candidateUsers;
 	}
 
-	public void setCandidateUsers(List<IdentityLink> candidateUsers) {
+	public void setCandidateUsers(List<String> candidateUsers) {
 		this.candidateUsers = candidateUsers;
+	}
+
+	public String getStartUserId() {
+		return startUserId;
+	}
+
+	public void setStartUserId(String startUserId) {
+		this.startUserId = startUserId;
 	}
 }
 

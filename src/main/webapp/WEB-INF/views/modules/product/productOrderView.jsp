@@ -34,7 +34,7 @@
         <a href="${ctx}/product/productOrder/list<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>">生产订单列表</a>
     </li>
     <li class="active"><a
-            href="${ctx}/product/productOrder/view<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>?id=${productOrder.id}">生产订单查看</a>
+            href="${ctx}/product/productOrder/view?id=${productOrder.id}">生产订单查看</a>
     </li>
 </ul>
 <br/>
@@ -169,12 +169,9 @@
             </div>
         </div>
     </c:if>
-    <c:if test="${empty productOrder.id}">
+    <%--<c:if test="${empty productOrder.id}">
         <input type="hidden" name="state" value="<%=ProductOrder.PRODUCT_STATE_INIT%>">
-    </c:if>
-    <input type="hidden" name="productType"
-           value="<c:if test="${not empty flagNewInvent}"><%=ProductOrder.PRODUCT_TYPE_NEW%></c:if><c:if test="${empty flagNewInvent}"><%=ProductOrder.PRODUCT_TYPE_OLD%></c:if>"/>
-
+    </c:if>--%>
     <div class="control-group">
         <label class="control-label">备注：</label>
 
@@ -183,10 +180,30 @@
                            class="input-xxlarge "/>
         </div>
     </div>
+    <div class="control-group">
+        <label class="control-label">生产日志：</label>
+        <div class="controls">
+           <a class="btn btn-primary btn-mini">查看</a>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">流转信息：</label>
+        <div class="controls">
+            <div class="row-fluid">
+                <div class="span11">
+                    <%@include file="/WEB-INF/views/modules/include/actTaskHistoricFlow.jsp"%>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="form-actions">
+        <c:if test="${productOrder.nextStepBelongsMe && not empty productOrder.nextStep}">
+            <input style="margin-right: 20px;" type="button" class="btn btn-primary" value="${productOrder.nextStep}"/>
+        </c:if>
         <input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
     </div>
 </form:form>
+
 <c:if test="${not empty productOrder.goodsId}">
     <script type="text/template" id="showGoodsDetails">
         <table class="table table-striped table-bordered table-condensed">
