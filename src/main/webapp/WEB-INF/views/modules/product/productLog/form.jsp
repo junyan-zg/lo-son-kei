@@ -27,8 +27,8 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li><a href="${ctx}/product/productLog/">生产日志列表</a></li>
-		<li class="active"><a href="${ctx}/product/productLog/form?id=${productLog.id}">生产日志<shiro:hasPermission name="product:productLog:edit">${not empty productLog.id?'修改':'添加'}</shiro:hasPermission><shiro:lacksPermission name="product:productLog:edit">查看</shiro:lacksPermission></a></li>
+		<li><a href="${ctx}/product/productLog?productOrderId=${productLog.productOrderId}">生产日志列表</a></li>
+		<li class="active"><a href="${ctx}/product/productLog/form?productOrderId=${productLog.productOrderId}">生产日志添加</a></li>
 	</ul><br/>
 	<form:form id="inputForm" modelAttribute="productLog" action="${ctx}/product/productLog/save" method="post" class="form-horizontal">
 		<form:hidden path="id"/>
@@ -36,13 +36,14 @@
 		<div class="control-group">
 			<label class="control-label">内容：</label>
 			<div class="controls">
-				<form:textarea path="content" htmlEscape="false" rows="4" class="input-xxlarge "/>
+				<form:textarea path="content" htmlEscape="false" rows="4" class="input-xxlarge required"/>
+				<span class="help-inline" style="color: red">*</span>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">花费：</label>
 			<div class="controls">
-				<form:input path="cost" htmlEscape="false" class="input-xlarge  number"/>
+				<form:input path="cost" htmlEscape="false" class="input-medium  number"/>
 			</div>
 		</div>
 		<%--<div class="control-group">

@@ -5,6 +5,9 @@ package com.zjy.losonkei.modules.product.service;
 
 import java.util.List;
 
+import com.zjy.losonkei.modules.product.dao.ProductOrderDao;
+import com.zjy.losonkei.modules.product.entity.ProductOrder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,9 @@ import com.zjy.losonkei.modules.product.dao.ProductLogDao;
 @Transactional(readOnly = true)
 public class ProductLogService extends CrudService<ProductLogDao, ProductLog> {
 
+	@Autowired
+	private ProductOrderDao productOrderDao;
+
 	public ProductLog get(String id) {
 		return super.get(id);
 	}
@@ -37,6 +43,10 @@ public class ProductLogService extends CrudService<ProductLogDao, ProductLog> {
 	@Transactional(readOnly = false)
 	public void save(ProductLog productLog) {
 		super.save(productLog);
+
+		ProductOrder productOrder = productOrderDao.get(productLog.getProductOrderId());
+		productOrder.setCostAll(dao.countCost(productLog));
+		productOrderDao.updateCostAll(productOrder);
 	}
 	
 	@Transactional(readOnly = false)

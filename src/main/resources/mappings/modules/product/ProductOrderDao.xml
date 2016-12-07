@@ -156,7 +156,13 @@
 			update_date = #{updateDate}
 		WHERE id = #{id}
 	</update>
-	
+
+	<update id="updateCostAll">
+		UPDATE product_order SET
+		cost_all = #{costAll}
+		WHERE id = #{id}
+	</update>
+
 	<update id="delete">
 		UPDATE product_order SET 
 			del_flag = #{DEL_FLAG_DELETE}

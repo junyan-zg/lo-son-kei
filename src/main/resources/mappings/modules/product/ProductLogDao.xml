@@ -54,14 +54,17 @@
 		SELECT DISTINCT
 		create_by
 		FROM product_log
-		<include refid="productLogJoins"/>
 		<where>
-			del_flag = #{DEL_FLAG_NORMAL}
-			<if test="productOrderId != null and productOrderId != ''">
-				AND product_order_id = #{productOrderId}
-			</if>
+			  product_order_id = #{productOrderId}
 		</where>
 		GROUP BY create_by
+	</select>
+
+	<select id="countCost" resultType="java.math.BigDecimal">
+		SELECT SUM(cost) FROM product_log
+		<where>
+			  product_order_id = #{productOrderId}
+		</where>
 	</select>
 	
 	<select id="findAllList" resultType="ProductLog">

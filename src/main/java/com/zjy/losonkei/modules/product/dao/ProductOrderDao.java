@@ -7,6 +7,8 @@ import com.zjy.losonkei.common.persistence.CrudDao;
 import com.zjy.losonkei.common.persistence.annotation.MyBatisDao;
 import com.zjy.losonkei.modules.product.entity.ProductOrder;
 
+import java.math.BigDecimal;
+
 /**
  * 生产订单DAO接口
  * @author zjy
@@ -14,5 +16,5 @@ import com.zjy.losonkei.modules.product.entity.ProductOrder;
  */
 @MyBatisDao
 public interface ProductOrderDao extends CrudDao<ProductOrder> {
-	
+	public void updateCostAll(ProductOrder productOrder);
 }

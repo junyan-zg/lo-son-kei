@@ -18,7 +18,7 @@
 </head>
 <body>
 
-<c:if test="${ empty nextStepBelongsMe || nextStepBelongsMe == 'yes'}">
+<c:if test="${not empty nextStepBelongsMe && nextStepBelongsMe == 'yes'}">
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/product/productLog?productOrderId=${productLog.productOrderId}">生产日志列表</a></li>
 			<shiro:hasPermission name="product:productLog:edit"><li><a href="${ctx}/product/productLog/form?productOrderId=${productLog.productOrderId}">生产日志添加</a></li></shiro:hasPermission>
