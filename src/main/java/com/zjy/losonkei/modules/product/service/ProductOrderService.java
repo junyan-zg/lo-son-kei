@@ -156,17 +156,12 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 			if (task != null){
 				productOrder.setNextStep(activitiService.getOutGoingTransNamesSingleResult(task.getId()));
 
-				List<IdentityLink> identityLinks = activitiService.getTaskService().getIdentityLinksForTask(task.getId());
-				String meId = UserUtils.getUser().getId();
-				for (IdentityLink identityLink:identityLinks){
-					if (meId.equals(identityLink.getUserId())){
-						productOrder.setNextStepBelongsMe(true);
-						break;
-					}
-				}
+				productOrder.setNextStepBelongsMe(activitiService.nextStepBelongsMe(null,task.getId()));
 			}
 		}
 	}
+
+
 
 	private String[] fillUserInfo(List<String> idsList){
 		StringBuffer ids = new StringBuffer();

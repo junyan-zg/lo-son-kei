@@ -183,7 +183,7 @@
     <div class="control-group">
         <label class="control-label">生产日志：</label>
         <div class="controls">
-           <a class="btn btn-primary btn-mini">查看</a>
+           <a class="btn btn-primary btn-mini" onclick="openLog('${ctx}/product/productLog?productOrderId=${productOrder.id}');">查看</a>
         </div>
     </div>
     <div class="control-group">
@@ -196,13 +196,28 @@
             </div>
         </div>
     </div>
+</form:form>
+
     <div class="form-actions">
         <c:if test="${productOrder.nextStepBelongsMe && not empty productOrder.nextStep}">
             <input style="margin-right: 20px;" type="button" class="btn btn-primary" value="${productOrder.nextStep}"/>
         </c:if>
         <input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
     </div>
-</form:form>
+
+<script>
+    function openLog(url){
+        top.$.jBox("iframe:" + url, {
+            title: "生产日志",
+            width: 800,
+            height: 500,
+            buttons: {"关闭": true},
+            loaded: function (h) {
+                $(".jbox-content", top.document).css("overflow-y", "hidden");
+            }
+        });
+    }
+</script>
 
 <c:if test="${not empty productOrder.goodsId}">
     <script type="text/template" id="showGoodsDetails">

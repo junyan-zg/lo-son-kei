@@ -278,6 +278,34 @@ public class ActivitiService extends BaseService {
 	}
 
 	/**
+	 * 流程下一步是否让我操作，参数任意填一个就可以。
+	 * @param processInstanceId
+	 * @param taskId
+	 * @return
+	 */
+	public boolean nextStepBelongsMe(String processInstanceId,String taskId){
+		boolean flag = false;
+
+		if (StringUtils.isNotBlank(processInstanceId)){
+			Task task = getCurrentTaskByInstanceId(processInstanceId);
+			if (task == null){
+				return flag;
+			}else{
+				taskId = task.getId();
+			}
+		}
+		List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+		String meId = UserUtils.getUser().getId();
+		for (IdentityLink identityLink:identityLinks){
+			if (meId.equals(identityLink.getUserId())){
+				flag = true;
+				break;
+			}
+		}
+		return flag;
+	}
+
+	/**
 	 * 获取流程列表
 	 * @param category 流程分类
 	 */
