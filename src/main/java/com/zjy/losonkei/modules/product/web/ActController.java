@@ -57,9 +57,4 @@ public class ActController extends BaseController{
         }
     }
 
-    public String doTask(String taskId){
-
-        return null;
-    }
-
 }

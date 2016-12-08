@@ -147,4 +147,10 @@ public class ProductOrderController extends BaseController {
 		return "redirect:"+Global.getAdminPath()+"/product/productOrder/?repage";
 	}
 
+	@RequestMapping(value = "doTask")
+	public String doTask(ProductOrder productOrder,String taskId,String comment,HttpServletRequest request) {
+		productOrderService.doTask(productOrder,taskId,comment,request);
+		return "redirect:"+Global.getAdminPath()+"/product/productOrder/view?id="+ productOrder.getId() +"&repage";
+	}
+
 }

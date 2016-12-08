@@ -17,7 +17,7 @@
             <td><fmt:formatDate value="${act.histIns.startTime}" type="both"/></td>
             <td><fmt:formatDate value="${act.histIns.endTime}" type="both"/></td>
             <td title="${act.comment}" style="word-wrap:break-word;word-break:break-all;">${act.comment}</td>
-            <td>${fns:getDateByTimestamp(act.histIns.durationInMillis,'yyyy-MM-dd HH:mm:ss')}</td>
+            <td><c:if test="${not empty act.histIns.durationInMillis}"><fmt:formatNumber var="day" value="${act.histIns.durationInMillis/(24*60*60*1000)}" maxFractionDigits="1"/>${day}&nbsp;天</c:if></td>
         </tr>
     </c:forEach>
 </table>

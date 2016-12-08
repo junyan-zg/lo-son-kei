@@ -1,7 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" import="com.zjy.losonkei.modules.product.entity.ProductOrder" %>
 <%@ include file="/WEB-INF/views/include/taglib.jsp" %>
-<c:set var="DEL_FLAG_NORMAL" value="<%=ProductOrder.DEL_FLAG_NORMAL%>"></c:set>
-<c:set var="DEL_FLAG_DELETE" value="<%=ProductOrder.DEL_FLAG_DELETE%>"></c:set>
+<c:set var="DEL_FLAG_NORMAL" value="<%=ProductOrder.DEL_FLAG_NORMAL%>"/>
+<c:set var="DEL_FLAG_DELETE" value="<%=ProductOrder.DEL_FLAG_DELETE%>"/>
+<c:set var="PRODUCT_STATE_AUDITING" value="<%=ProductOrder.PRODUCT_STATE_AUDITING%>"/>
+<c:set var="PRODUCT_STATE_FINISHED" value="<%=ProductOrder.PRODUCT_STATE_FINISHED%>"/>
 <html>
 <head>
     <title>生产订单管理</title>
@@ -79,6 +81,12 @@
                                     </th>
                                 </c:forEach>
                                 <th class="sort-column">生产数量</th>
+                                <c:if test="${PRODUCT_STATE_FINISHED == productOrder.state}">
+                                    <th class="sort-column">合格数量</th>
+                                </c:if>
+                                <c:if test="${PRODUCT_STATE_AUDITING == productOrder.state && productOrder.nextStepBelongsMe && not empty productOrder.nextStep}">
+                                    <th class="sort-column">合格数量</th>
+                                </c:if>
                             </tr>
                             </thead>
                             <tbody>
@@ -97,9 +105,33 @@
                                                         test="${val.goodsSpecification.id eq list.id}">${val.specificationValue}</c:if></c:forEach>
                                             </td>
                                         </c:forEach>
-                                        <td><c:if test="${not empty productOrder.productOrderDetailsList}"><c:forEach
-                                                var="pod" items="${productOrder.productOrderDetailsList}"><c:if
-                                                test="${pod.goodsNo == i.id}">${pod.productAmount}</c:if></c:forEach></c:if></td>
+                                        <td>
+                                            <c:if test="${not empty productOrder.productOrderDetailsList}">
+                                            <c:forEach var="pod" items="${productOrder.productOrderDetailsList}">
+                                                <c:if test="${pod.goodsNo == i.id}">${pod.productAmount}</c:if>
+                                            </c:forEach>
+                                            </c:if>
+                                        </td>
+                                        <c:if test="${PRODUCT_STATE_FINISHED == productOrder.state}">
+                                            <td>
+                                                <c:if test="${not empty productOrder.productOrderDetailsList}">
+                                                    <c:forEach var="pod" items="${productOrder.productOrderDetailsList}">
+                                                        <c:if test="${pod.goodsNo == i.id}">${pod.successAmount}</c:if>
+                                                    </c:forEach>
+                                                </c:if>
+                                            </td>
+                                        </c:if>
+                                        <c:if test="${PRODUCT_STATE_AUDITING == productOrder.state && productOrder.nextStepBelongsMe && not empty productOrder.nextStep}">
+                                            <td>
+                                                <c:if test="${not empty productOrder.productOrderDetailsList}">
+                                                    <c:forEach var="pod" items="${productOrder.productOrderDetailsList}">
+                                                        <c:if test="${pod.goodsNo == i.id}">
+                                                            <input style="width: 50px;" class="required digits successAmount" id="test${i.id}" data-product-amount="${pod.productAmount}" data-id="${pod.id}">
+                                                        </c:if>
+                                                    </c:forEach>
+                                                </c:if>
+                                            </td>
+                                        </c:if>
                                     </tr>
                                 </c:forEach>
                             </c:if>
@@ -196,15 +228,64 @@
             </div>
         </div>
     </div>
-</form:form>
+
+    <c:if test="${productOrder.nextStepBelongsMe && not empty productOrder.nextStep}">
+    <div class="control-group">
+        <label class="control-label">提交意见：</label>
+        <div class="controls">
+            <textarea id="comment" rows="4" class="input-xxlarge"></textarea>
+        </div>
+    </div>
+    </c:if>
 
     <div class="form-actions">
         <c:if test="${productOrder.nextStepBelongsMe && not empty productOrder.nextStep}">
-            <input style="margin-right: 20px;" type="button" class="btn btn-primary" value="${productOrder.nextStep}"/>
+            <input onclick="fillForm();" style="margin-right: 20px;" type="button" class="btn btn-primary" value="${productOrder.nextStep}"/>
         </c:if>
         <input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
     </div>
 
+</form:form>
+<c:if test="${productOrder.nextStepBelongsMe && not empty productOrder.nextStep}">
+    <form id="act-form" action="${ctx}/product/productOrder/doTask" method="post">
+        <input type="hidden" name="id" value="${productOrder.id}"/>
+        <input type="hidden" name="taskId" value="${productOrder.act.task.id}"/>
+        <input type="hidden" name="comment" id="form-comment"/>
+    </form>
+    <script>
+        function fillForm(){
+            var srcHtml = $("#act-form").html();
+            var flag = true;
+            $(".successAmount").each(function(){
+               var name = $(this).attr("data-id") + "Amount";
+               var value = $(this).val();
+                if(value.trim() == '' || !isPositiveNum(value.trim())){
+                    flag = false;
+                    this.focus();
+                    return;
+                }
+                if(parseInt(value.trim()) > parseInt($(this).attr("data-product-amount"))){
+                    flag = false;
+                    this.focus();
+                    return;
+                }
+                var html = "<input name=\"" + name + "\" value=\"" + value.trim() + "\" type=\"hidden\"/>";
+                $("#act-form").append(html);
+            });
+            $("#form-comment").val($("#comment").val());
+            if(flag){
+                $("#act-form").submit();
+            }else {
+                $("#act-form").html(srcHtml);
+                alertx("请填写正确的数量！");
+            }
+        }
+        function isPositiveNum(s){//是否为正整数
+            var re = /^[0-9]*[1-9][0-9]*$/ ;
+            return re.test(s)
+        }
+    </script>
+</c:if>
 <script>
     function openLog(url){
         top.$.jBox("iframe:" + url, {

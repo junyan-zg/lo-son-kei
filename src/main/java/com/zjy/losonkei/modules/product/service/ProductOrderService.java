@@ -7,6 +7,11 @@ import com.google.common.collect.Lists;
 import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.service.CrudService;
 import com.zjy.losonkei.common.utils.StringUtils;
+import com.zjy.losonkei.modules.act.entity.Act;
+import com.zjy.losonkei.modules.goods.entity.Goods;
+import com.zjy.losonkei.modules.goods.entity.GoodsAll;
+import com.zjy.losonkei.modules.goods.service.GoodsAllService;
+import com.zjy.losonkei.modules.goods.service.GoodsService;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import com.zjy.losonkei.modules.product.dao.ProductOrderDao;
 import com.zjy.losonkei.modules.product.dao.ProductOrderDetailsDao;
@@ -23,8 +28,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 生产订单Service
@@ -40,6 +48,12 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 
 	@Autowired
 	private ActivitiService activitiService;
+
+	@Autowired
+	private GoodsService goodsService;
+
+	@Autowired
+	private GoodsAllService goodsAllService;
 
 	public ProductOrder get(String id) {
 		return super.get(id);
@@ -70,6 +84,11 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 		if (isNewRecord){
 			productOrder.preInsert();
 		}else {
+			//非初始化状态不可修改
+			if(!ProductOrder.PRODUCT_STATE_INIT.equals(productOrder.getState())){
+				return;
+			}
+
 			for (ProductOrderDetails productOrderDetailsDelete : productOrderDetailsDao.findList(new ProductOrderDetails(null,null, productOrder.getId()))){
 				productOrderDetailsDao.delete(productOrderDetailsDelete);
 			}
@@ -128,7 +147,7 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 		String[] infos = fillUserInfo(producers);
 		productOrder.setProducersIds(infos[0]);
 		productOrder.setProducersNames(infos[1]);
-		
+
 		List<String> auditors = (List<String>) activitiService.getVariablesByProcessInstanceId(productOrder.getProcessInstanceId(),ActivitiUtils.VAR_AUDITORS).getValue();
 		infos = fillUserInfo(auditors);
 		productOrder.setAuditorsIds(infos[0]);
@@ -154,14 +173,16 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 		if (!ProductOrder.PRODUCT_STATE_FINISHED.equals(productOrder.getState())){
 			Task task = activitiService.getCurrentTaskByInstanceId(productOrder.getProcessInstanceId());
 			if (task != null){
+				Act act = new Act();
+				act.setTask(task);
+				productOrder.setAct(act);
+
 				productOrder.setNextStep(activitiService.getOutGoingTransNamesSingleResult(task.getId()));
 
 				productOrder.setNextStepBelongsMe(activitiService.nextStepBelongsMe(null,task.getId()));
 			}
 		}
 	}
-
-
 
 	private String[] fillUserInfo(List<String> idsList){
 		StringBuffer ids = new StringBuffer();
@@ -174,5 +195,54 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 			names.append(",");
 		}
 		return new String[]{ids.substring(0,ids.length()-1),names.substring(0,names.length()-1)};
+	}
+
+	@Transactional(readOnly = false)
+	public void doTask(ProductOrder productOrder,String taskId,String comment,HttpServletRequest request){
+		if(activitiService.nextStepBelongsMe(null,taskId)){
+			if(StringUtils.isNotBlank(comment)) {
+				activitiService.getTaskService().addComment(taskId, productOrder.getProcessInstanceId(), comment);
+			}
+			activitiService.getTaskService().complete(taskId);
+
+			productOrder.setState(ProductOrder.nextStepMap.get(productOrder.getState()));
+			//已完成
+			if(ProductOrder.PRODUCT_STATE_FINISHED.equals(productOrder.getState())){
+				//设置成功数量
+				ProductOrderDetails productOrderDetails = new ProductOrderDetails();
+				productOrderDetails.setProductOrderId(productOrder.getId());
+				List<ProductOrderDetails> detailsList = productOrderDetailsDao.findList(productOrderDetails);
+				int amount_all = 0;
+				int success_all = 0;
+				for(ProductOrderDetails pod : detailsList){
+					String id = pod.getId();
+					Integer successAmount = Integer.valueOf(request.getParameter(id + "Amount"));
+					amount_all += pod.getProductAmount();
+					pod.setSuccessAmount(successAmount);
+					success_all += successAmount;
+					pod.preUpdate();
+					productOrderDetailsDao.update(pod);
+
+					//加入库存
+					GoodsAll goodsAll = goodsAllService.get(pod.getGoodsNo());
+					goodsAll.setStock((goodsAll.getStock() == null ? 0 : goodsAll.getStock()) + successAmount);
+					goodsAllService.save(goodsAll);
+				}
+				//计算成功率
+				productOrder.setSuccessRate(new BigDecimal((double)success_all/amount_all));
+				//设置流程环节
+				productOrder.setProcessState("已完成");
+				//新产品就上线
+				if(ProductOrder.PRODUCT_TYPE_NEW.equals(productOrder.getProductType())){
+					Goods goods = goodsService.get(productOrder.getGoodsId());
+					goods.setState(Goods.STATE_NO_PUSH);
+					goodsService.save(goods);
+				}
+			}else{
+				//设置流程环节
+				productOrder.setProcessState(activitiService.getCurrentTaskByInstanceId(productOrder.getProcessInstanceId()).getName());
+			}
+			save(productOrder);
+		}
 	}
 }

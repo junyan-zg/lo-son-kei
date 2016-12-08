@@ -14,7 +14,9 @@ import org.hibernate.validator.constraints.Length;
 import com.zjy.losonkei.common.persistence.DataEntity;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 生产订单Entity
@@ -68,6 +70,14 @@ public class ProductOrder extends DataEntity<ProductOrder> {
 	private String auditorsNames;
 
 	private List<ProductOrderDetails> productOrderDetailsList;
+
+	public final static Map<String,String> nextStepMap = new HashMap<String,String>();
+
+	static {
+		nextStepMap.put(PRODUCT_STATE_INIT,PRODUCT_STATE_PRODUCTING);
+		nextStepMap.put(PRODUCT_STATE_PRODUCTING,PRODUCT_STATE_AUDITING);
+		nextStepMap.put(PRODUCT_STATE_AUDITING,PRODUCT_STATE_FINISHED);
+	}
 
 	public ProductOrder() {
 		super();
