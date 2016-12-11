@@ -4,6 +4,7 @@ package com.zjy.losonkei.modules.product.web;
  * Created by zjy on 2016/11/13.
  */
 
+import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.act.entity.Act;
 import com.zjy.losonkei.modules.product.service.ActivitiService;
@@ -13,24 +14,19 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 新产品研发Controller
+ * Act Controller
  */
 @Controller
 @RequestMapping("${adminPath}/product/act/")
 public class ActController extends BaseController{
-
-    //taskName,forward
-    private static final Map<String,String> rounter = new HashMap<String, String>();
-
-    static {
-        rounter.put("","");
-    }
 
     @Autowired
     private ActivitiService activitiService;
@@ -41,7 +37,12 @@ public class ActController extends BaseController{
         return "modules/product/act/readyToDoList";
     }
 
-
+    @RequestMapping("history/list")
+    public String historyList(Act act, Model model, HttpServletRequest request,HttpServletResponse response){
+        act.setPage(new Page<Act>(request,response));
+        act.getPage().setList(activitiService.historyList(act));
+        return "modules/product/act/historyList";
+    }
 
     /**
      * 读取带跟踪的图片

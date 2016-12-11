@@ -74,9 +74,11 @@
 </head>
 <body>
 <ul class="nav nav-tabs">
+    <c:if test="${not empty productOrder.id}">
     <li>
         <a href="${ctx}/product/productOrder/list<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>">生产订单列表</a>
     </li>
+    </c:if>
     <li class="active"><a
             href="${ctx}/product/productOrder/form<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>?id=${productOrder.id}">生产订单<shiro:hasPermission
             name="product:productOrder:edit">${not empty productOrder.id?'修改':'添加'}</shiro:hasPermission><shiro:lacksPermission

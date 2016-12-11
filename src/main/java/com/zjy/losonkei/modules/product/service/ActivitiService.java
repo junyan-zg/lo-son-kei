@@ -142,7 +142,7 @@ public class ActivitiService extends BaseService {
 		for (Task task : todoList) {
 			Act e = new Act();
 			e.setTask(task);
-			e.setVars(task.getProcessVariables());
+			e.setTaskId(task.getId());
 			e.setProcDef(ProcessDefCache.get(task.getProcessDefinitionId()));
 
 			List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
@@ -159,52 +159,52 @@ public class ActivitiService extends BaseService {
 
 		return result;
 	}
-	
+
+
 	/**
-	 * 获取已办任务
-	 * @param page
+	 * 获取待办列表
 	 * @param procDefKey 流程定义标识
 	 * @return
 	 */
-	public Page<Act> historicList(Page<Act> page, Act act){
-		String userId = UserUtils.getUser().getLoginName();//ObjectUtils.toString(UserUtils.getUser().getId());
+	public List<Act> historyList(Act act){
+		String userId = UserUtils.getUser().getId();
 
-		HistoricTaskInstanceQuery histTaskQuery = historyService.createHistoricTaskInstanceQuery().taskAssignee(userId).finished()
-				.includeProcessVariables().orderByHistoricTaskInstanceEndTime().desc();
+		List<Act> result = new ArrayList<Act>();
+
+		HistoricTaskInstanceQuery taskInstanceQuery = historyService.createHistoricTaskInstanceQuery().taskCandidateUser(userId).orderByHistoricTaskInstanceEndTime().desc();
 		
 		// 设置查询条件
 		if (StringUtils.isNotBlank(act.getProcDefKey())){
-			histTaskQuery.processDefinitionKey(act.getProcDefKey());
+			taskInstanceQuery.processDefinitionKey(act.getProcDefKey());
 		}
 		if (act.getBeginDate() != null){
-			histTaskQuery.taskCompletedAfter(act.getBeginDate());
+			taskInstanceQuery.taskCreatedAfter(act.getBeginDate());
 		}
 		if (act.getEndDate() != null){
-			histTaskQuery.taskCompletedBefore(act.getEndDate());
+			taskInstanceQuery.taskCreatedBefore(act.getEndDate());
 		}
-		
-		// 查询总数
-		page.setCount(histTaskQuery.count());
-		
+		act.getPage().setCount(taskInstanceQuery.count());
 		// 查询列表
-		List<HistoricTaskInstance> histList = histTaskQuery.listPage(page.getFirstResult(), page.getMaxResults());
-		//处理分页问题
-		List<Act> actList=Lists.newArrayList();
-		for (HistoricTaskInstance histTask : histList) {
+		List<HistoricTaskInstance> historicTaskInstances = taskInstanceQuery.listPage(act.getPage().getFirstResult(), act.getPage().getPageSize());
+		for (HistoricTaskInstance task: historicTaskInstances) {
 			Act e = new Act();
-			e.setHistTask(histTask);
-			e.setVars(histTask.getProcessVariables());
-//			e.setTaskVars(histTask.getTaskLocalVariables());
-//			System.out.println(histTask.getId()+"  =  "+histTask.getProcessVariables() + "  ========== " + histTask.getTaskLocalVariables());
-			e.setProcDef(ProcessDefCache.get(histTask.getProcessDefinitionId()));
-//			e.setProcIns(runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult());
-//			e.setProcExecUrl(ActUtils.getProcExeUrl(task.getProcessDefinitionId()));
-			e.setStatus("finish");
-			actList.add(e);
-			//page.getList().add(e);
+			e.setTaskId(task.getId());
+			e.setProcDef(ProcessDefCache.get(task.getProcessDefinitionId()));
+
+			List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
+			List<String> candidateUsers = Lists.newArrayList();
+			for (HistoricIdentityLink identityLink:identityLinks){
+				candidateUsers.add(identityLink.getUserId());
+			}
+			e.setCandidateUsers(candidateUsers);
+
+			HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+			e.setStartUserId(historicProcessInstance.getStartUserId());
+			e.setProcInsId(historicProcessInstance.getId());
+			e.setBusinessId(historicProcessInstance.getBusinessKey());
+			result.add(e);
 		}
-		page.setList(actList);
-		return page;
+		return result;
 	}
 
 

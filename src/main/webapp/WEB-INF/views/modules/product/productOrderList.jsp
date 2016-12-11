@@ -19,32 +19,28 @@
 <body>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/product/productOrder/list<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>">生产订单列表</a></li>
-		<shiro:hasPermission name="product:productOrder:edit"><li><a href="${ctx}/product/productOrder/form<c:if test="${not empty flagNewInvent}">New</c:if><c:if test="${empty flagNewInvent}">Old</c:if>">生产订单添加</a></li></shiro:hasPermission>
 	</ul>
 	<form:form id="searchForm" modelAttribute="productOrder" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
-			<li><label>生产订单id：</label>
+			<li><label>生产订单号：</label>
 				<form:input path="id" htmlEscape="false" maxlength="64" class="input-medium"/>
 			</li>
-			<li><label>生产订单名称：</label>
+			<li><label>订单名称：</label>
 				<form:input path="orderName" htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
 			<li><label>商品名称：</label>
 				<form:input path="goodsName" htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
-			<li><label>商品id：</label>
+			<li><label>商品号：</label>
 				<form:input path="goodsId" htmlEscape="false" maxlength="64" class="input-medium"/>
 			</li>
-			<li><label>流程实例id：</label>
-				<form:input path="processInstanceId" htmlEscape="false" maxlength="64" class="input-medium"/>
-			</li>
-			<li><label>状态0进行中1成功2失败：</label>
-				<form:input path="state" htmlEscape="false" maxlength="1" class="input-medium"/>
-			</li>
-			<li><label>0已有产品生产，1新产品生产：</label>
-				<form:input path="productType" htmlEscape="false" maxlength="1" class="input-medium"/>
+			<li><label>状态：</label>
+				<form:select path="state" class="input-medium">
+					<form:options items="${fns:getDictList('product_order_state')}" itemLabel="label" itemValue="value"
+								  htmlEscape="false"/>
+				</form:select>
 			</li>
 			<li><label>创建者：</label>
 				<form:input path="createBy.id" htmlEscape="false" maxlength="64" class="input-medium"/>
@@ -59,10 +55,10 @@
 			<tr>
 				<th>生产订单名称</th>
 				<th>商品名称</th>
-				<th>当前流程状态</th>
+				<th>当前环节</th>
 				<th>预算</th>
-				<th>实际花费：根据product_log更新</th>
-				<th>状态0进行中1成功2失败</th>
+				<th>实际花费</th>
+				<th>状态</th>
 				<th>备注</th>
 				<th>创建者</th>
 				<th>更新时间</th>

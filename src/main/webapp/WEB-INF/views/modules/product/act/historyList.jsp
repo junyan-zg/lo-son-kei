@@ -34,15 +34,23 @@
 				}
 			});
 		}
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+			return false;
+		}
 	</script>
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/product/act/ready/todo/list">待办任务</a></li>
-		<li><a href="${ctx}/product/act/history/list">已办任务</a></li>
+		<li><a href="${ctx}/product/act/ready/todo/list">待办任务</a></li>
+		<li class="active"><a href="${ctx}/product/act/history/list">已办任务</a></li>
 	</ul>
-	<form:form id="searchForm" modelAttribute="act" action="${ctx}/product/act/ready/todo/list" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="act" action="${ctx}/product/act/history/list" method="post" class="breadcrumb form-search">
 		<div>
+			<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+			<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 			<label>流程类型：&nbsp;</label>
 			<form:select path="procDefKey" class="input-medium">
 				<form:option value="" label="全部流程"/>
@@ -72,16 +80,14 @@
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach items="${list}" var="act">
+			<c:forEach items="${act.page.list}" var="act">
 				<c:set var="task" value="${act.task}" />
-				<c:set var="vars" value="${act.vars}" />
-				<c:set var="status" value="${act.status}" />
-				<c:set var="productOrder" value="${fns:getProductOrderById(act.procIns.businessKey)}" />
+				<c:set var="productOrder" value="${fns:getProductOrderById(act.businessId)}" />
 				<tr>
 					<td>${productOrder.id}</td>
 					<td>${productOrder.orderName}</td>
 					<td>
-						<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${task.processDefinitionId}&processInstanceId=${task.processInstanceId}">${task.name}</a>
+						<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${act.procDef.id}&processInstanceId=${act.procInsId}">已完成</a>
 					</td>
 					<td>${fns:getUserById(act.startUserId).name}</td>
 					<td>
@@ -89,7 +95,7 @@
 							${fns:getUserById(candidateUser).name}<c:if test="${status.index < fn:length(act.candidateUsers)-1}">,</c:if>
 						</c:forEach>
 					</td>
-					<td><fmt:formatDate value="${task.createTime}" type="both"/></td>
+					<td><fmt:formatDate value="${productOrder.createDate}" type="both"/></td>
 					<td>
 						<c:if test="${not empty task.assignee}"><%--
 							<a href="${ctx}${procExecUrl}/exec/${task.taskDefinitionKey}?procInsId=${task.processInstanceId}&act.taskId=${task.id}">办理</a> --%>
@@ -104,6 +110,7 @@
 			</c:forEach>
 		</tbody>
 	</table>
+	<div class="pagination">${act.page}</div>
 	<div style="display:none;" id="tmp-trace-photo">
 		<div style="background-color:whitesmoke;padding: 49px;">
 			<img src=""/>
