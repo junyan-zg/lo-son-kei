@@ -1,44 +1,30 @@
 /**
  * Copyright &copy; 2016-2017 <a>ZhangJunYan</a> All rights reserved.
  */
-package com.zjy.losonkei.modules.product.service;
+package com.zjy.losonkei.modules.act.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.service.BaseService;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.modules.act.entity.Act;
-import com.zjy.losonkei.modules.act.utils.ActUtils;
 import com.zjy.losonkei.modules.act.utils.ProcessDefCache;
-import com.zjy.losonkei.modules.product.utils.ActivitiUtils;
-import com.zjy.losonkei.modules.sys.entity.User;
+import com.zjy.losonkei.modules.act.utils.ActivitiUtils;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.*;
-import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.history.*;
-import org.activiti.engine.impl.RepositoryServiceImpl;
-import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
-import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
-import org.activiti.engine.impl.task.TaskDefinition;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.repository.ProcessDefinitionQuery;
-import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.spring.ProcessEngineFactoryBean;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,7 +68,7 @@ public class ActivitiService extends BaseService {
 		variables.put(ActivitiUtils.VAR_PRODUCERS, producers);
 		variables.put(ActivitiUtils.VAR_AUDITORS,auditors);
 		identityService.setAuthenticatedUserId(startUserId);
-		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ActivitiUtils.PROCESS_KEY_INVENT, orderId, variables);
+		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ActivitiUtils.PROCESS_KEY_PRODUCT, orderId, variables);
 		return processInstance;
 	}
 
@@ -114,7 +100,6 @@ public class ActivitiService extends BaseService {
 
 	/**
 	 * 获取待办列表
-	 * @param procDefKey 流程定义标识
 	 * @return
 	 */
 	public List<Act> todoList(Act act){
@@ -162,8 +147,7 @@ public class ActivitiService extends BaseService {
 
 
 	/**
-	 * 获取待办列表
-	 * @param procDefKey 流程定义标识
+	 * 获取流转列表
 	 * @return
 	 */
 	public List<Act> historyList(Act act){
@@ -305,33 +289,6 @@ public class ActivitiService extends BaseService {
 		return flag;
 	}
 
-	/**
-	 * 获取流程列表
-	 * @param category 流程分类
-	 */
-	public Page<Object[]> processList(Page<Object[]> page, String category) {
-		/*
-		 * 保存两个对象，一个是ProcessDefinition（流程定义），一个是Deployment（流程部署）
-		 */
-	    ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery()
-	    		.latestVersion().active().orderByProcessDefinitionKey().asc();
-	    
-	    if (StringUtils.isNotEmpty(category)){
-	    	processDefinitionQuery.processDefinitionCategory(category);
-		}
-	    
-	    page.setCount(processDefinitionQuery.count());
-	    
-	    List<ProcessDefinition> processDefinitionList = processDefinitionQuery.listPage(page.getFirstResult(), page.getMaxResults());
-	    for (ProcessDefinition processDefinition : processDefinitionList) {
-	      String deploymentId = processDefinition.getDeploymentId();
-	      Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
-	      page.getList().add(new Object[]{processDefinition, deployment});
-	    }
-		return page;
-	}
-	
-
 
 
 	/**
@@ -445,168 +402,9 @@ public class ActivitiService extends BaseService {
 
 		return ProcessDiagramGenerator.generateDiagram(bpmnModel, "png", activeActivityIds);
 	}
-	/**
-	 * 流程跟踪图信息
-	 * @param processInstanceId		流程实例ID
-	 * @return	封装了各种节点信息
-	 */
-	public List<Map<String, Object>> traceProcess(String processInstanceId) throws Exception {
-		Execution execution = runtimeService.createExecutionQuery().executionId(processInstanceId).singleResult();//执行实例
-		Object property = PropertyUtils.getProperty(execution, "activityId");
-		String activityId = "";
-		if (property != null) {
-			activityId = property.toString();
-		}
-		ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId)
-				.singleResult();
-		ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService)
-				.getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
-		List<ActivityImpl> activitiList = processDefinition.getActivities();//获得当前任务的所有节点
 
-		List<Map<String, Object>> activityInfos = new ArrayList<Map<String, Object>>();
-		for (ActivityImpl activity : activitiList) {
 
-			boolean currentActiviti = false;
-			String id = activity.getId();
 
-			// 当前节点
-			if (id.equals(activityId)) {
-				currentActiviti = true;
-			}
-
-			Map<String, Object> activityImageInfo = packageSingleActivitiInfo(activity, processInstance, currentActiviti);
-
-			activityInfos.add(activityImageInfo);
-		}
-
-		return activityInfos;
-	}
-
-	/**
-	 * 封装输出信息，包括：当前节点的X、Y坐标、变量信息、任务类型、任务描述
-	 * @param activity
-	 * @param processInstance
-	 * @param currentActiviti
-	 * @return
-	 */
-	private Map<String, Object> packageSingleActivitiInfo(ActivityImpl activity, ProcessInstance processInstance,
-			boolean currentActiviti) throws Exception {
-		Map<String, Object> vars = new HashMap<String, Object>();
-		Map<String, Object> activityInfo = new HashMap<String, Object>();
-		activityInfo.put("currentActiviti", currentActiviti);
-		setPosition(activity, activityInfo);
-		setWidthAndHeight(activity, activityInfo);
-
-		Map<String, Object> properties = activity.getProperties();
-		vars.put("节点名称", properties.get("name"));
-		vars.put("任务类型", ActUtils.parseToZhType(properties.get("type").toString()));
-
-		ActivityBehavior activityBehavior = activity.getActivityBehavior();
-		logger.debug("activityBehavior={}", activityBehavior);
-		if (activityBehavior instanceof UserTaskActivityBehavior) {
-
-			Task currentTask = null;
-
-			// 当前节点的task
-			if (currentActiviti) {
-				currentTask = getCurrentTaskInfo(processInstance);
-			}
-
-			// 当前任务的分配角色
-			UserTaskActivityBehavior userTaskActivityBehavior = (UserTaskActivityBehavior) activityBehavior;
-			TaskDefinition taskDefinition = userTaskActivityBehavior.getTaskDefinition();
-			Set<Expression> candidateGroupIdExpressions = taskDefinition.getCandidateGroupIdExpressions();
-			if (!candidateGroupIdExpressions.isEmpty()) {
-
-				// 任务的处理角色
-				setTaskGroup(vars, candidateGroupIdExpressions);
-
-				// 当前处理人
-				if (currentTask != null) {
-					setCurrentTaskAssignee(vars, currentTask);
-				}
-			}
-		}
-
-		vars.put("节点说明", properties.get("documentation"));
-
-		String description = activity.getProcessDefinition().getDescription();
-		vars.put("描述", description);
-
-		logger.debug("trace variables: {}", vars);
-		activityInfo.put("vars", vars);
-		return activityInfo;
-	}
-
-	/**
-	 * 设置任务组
-	 * @param vars
-	 * @param candidateGroupIdExpressions
-	 */
-	private void setTaskGroup(Map<String, Object> vars, Set<Expression> candidateGroupIdExpressions) {
-		String roles = "";
-		for (Expression expression : candidateGroupIdExpressions) {
-			String expressionText = expression.getExpressionText();
-			//String roleName = identityService.createGroupQuery().groupId(expressionText).singleResult().getName();
-			//roles += roleName;
-		}
-		vars.put("任务所属角色", roles);
-	}
-
-	/**
-	 * 设置当前处理人信息
-	 * @param vars
-	 * @param currentTask
-	 */
-	private void setCurrentTaskAssignee(Map<String, Object> vars, Task currentTask) {
-		String assignee = currentTask.getAssignee();
-		if (assignee != null) {
-			//org.activiti.engine.identity.User assigneeUser = identityService.createUserQuery().userId(assignee).singleResult();
-			//String userInfo = assigneeUser.getFirstName() + " " + assigneeUser.getLastName();
-			//vars.put("当前处理人", userInfo);
-		}
-	}
-
-	/**
-	 * 获取当前节点信息
-	 * @param processInstance
-	 * @return
-	 */
-	private Task getCurrentTaskInfo(ProcessInstance processInstance) {
-		Task currentTask = null;
-		try {
-			String activitiId = (String) PropertyUtils.getProperty(processInstance, "activityId");
-			logger.debug("current activity id: {}", activitiId);
-
-			currentTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey(activitiId)
-					.singleResult();
-			logger.debug("current task for processInstance: {}", ToStringBuilder.reflectionToString(currentTask));
-
-		} catch (Exception e) {
-			logger.error("can not get property activityId from processInstance: {}", processInstance);
-		}
-		return currentTask;
-	}
-
-	/**
-	 * 设置宽度、高度属性
-	 * @param activity
-	 * @param activityInfo
-	 */
-	private void setWidthAndHeight(ActivityImpl activity, Map<String, Object> activityInfo) {
-		activityInfo.put("width", activity.getWidth());
-		activityInfo.put("height", activity.getHeight());
-	}
-
-	/**
-	 * 设置坐标位置
-	 * @param activity
-	 * @param activityInfo
-	 */
-	private void setPosition(ActivityImpl activity, Map<String, Object> activityInfo) {
-		activityInfo.put("x", activity.getX());
-		activityInfo.put("y", activity.getY());
-	}
 
 	public TaskService getTaskService() {
 		return taskService;

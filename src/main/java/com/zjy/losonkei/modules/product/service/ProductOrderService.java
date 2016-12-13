@@ -3,11 +3,11 @@
  */
 package com.zjy.losonkei.modules.product.service;
 
-import com.google.common.collect.Lists;
 import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.service.CrudService;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.modules.act.entity.Act;
+import com.zjy.losonkei.modules.act.service.ActivitiService;
 import com.zjy.losonkei.modules.goods.entity.Goods;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import com.zjy.losonkei.modules.goods.service.GoodsAllService;
@@ -17,11 +17,10 @@ import com.zjy.losonkei.modules.product.dao.ProductOrderDao;
 import com.zjy.losonkei.modules.product.dao.ProductOrderDetailsDao;
 import com.zjy.losonkei.modules.product.entity.ProductOrder;
 import com.zjy.losonkei.modules.product.entity.ProductOrderDetails;
-import com.zjy.losonkei.modules.product.utils.ActivitiUtils;
+import com.zjy.losonkei.modules.act.utils.ActivitiUtils;
 import com.zjy.losonkei.modules.sys.entity.User;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,9 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 生产订单Service

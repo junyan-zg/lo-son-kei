@@ -1,5 +1,6 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" import="com.zjy.losonkei.modules.act.utils.ActivitiUtils" %>
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<c:set value="<%=ActivitiUtils.PROCESS_KEY_PRODUCT%>" var="PROCESS_KEY_PRODUCT"/>
 <html>
 <head>
 	<title>待办任务</title>
@@ -38,10 +39,10 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/product/act/ready/todo/list">待办任务</a></li>
-		<li><a href="${ctx}/product/act/history/list">已办任务</a></li>
+		<li class="active"><a href="${ctx}/act/ready/todo/list">待办任务</a></li>
+		<li><a href="${ctx}/act/history/list">已办任务</a></li>
 	</ul>
-	<form:form id="searchForm" modelAttribute="act" action="${ctx}/product/act/ready/todo/list" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="act" action="${ctx}/act/ready/todo/list" method="post" class="breadcrumb form-search">
 		<div>
 			<label>流程类型：&nbsp;</label>
 			<form:select path="procDefKey" class="input-medium">
@@ -62,10 +63,11 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
-				<th>生产订单编号</th>
-				<th>生产订单名称</th>
+				<th>任务类型</th>
+				<th>订单编号</th>
+				<th>订单名称</th>
 				<th>当前环节</th>
-				<th>发起者</th>
+				<th>发起人</th>
 				<th>执行人</th>
 				<th>创建时间</th>
 				<th>操作</th>
@@ -74,14 +76,21 @@
 		<tbody>
 			<c:forEach items="${list}" var="act">
 				<c:set var="task" value="${act.task}" />
-				<c:set var="vars" value="${act.vars}" />
-				<c:set var="status" value="${act.status}" />
-				<c:set var="productOrder" value="${fns:getProductOrderById(act.procIns.businessKey)}" />
 				<tr>
-					<td>${productOrder.id}</td>
-					<td>${productOrder.orderName}</td>
+					<c:if test="${act.procDef.key == PROCESS_KEY_PRODUCT}">
+						<c:set var="productOrder" value="${fns:getProductOrderById(act.procIns.businessKey)}" />
+						<td>生产</td>
+						<td>${productOrder.id}</td>
+						<td>${productOrder.orderName}</td>
+					</c:if>
+					<c:if test="${act.procDef.key != PROCESS_KEY_PRODUCT}">
+						<td>销售</td>
+						<td></td>
+						<td></td>
+					</c:if>
 					<td>
-						<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${task.processDefinitionId}&processInstanceId=${task.processInstanceId}">${task.name}</a>
+						<%--<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${task.processDefinitionId}&processInstanceId=${task.processInstanceId}">${task.name}</a>--%>
+						<a href="javascript:;" onclick="tracePhoto('${ctx}/act/trace/photo/${task.processDefinitionId}/${task.executionId}');">${task.name}</a>
 					</td>
 					<td>${fns:getUserById(act.startUserId).name}</td>
 					<td>
@@ -91,14 +100,12 @@
 					</td>
 					<td><fmt:formatDate value="${task.createTime}" type="both"/></td>
 					<td>
-						<c:if test="${not empty task.assignee}"><%--
-							<a href="${ctx}${procExecUrl}/exec/${task.taskDefinitionKey}?procInsId=${task.processInstanceId}&act.taskId=${task.id}">办理</a> --%>
-							<a href="${ctx}/act/task/form?taskId=${task.id}&taskName=${fns:urlEncode(task.name)}&taskDefKey=${task.taskDefinitionKey}&procInsId=${task.processInstanceId}&procDefId=${task.processDefinitionId}&status=${status}">任务办理</a>
-						</c:if>
-							<c:if test="${empty task.executionId}">
+							<%--<c:if test="${empty task.executionId}">
 								<a href="${ctx}/act/task/deleteTask?taskId=${task.id}&reason=" onclick="return promptx('删除任务','删除原因',this.href);">删除任务</a>
+						</c:if>--%>
+						<c:if test="${act.procDef.key == PROCESS_KEY_PRODUCT}">
+							<a href="${ctx}/product/productOrder/view?id=${act.procIns.businessKey}" onclick="top.addTab($(this),true);return false;">办理任务</a>
 						</c:if>
-						<a href="javascript:;" onclick="tracePhoto('${ctx}/product/act/trace/photo/${task.processDefinitionId}/${task.executionId}');">进度</a>
 					</td>
 				</tr>
 			</c:forEach>
@@ -109,5 +116,6 @@
 			<img src=""/>
 		</div>
 	</div>
+
 </body>
 </html>

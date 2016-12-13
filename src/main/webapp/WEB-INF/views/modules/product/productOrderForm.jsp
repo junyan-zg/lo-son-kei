@@ -5,7 +5,7 @@
 <c:set var="DEL_FLAG_DELETE" value="<%=ProductOrder.DEL_FLAG_DELETE%>"></c:set>
 <c:set var="PRODUCT_STATE_INIT" value="<%=ProductOrder.PRODUCT_STATE_INIT%>"></c:set>
 <c:if test="${(not empty productOrder.state && productOrder.state != PRODUCT_STATE_INIT) || (not empty productOrder.createBy && productOrder.createBy.id != fns:getUser().id)}">
-    <%request.getRequestDispatcher(Global.getAdminPath()+"/product/productOrder/view").forward(request,response);%>
+    <%request.getRequestDispatcher("/WEB-INF/views/modules/product/productOrderView.jsp").forward(request,response);%>
 </c:if>
 <html>
 <head>

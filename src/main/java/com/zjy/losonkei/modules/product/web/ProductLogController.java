@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.zjy.losonkei.modules.product.entity.ProductOrder;
-import com.zjy.losonkei.modules.product.service.ActivitiService;
+import com.zjy.losonkei.modules.act.service.ActivitiService;
 import com.zjy.losonkei.modules.product.service.ProductOrderService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;

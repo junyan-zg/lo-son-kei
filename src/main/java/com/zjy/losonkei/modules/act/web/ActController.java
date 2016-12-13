@@ -1,4 +1,4 @@
-package com.zjy.losonkei.modules.product.web;
+package com.zjy.losonkei.modules.act.web;
 
 /**
  * Created by zjy on 2016/11/13.
@@ -7,25 +7,22 @@ package com.zjy.losonkei.modules.product.web;
 import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.act.entity.Act;
-import com.zjy.losonkei.modules.product.service.ActivitiService;
+import com.zjy.losonkei.modules.act.service.ActivitiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Act Controller
  */
 @Controller
-@RequestMapping("${adminPath}/product/act/")
+@RequestMapping("${adminPath}/act/")
 public class ActController extends BaseController{
 
     @Autowired
@@ -34,14 +31,14 @@ public class ActController extends BaseController{
     @RequestMapping("ready/todo/list")
     public String readyTodoList(Act act,Model model){
         model.addAttribute("list",activitiService.todoList(act));
-        return "modules/product/act/readyToDoList";
+        return "modules/activiti/readyToDoList";
     }
 
     @RequestMapping("history/list")
     public String historyList(Act act, Model model, HttpServletRequest request,HttpServletResponse response){
         act.setPage(new Page<Act>(request,response));
         act.getPage().setList(activitiService.historyList(act));
-        return "modules/product/act/historyList";
+        return "modules/activiti/historyList";
     }
 
     /**

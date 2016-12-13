@@ -6,17 +6,13 @@ package com.zjy.losonkei.modules.product.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.zjy.losonkei.modules.act.entity.Act;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import com.zjy.losonkei.modules.goods.entity.GoodsSpecification;
-import com.zjy.losonkei.modules.goods.service.GoodsService;
 import com.zjy.losonkei.modules.goods.service.GoodsSpecificationService;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
-import com.zjy.losonkei.modules.product.service.ActivitiService;
-import org.apache.shiro.SecurityUtils;
+import com.zjy.losonkei.modules.act.service.ActivitiService;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +28,6 @@ import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.modules.product.entity.ProductOrder;
 import com.zjy.losonkei.modules.product.service.ProductOrderService;
 
-import java.security.Security;
 import java.util.List;
 
 /**
@@ -99,6 +94,9 @@ public class ProductOrderController extends BaseController {
 		if (StringUtils.isNotBlank(productOrder.getId())){
 			productOrderService.loadEntity(productOrder);
 		}
+		if(StringUtils.isNotBlank(productOrder.getProcessInstanceId())){
+			model.addAttribute("histoicFlowList",activitiService.histoicFlowList(productOrder.getProcessInstanceId()));
+		}
 		return "modules/product/productOrderForm";
 	}
 
@@ -110,7 +108,6 @@ public class ProductOrderController extends BaseController {
 		}else {
 			formOld(productOrder,model);
 		}
-		model.addAttribute("histoicFlowList",activitiService.histoicFlowList(productOrder.getProcessInstanceId()));
 		return "modules/product/productOrderView";
 	}
 
