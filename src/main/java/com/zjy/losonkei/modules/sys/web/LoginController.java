@@ -14,6 +14,7 @@ import com.zjy.losonkei.common.utils.CacheUtils;
 import com.zjy.losonkei.common.utils.CookieUtils;
 import com.zjy.losonkei.common.utils.IdGen;
 import com.zjy.losonkei.modules.sys.security.FormAuthenticationFilter;
+import com.zjy.losonkei.modules.sys.security.Principal;
 import com.zjy.losonkei.modules.sys.security.SystemAuthorizingRealm;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -47,7 +48,7 @@ public class LoginController extends BaseController{
 	 */
 	@RequestMapping(value = "${adminPath}/login", method = RequestMethod.GET)
 	public String login(HttpServletRequest request, HttpServletResponse response, Model model) {
-		SystemAuthorizingRealm.Principal principal = UserUtils.getPrincipal();
+		Principal principal = UserUtils.getPrincipal();
 
 //		// 默认页签模式
 //		String tabmode = CookieUtils.getCookie(request, "tabmode");
@@ -82,7 +83,7 @@ public class LoginController extends BaseController{
 	 */
 	@RequestMapping(value = "${adminPath}/login", method = RequestMethod.POST)
 	public String loginFail(HttpServletRequest request, HttpServletResponse response, Model model) {
-		SystemAuthorizingRealm.Principal principal = UserUtils.getPrincipal();
+		Principal principal = UserUtils.getPrincipal();
 		
 		// 如果已经登录，则跳转到管理首页
 		if(principal != null){
@@ -132,7 +133,7 @@ public class LoginController extends BaseController{
 	@RequiresPermissions("user")
 	@RequestMapping(value = "${adminPath}")
 	public String index(HttpServletRequest request, HttpServletResponse response) {
-		SystemAuthorizingRealm.Principal principal = UserUtils.getPrincipal();
+		Principal principal = UserUtils.getPrincipal();
 
 		// 登录成功后，验证码计算器清零
 		isValidateCodeLogin(principal.getLoginName(), false, true);

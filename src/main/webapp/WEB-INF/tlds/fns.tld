@@ -76,7 +76,7 @@
     <description>获取授权用户信息</description>
     <name>getPrincipal</name>
     <function-class>com.zjy.losonkei.modules.sys.utils.UserUtils</function-class>
-    <function-signature>com.zjy.losonkei.modules.sys.security.SystemAuthorizingRealm.Principal getPrincipal()</function-signature>
+    <function-signature>com.zjy.losonkei.modules.sys.security.Principal getPrincipal()</function-signature>
     <example>${fns:getPrincipal()}</example>  
   </function>
   

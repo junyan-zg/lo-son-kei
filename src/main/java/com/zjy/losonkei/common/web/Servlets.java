@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.zjy.losonkei.common.utils.Encodes;
+import com.zjy.losonkei.modules.sys.security.Principal;
 import com.zjy.losonkei.modules.sys.security.SystemAuthorizingRealm;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.apache.commons.lang3.Validate;
@@ -214,7 +215,7 @@ public class Servlets {
 		
 		String accept = request.getHeader("accept");
 		String xRequestedWith = request.getHeader("X-Requested-With");
-		SystemAuthorizingRealm.Principal principal = UserUtils.getPrincipal();
+		Principal principal = UserUtils.getPrincipal();
 
 		// 如果是异步请求或是手机端，则直接返回信息
 		return ((accept != null && accept.indexOf("application/json") != -1 

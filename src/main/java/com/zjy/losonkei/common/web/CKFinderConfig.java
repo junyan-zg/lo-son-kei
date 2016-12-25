@@ -8,12 +8,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.zjy.losonkei.common.config.Global;
 import com.zjy.losonkei.common.utils.FileUtils;
+import com.zjy.losonkei.modules.sys.security.Principal;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 
 import com.ckfinder.connector.configuration.Configuration;
 import com.ckfinder.connector.data.AccessControlLevel;
 import com.ckfinder.connector.utils.AccessControlUtil;
 import com.zjy.losonkei.modules.sys.security.SystemAuthorizingRealm;
+import org.apache.shiro.SecurityUtils;
 
 /**
  * CKFinder配置
@@ -28,7 +30,7 @@ public class CKFinderConfig extends Configuration {
 	
 	@Override
     protected Configuration createConfigurationInstance() {
-		SystemAuthorizingRealm.Principal principal = (SystemAuthorizingRealm.Principal) UserUtils.getPrincipal();
+		Principal principal = UserUtils.getPrincipal();
 		if (principal == null){
 			return new CKFinderConfig(this.servletConf);
 		}
@@ -53,8 +55,8 @@ public class CKFinderConfig extends Configuration {
 		try {
 //			Principal principal = (Principal)SecurityUtils.getSubject().getPrincipal();
 //			this.baseURL = ServletContextFactory.getServletContext().getContextPath()+"/userfiles/"+principal+"/";
-			this.baseURL = FileUtils.path(Servlets.getRequest().getContextPath() + Global.USERFILES_BASE_URL + principal + "/");
-			this.baseDir = FileUtils.path(Global.getUserfilesBaseDir() + Global.USERFILES_BASE_URL + principal + "/");
+			this.baseURL = FileUtils.path(Servlets.getRequest().getContextPath() + Global.USERFILES_BASE_URL /*+ principal + "/"*/);
+			this.baseDir = FileUtils.path(Global.getUserfilesBaseDir() + Global.USERFILES_BASE_URL /*+ principal + "/"*/);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -63,7 +65,8 @@ public class CKFinderConfig extends Configuration {
 
     @Override  
     public boolean checkAuthentication(final HttpServletRequest request) {
-        return UserUtils.getPrincipal()!=null;
+        return UserUtils.getPrincipal()!=null && !SecurityUtils.getSubject().hasRole("member");
+
     }
 
 }

@@ -24,7 +24,7 @@ import com.zjy.losonkei.modules.sys.dao.OfficeDao;
 import com.zjy.losonkei.modules.sys.entity.Menu;
 import com.zjy.losonkei.modules.sys.entity.Role;
 import com.zjy.losonkei.modules.sys.entity.User;
-import com.zjy.losonkei.modules.sys.security.SystemAuthorizingRealm.Principal;
+import com.zjy.losonkei.modules.sys.security.Principal;
 
 /**
  * 用户工具类

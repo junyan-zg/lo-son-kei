@@ -15,14 +15,17 @@
 		<constructor-arg>
 			<value>
 				/static/** = anon
-				/userfiles/** = anon
+				/photos/** = anon
 				${adminPath}/cas = cas
 				${adminPath}/login = authc
+				/login = mauthc
 				${adminPath}/logout = logout
-				${adminPath}/** = user
+				${frontPath}/logout = logout
+				${frontPath}/** = mauthc,roles[member]
+				${adminPath}/** = perms[user]
 				/act/rest/service/editor/** = perms[act:model:edit]
 				/act/rest/service/model/** = perms[act:model:edit]
-				/act/rest/service/** = user
+				/act/rest/service/** = perms[user]
 				/ReportServer/** = user
 			</value>
 		</constructor-arg>
@@ -36,10 +39,11 @@
 		<property name="successUrl" value="${adminPath}" />
 		<property name="filters">
             <map>
-                <entry key="cas" value-ref="casFilter"/>
-                <entry key="authc" value-ref="formAuthenticationFilter"/>
 				<entry key="logout" value-ref="logoutFilter"/>
-            </map>
+				<entry key="mauthc" value-ref="memberFormAuthenticationFilter"/>
+				<entry key="authc" value-ref="formAuthenticationFilter"/>
+				<entry key="cas" value-ref="casFilter"/>
+			</map>
         </property>
 		<property name="filterChainDefinitions">
 			<ref bean="shiroFilterChainDefinitions"/>
@@ -47,7 +51,7 @@
 	</bean>
 
 	<bean id="logoutFilter" class="com.zjy.losonkei.modules.sys.security.LogoutFilter">
-		<property name="redirectUrl" value="${adminPath}" />
+		<property name="redirectUrl" value="/" />
 	</bean>
 
 	<!-- CAS认证过滤器 -->  
@@ -57,11 +61,25 @@
 	
 	<!-- 定义Shiro安全管理配置 -->
 	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
-		<property name="realm" ref="systemAuthorizingRealm" />
+		<property name="authenticator" ref="authenticator" />
+		<property name="realms">
+			<list>
+				<ref bean="memberAuthorizingRealm" />
+				<ref bean="systemAuthorizingRealm" />
+			</list>
+		</property>
+		<!--<property name="realm" ref="systemAuthorizingRealm" />-->
 		<property name="sessionManager" ref="sessionManager" />
 		<property name="cacheManager" ref="shiroCacheManager" />
 	</bean>
-	
+
+	<!--认证策略-->
+	<bean id="authenticator" class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
+		<property name="authenticationStrategy">
+			<bean class="org.apache.shiro.authc.pam.FirstSuccessfulStrategy" />
+		</property>
+	</bean>
+
 	<!-- 自定义会话管理配置 -->
 	<bean id="sessionManager" class="com.zjy.losonkei.common.security.shiro.session.SessionManager">
 		<property name="sessionDAO" ref="sessionDAO"/>

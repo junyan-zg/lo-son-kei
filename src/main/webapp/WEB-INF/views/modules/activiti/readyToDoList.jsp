@@ -89,7 +89,7 @@
 						<td></td>
 					</c:if>
 					<td>
-						<%--<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${task.processDefinitionId}&processInstanceId=${task.processInstanceId}">${task.name}</a>--%>
+						<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${task.processDefinitionId}&processInstanceId=${task.processInstanceId}">${task.name}</a>
 						<a href="javascript:;" onclick="tracePhoto('${ctx}/act/trace/photo/${task.processDefinitionId}/${task.executionId}');">${task.name}</a>
 					</td>
 					<td>${fns:getUserById(act.startUserId).name}</td>

@@ -3,19 +3,18 @@
  */
 package com.zjy.losonkei.common.web;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import com.ckfinder.connector.ConnectorServlet;
+import com.zjy.losonkei.common.config.Global;
+import com.zjy.losonkei.common.utils.FileUtils;
+import com.zjy.losonkei.modules.sys.security.Principal;
+import com.zjy.losonkei.modules.sys.utils.UserUtils;
+import org.apache.shiro.subject.Subject;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.zjy.losonkei.common.config.Global;
-import com.zjy.losonkei.common.utils.FileUtils;
-import com.zjy.losonkei.modules.sys.security.SystemAuthorizingRealm.Principal;
-import com.zjy.losonkei.modules.sys.utils.UserUtils;
-
-import com.ckfinder.connector.ConnectorServlet;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * CKFinderConnectorServlet
@@ -42,8 +41,12 @@ public class CKFinderConnectorServlet extends ConnectorServlet {
 	
 	private void prepareGetResponse(final HttpServletRequest request,
 			final HttpServletResponse response, final boolean post) throws ServletException, UnsupportedEncodingException {
-		Principal principal = (Principal) UserUtils.getPrincipal();
-		if (principal == null){
+		Principal principal = UserUtils.getPrincipal();
+		Subject subject = UserUtils.getSubject();
+		if (principal == null ){
+			return;
+		}
+		if(subject.hasRole("member")){
 			return;
 		}
 		String command = request.getParameter("command");
@@ -60,7 +63,7 @@ public class CKFinderConnectorServlet extends ConnectorServlet {
 				String[] ss = startupPath.split(":");
 				if (ss.length==2){
 					String realPath = Global.getUserfilesBaseDir() + Global.USERFILES_BASE_URL
-							+ principal + "/" + ss[0] + ss[1];
+							/*+ principal + "/"*/ + ss[0] + ss[1];
 					FileUtils.createDirectory(FileUtils.path(realPath));
 				}
 			}
@@ -70,7 +73,7 @@ public class CKFinderConnectorServlet extends ConnectorServlet {
 			String currentFolder = request.getParameter("currentFolder");// 当前文件夹可指定为模块名
 			currentFolder = new String(currentFolder.getBytes("ISO-8859-1"), "utf-8");
 			String realPath = Global.getUserfilesBaseDir() + Global.USERFILES_BASE_URL
-					+ principal + "/" + type + (currentFolder != null ? currentFolder : "");
+					/*+ principal + "/"*/ + type + (currentFolder != null ? currentFolder : "");
 			FileUtils.createDirectory(FileUtils.path(realPath));
 		}
 //		System.out.println("------------------------");
