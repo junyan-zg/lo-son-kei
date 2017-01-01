@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * Created by Administrator on 2016/12/19.
+ * Created by zjy on 2016/12/19.
  */
-@Controller
-public class LoginController2 extends BaseController{
+@Controller("com.zjy.losonkei.modules.front.LoginController")
+public class LoginController extends BaseController{
 
     @RequestMapping(value="/login",method = RequestMethod.POST)
     public String loginCheck(){
@@ -24,7 +24,6 @@ public class LoginController2 extends BaseController{
 
     @RequestMapping(value="/login",method = RequestMethod.GET)
     public String login(){
-        System.out.println("go to login");
         return "modules/front/login";
     }
 

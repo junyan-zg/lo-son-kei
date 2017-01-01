@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjy.losonkei.modules.member.dao.MemberDao">
+    
+	<sql id="memberColumns">
+		a.id AS "id",
+		a.member_account AS "memberAccount",
+		a.member_name AS "memberName",
+		a.member_truename AS "memberTruename",
+		a.member_avatar AS "memberAvatar",
+		a.member_pwd AS "memberPwd",
+		a.member_paypwd AS "memberPaypwd",
+		a.member_addtime AS "memberAddtime",
+		a.member_points AS "memberPoints",
+		a.member_state AS "memberState",
+		a.member_loginnum AS "memberLoginnum",
+		a.member_balance AS "memberBalance",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="memberJoins">
+	</sql>
+    
+	<select id="get" resultType="Member">
+		SELECT 
+			<include refid="memberColumns"/>
+		FROM member a
+		<include refid="memberJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Member">
+		SELECT 
+			<include refid="memberColumns"/>
+		FROM member a
+		<include refid="memberJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="memberAccount != null and memberAccount != ''">
+				AND a.member_account = #{memberAccount}
+			</if>
+			<if test="memberName != null and memberName != ''">
+				AND a.member_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{memberName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{memberName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{memberName},'%')</if>
+			</if>
+			<if test="memberTruename != null and memberTruename != ''">
+				AND a.member_truename = #{memberTruename}
+			</if>
+			<if test="beginMemberAddtime != null and endMemberAddtime != null and beginMemberAddtime != '' and endMemberAddtime != ''">
+				AND a.member_addtime BETWEEN #{beginMemberAddtime} AND #{endMemberAddtime}
+			</if>
+			<if test="beginMemberPoints != null and endMemberPoints != null and beginMemberPoints != '' and endMemberPoints != ''">
+				AND a.member_points BETWEEN #{beginMemberPoints} AND #{endMemberPoints}
+			</if>
+			<if test="memberState != null and memberState != ''">
+				AND a.member_state = #{memberState}
+			</if>
+			<if test="beginMemberLoginnum != null and endMemberLoginnum != null and beginMemberLoginnum != '' and endMemberLoginnum != ''">
+				AND a.member_loginnum BETWEEN #{beginMemberLoginnum} AND #{endMemberLoginnum}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Member">
+		SELECT 
+			<include refid="memberColumns"/>
+		FROM member a
+		<include refid="memberJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO member(
+			id,
+			member_account,
+			member_name,
+			member_truename,
+			member_avatar,
+			member_pwd,
+			member_paypwd,
+			member_addtime,
+			member_points,
+			member_state,
+			member_loginnum,
+			member_balance,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{memberAccount},
+			#{memberName},
+			#{memberTruename},
+			#{memberAvatar},
+			#{memberPwd},
+			#{memberPaypwd},
+			#{memberAddtime},
+			#{memberPoints},
+			#{memberState},
+			#{memberLoginnum},
+			#{memberBalance},
+			#{remarks},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE member SET 	
+			member_name = #{memberName},
+			member_truename = #{memberTruename},
+			member_avatar = #{memberAvatar},
+			member_pwd = #{memberPwd},
+			member_paypwd = #{memberPaypwd},
+			member_points = #{memberPoints},
+			member_state = #{memberState},
+			member_loginnum = #{memberLoginnum},
+			member_balance = #{memberBalance},
+			remarks = #{remarks},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE member SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -33,7 +33,6 @@ public class Goods extends DataEntity<Goods> {
 	private String sex;		// 推荐人群
 	private String keywords;		// 关键词
 	private GoodsCategory goodsCategory;		// 商品分类 父类
-	private Goods parent;		// 父商品id,字段不为空时该商品作为配件
 	private BigDecimal price;		// 现价
 	private BigDecimal srcPrice;		// 原价
 	private String state;		// 状态
@@ -134,16 +133,7 @@ public class Goods extends DataEntity<Goods> {
 	public void setGoodsCategory(GoodsCategory goodsCategory) {
 		this.goodsCategory = goodsCategory;
 	}
-	
-	@JsonBackReference
-	public Goods getParent() {
-		return parent;
-	}
 
-	public void setParent(Goods parent) {
-		this.parent = parent;
-	}
-	
 	public BigDecimal getPrice() {
 		return price;
 	}

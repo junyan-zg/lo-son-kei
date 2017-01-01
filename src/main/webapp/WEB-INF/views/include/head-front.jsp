@@ -20,6 +20,7 @@
 <script src="${ctxStaticFront}/common/js/jquery.jqzoom-core.js" type="text/javascript"></script>
 <script src="${ctxStaticFront}/common/js/jquery.transit.js" type="text/javascript"></script>
 <script src="${ctxStaticFront}/common/js/jquery.easing.1.2.js" type="text/javascript"></script>
+<script src="${ctxStatic}/jquery-tabs/jquery.tabs.min.js" type="text/javascript"></script>
 <script src="${ctxStaticFront}/common/js/pageSwitch.min.js" type="text/javascript"></script>
 <script src="${ctxStaticFront}/common/js/main.js" type="text/javascript"></script>
 <script src="${ctxStaticFront}/${moduleName}/js/main.js" type="text/javascript"></script>

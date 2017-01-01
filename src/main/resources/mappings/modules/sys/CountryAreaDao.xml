@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjy.losonkei.modules.sys.dao.CountryAreaDao">
+    
+	<sql id="countryAreaColumns_bak">
+		a.id AS "id",
+		a.code AS "code",
+		a.name AS "name",
+		a.parent_id AS "parentId",
+		a.first_letter AS "firstLetter",
+		a.level AS "level"
+	</sql>
+
+	<sql id="countryAreaColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.parent_id AS "parentId",
+		a.level AS "level"
+	</sql>
+	
+	<sql id="countryAreaJoins">
+	</sql>
+    
+	<select id="get" resultType="CountryArea">
+		SELECT 
+			<include refid="countryAreaColumns"/>
+		FROM sys_dict_area a
+		<include refid="countryAreaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CountryArea">
+		SELECT 
+			<include refid="countryAreaColumns"/>
+		FROM sys_dict_area a
+		<include refid="countryAreaJoins"/>
+		<where>
+			1 = 1
+			<if test="parentId != null and parentId != ''">
+				AND a.parent_id = #{parentId}
+			</if>
+			<if test="level != null and level != ''">
+				AND a.level = #{level}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CountryArea">
+		SELECT 
+			<include refid="countryAreaColumns"/>
+		FROM sys_dict_area a
+		<include refid="countryAreaJoins"/>
+		<!--<where>
+			
+		</where>-->
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_dict_area(
+			id,
+			code,
+			name,
+			parent_id,
+			first_letter,
+			level
+		) VALUES (
+			#{id},
+			#{code},
+			#{name},
+			#{parentId},
+			#{firstLetter},
+			#{level}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_dict_area SET 	
+			id = #{id},
+			code = #{code},
+			name = #{name},
+			parent_id = #{parentId},
+			first_letter = #{firstLetter},
+			level = #{level}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM sys_dict_area
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

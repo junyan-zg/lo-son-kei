@@ -11,8 +11,8 @@ public class StartUp {
 
 		WebAppContext context = new WebAppContext();  // 关联一个已经存在的上下文
 		context.setContextPath("/losonkei");
-		context.setDescriptor("src/main/webapp/WEB-INF/web.xml");  // 设置描述符位置  
-		context.setResourceBase("src/main/webapp");      // 设置Web内容上下文路径  
+		context.setDescriptor("src/main/webapp/WEB-INF/web.xml");  // 设置描述符位置
+		context.setResourceBase("src/main/webapp");      // 设置Web内容上下文路径
 		context.setParentLoaderPriority(true);
 		server.setHandler(context);
 		server.start();

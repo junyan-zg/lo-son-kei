@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjy.losonkei.modules.member.dao.MemberAddressDao">
+    
+	<sql id="memberAddressColumns">
+		a.id AS "id",
+		a.area_id AS "area.id",
+		a.city_id AS "city.id",
+		a.province_id AS "province.id",
+		a.address AS "address",
+		a.default_flag AS "defaultFlag",
+		a.member_id AS "memberId",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+
+		a2.name AS "area.name",
+		a3.name AS "city.name",
+		a4.name AS "province.name"
+	</sql>
+	
+	<sql id="memberAddressJoins">
+		LEFT JOIN sys_dict_area a2 ON a2.id = a.area_id
+		LEFT JOIN sys_dict_area a3 ON a3.id = a.city_id
+		LEFT JOIN sys_dict_area a4 ON a4.id = a.province_id
+	</sql>
+    
+	<select id="get" resultType="MemberAddress">
+		SELECT 
+			<include refid="memberAddressColumns"/>
+		FROM member_address a
+		<include refid="memberAddressJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="MemberAddress">
+		SELECT 
+			<include refid="memberAddressColumns"/>
+		FROM member_address a
+		<include refid="memberAddressJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="memberId != null and memberId != ''">
+				AND a.member_id = #{memberId}
+			</if>
+			<if test="defaultFlag != null and defaultFlag != ''">
+				AND a.default_flag = #{defaultFlag}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="MemberAddress">
+		SELECT 
+			<include refid="memberAddressColumns"/>
+		FROM member_address a
+		<include refid="memberAddressJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO member_address(
+			id,
+			area_id,
+			city_id,
+			province_id,
+			address,
+			default_flag,
+			member_id,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			#{area.id},
+			#{city.id},
+			#{province.id},
+			#{address},
+			#{defaultFlag},
+			#{memberId},
+			#{remarks},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE member_address SET 	
+			area_id = #{area.id},
+			city_id = #{city.id},
+			province_id = #{province.id},
+			address = #{address},
+			default_flag = #{defaultFlag},
+			member_id = #{memberId},
+			remarks = #{remarks},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE member_address SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

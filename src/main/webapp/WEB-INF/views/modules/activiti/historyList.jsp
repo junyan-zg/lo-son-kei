@@ -100,7 +100,7 @@
 					<%--
 						<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${act.procDef.id}&processInstanceId=${act.procInsId}">已完成</a>
 					--%>
-						<a href="javascript:;" onclick="tracePhoto('${ctx}/act/process/resource/read?procDefId=${act.procDefId}&resType=image');">已完成</a>
+						<a href="javascript:;" onclick="tracePhoto('${ctx}/act/process/resource/read?procDefId=${act.procDef.id}&resType=image');">已完成</a>
 					</td>
 					<td>${fns:getUserById(act.startUserId).name}</td>
 					<td>
