@@ -17,7 +17,7 @@
                     <li><a href="#">购物车</a></li>
                     <li><a href="#">我的订单</a></li>
                     <li><a href="${ctx}/login">登录</a></li>
-                    <li><a href="${ctx}/login">注册</a></li>
+                    <li><a href="${ctx}/register">注册</a></li>
                 </ul>
             </nav>
         </div><!-- .grid_9 -->

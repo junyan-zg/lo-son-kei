@@ -5,8 +5,12 @@ import com.zjy.losonkei.modules.sys.security.Principal;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by zjy on 2016/12/19.
@@ -22,8 +26,11 @@ public class LoginController extends BaseController{
         return "redirect:/";
     }
 
-    @RequestMapping(value="/login",method = RequestMethod.GET)
-    public String login(){
+    @RequestMapping(value={"/login","/register"},method = RequestMethod.GET)
+    public String login(Model model, HttpServletRequest request){
+        if(request.getServletPath().contains("login")){
+            model.addAttribute("isLogin","yes");
+        }
         return "modules/front/login";
     }
 

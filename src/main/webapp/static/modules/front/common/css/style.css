@@ -2046,7 +2046,6 @@ form.registed{
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-khtml-border-radius: 2px;
-	behavior: url(PIE.htc);
 	box-shadow: 0px 1px 3px 1px #ededed;
 	-moz-box-shadow: 0px 1px 3px 1px #ededed;
 	-webkit-box-shadow: 0px 1px 3px 1px #ededed;
@@ -2056,13 +2055,20 @@ form.registed{
 form.registed strong{
 	color: #707070;
 	font: bold 13px/13px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, Arial, Verdana, sans-serif;
+	font-weight: bolder;
+	width: 50px;
+	display: inline-block;
+}
+form.registed2 strong{
+	width: 100px;
+	display: inline-block;
 }
 form.registed sup{
 	color: #eb6447;
-	margin: 0 3px;
+	margin-right: 20px;
 }
 form.registed input[type="text"],
-form.registed input[type="email"]{
+form.registed input[type="password"]{
 	margin: 5px 0 13px 0;
 	width: 416px;
 }
@@ -2293,7 +2299,6 @@ select.bottom-index,
 	border-radius: 25px;
 	-moz-border-radius: 25px;
 	-khtml-border-radius: 25px;
-	behavior: url(PIE.htc);
 	float: right;
 	font:bold 15px/50px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, Arial, Verdana, sans-serif;
 	height: 50px;
@@ -2825,7 +2830,6 @@ article.view_post{
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-khtml-border-radius: 2px;
-	behavior: url(PIE.htc);
 	display: block;
 	height: 101px;
 	padding: 0;
@@ -2836,7 +2840,6 @@ article.view_post{
 	border-radius: 2px;
 	-moz-border-radius: 2px;
 	-khtml-border-radius: 2px;
-	behavior: url(PIE.htc);
 }
 a:hover.button_block{
 	border: 1px solid #ccc;
