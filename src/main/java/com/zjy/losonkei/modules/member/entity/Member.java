@@ -39,6 +39,9 @@ public class Member extends DataEntity<Member> {
 	private String endMemberLoginnum;		// 结束 登录次数
 
 
+	public final static String STATE_ENABLED = "1";	//启用
+	public final static String STATE_DISABLED = "0";	//禁用
+
 	//private
 	
 	public Member() {

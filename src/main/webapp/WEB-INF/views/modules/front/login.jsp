@@ -23,20 +23,20 @@
                 <div class="tabs">
                     <div class="tab_box">
                         <div class="grid_12 registed_form<c:if test="${empty isLogin}"> hide</c:if>">
-                            <form class="registed" style="text-align: left;padding-left: 210px;margin-bottom: 20px;">
+                            <form class="registed" method="post" action="${ctx}/login" style="text-align: left;padding-left: 210px;margin-bottom: 20px;">
                                 <div>
                                     <strong>账 户</strong>
-                                    <input type="text" name="account" placeholder="请输入您的账号" class="" value="">
+                                    <input type="text" name="username" placeholder="请输入您的账号" value="${username}">
                                     <sup>*</sup>
                                 </div>
                                 <div>
                                     <strong>密 码</strong>
-                                    <input type="password" name="password" placeholder="请输入您的密码" class="" value="">
+                                    <input type="password" name="password" placeholder="请输入您的密码">
                                     <sup>*</sup>
                                     <span style="color: #eb6447;margin-left: 5px;">账号或密码不正确</span>
                                 </div>
                                 <div class="remember">
-                                    <input class="niceCheck" type="checkbox" name="remember" id="remember"/>
+                                    <input class="niceCheck" type="checkbox" name="rememberMe" ${rememberMe ? 'checked' : ''}/>
                                     <span class="rem"<%--onclick="$('#remember').attr('checked', !$('#remember').attr('checked'));"--%>>记 住 我</span>
                                 </div>
                                 <div class="submit">
@@ -105,7 +105,8 @@
 
                                 <div>
                                     <strong>生 日</strong>
-                                    <input type="text" name="account" placeholder="生日" class="Wate" value="">
+                                    <input type="text" name="account" placeholder="生日" class="Wdate" value="" readonly
+                                    onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,isShowToday:false});" />
                                 </div>
 
                                 <div>

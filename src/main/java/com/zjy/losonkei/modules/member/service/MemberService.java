@@ -25,6 +25,10 @@ public class MemberService extends CrudService<MemberDao, Member> {
 	public Member get(String id) {
 		return super.get(id);
 	}
+
+	public Member getByAccount(String account) {
+		return dao.getByAccount(account);
+	}
 	
 	public List<Member> findList(Member member) {
 		return super.findList(member);

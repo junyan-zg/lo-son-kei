@@ -14,5 +14,6 @@ import com.zjy.losonkei.modules.member.entity.Member;
  */
 @MyBatisDao
 public interface MemberDao extends CrudDao<Member> {
-	
+
+    public Member getByAccount(String memberAccount);
 }

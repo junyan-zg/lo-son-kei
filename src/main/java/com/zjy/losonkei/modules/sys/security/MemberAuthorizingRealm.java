@@ -3,8 +3,13 @@
  */
 package com.zjy.losonkei.modules.sys.security;
 
+import com.zjy.losonkei.common.config.Global;
 import com.zjy.losonkei.common.security.shiro.session.SessionDAO;
 import com.zjy.losonkei.common.utils.Encodes;
+import com.zjy.losonkei.common.utils.StringUtils;
+import com.zjy.losonkei.modules.member.entity.Member;
+import com.zjy.losonkei.modules.member.service.MemberService;
+import com.zjy.losonkei.modules.member.utils.MemberUtils;
 import com.zjy.losonkei.modules.sys.entity.User;
 import com.zjy.losonkei.modules.sys.service.SystemService;
 import org.apache.shiro.authc.AuthenticationException;
@@ -36,7 +41,7 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	@Autowired
-	private SessionDAO sessionDao;
+	private MemberService memberService;
 
 	/**
 	 * 认证回调函数, 登录时调用
@@ -44,31 +49,29 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
 		System.out.println("认证");
-		org.apache.shiro.authc.UsernamePasswordToken token = (org.apache.shiro.authc.UsernamePasswordToken) authcToken;
-		
-		int activeSessionSize = sessionDao.getActiveSessions(false).size();
-		if (logger.isDebugEnabled()){
-			logger.debug("login submit, active session size: {}, username: {}", activeSessionSize, token.getUsername());
-		}
 
-		if (!"mm".equals(token.getUsername())){
-			throw new AuthenticationException();
+		if(authcToken instanceof UsernamePasswordToken){
+			return null;
 		}
+		System.out.println("认证2");
+
+		org.apache.shiro.authc.UsernamePasswordToken token = (org.apache.shiro.authc.UsernamePasswordToken) authcToken;
 
 		// 校验用户名密码
-
-		User user = new User();
-		//throw new AuthenticationException("msg:该已帐号禁止登录.");
-		user.setId("hszgihwgaiu");
-		user.setLoginName(token.getUsername());
-		user.setName(token.getUsername());
-		user.setPassword(String.valueOf(token.getPassword()));
-		byte[] salt = Encodes.decodeHex("02a3f0772fcca9f415adc990734b45c6f059c7d33ee28362c4852032".substring(0,16));
-		return new SimpleAuthenticationInfo(new Principal(user),
-					"02a3f0772fcca9f415adc990734b45c6f059c7d33ee28362c4852032".substring(16), ByteSource.Util.bytes(salt), getName());
-
+		Member member = memberService.getByAccount(token.getUsername());
+		if (member != null) {
+			if (Member.STATE_DISABLED.equals(member.getMemberState())){
+				throw new AuthenticationException("msg:该帐号已禁止登录.");
+			}
+			User user = new User();
+			user.setId(member.getId());
+			byte[] salt = Encodes.decodeHex(member.getMemberPwd().substring(0,16));
+			return new SimpleAuthenticationInfo(new Principal(user),member.getMemberPwd().substring(16), ByteSource.Util.bytes(salt), getName());
+		} else {
+			return null;
+		}
 		//createToken不要加密
-		//info加密
+		//info要加密
 	}
 
 	/**
@@ -78,23 +81,30 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		System.out.println("授权");
 
-		Object availablePrincipal = getAvailablePrincipal(principals);
+		Principal principal = (Principal) getAvailablePrincipal(principals);
 
-		Principal principal = (Principal) availablePrincipal;
+		if(principal.isCompanyUser()){
+			return null;
+		}
 
-		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+		Member member = memberService.get(principal.getId());
+
+		if(member != null){
+			SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+			info.addRole("member");
+			System.out.println("添加角色member");
+			return info;
+		}else{
+			return null;
+		}
+
 		// 添加用户权限
 		//info.addStringPermission("");
 		//info.addStringPermission("member");
 		// 添加用户角色信息
-		if (!principal.isCompanyUser()){
-			info.addRole("member");
-		}
-		// 更新登录IP和时间
-		//getSystemService().updateUserLoginInfo(user);
-		// 记录登录日志
-		//LogUtils.saveLog(Servlets.getRequest(), "系统登录");
-		return info;
+//		if (!principal.isCompanyUser()){
+//			info.addRole("member");
+//		}
 
 	}
 
@@ -103,8 +113,8 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
 	 */
 	@PostConstruct
 	public void initCredentialsMatcher() {
-		HashedCredentialsMatcher matcher = new HashedCredentialsMatcher(SystemService.HASH_ALGORITHM);
-		matcher.setHashIterations(SystemService.HASH_INTERATIONS);
+		HashedCredentialsMatcher matcher = new HashedCredentialsMatcher(MemberUtils.HASH_ALGORITHM);
+		matcher.setHashIterations(MemberUtils.HASH_INTERATIONS);
 		setCredentialsMatcher(matcher);
 	}
 

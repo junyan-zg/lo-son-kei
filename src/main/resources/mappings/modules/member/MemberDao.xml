@@ -33,7 +33,15 @@
 		<include refid="memberJoins"/>
 		WHERE a.id = #{id}
 	</select>
-	
+
+	<select id="getByAccount" resultType="Member">
+		SELECT
+		<include refid="memberColumns"/>
+		FROM member a
+		<include refid="memberJoins"/>
+		WHERE a.member_account = #{memberAccount}
+	</select>
+
 	<select id="findList" resultType="Member">
 		SELECT 
 			<include refid="memberColumns"/>
