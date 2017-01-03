@@ -47,12 +47,6 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">会员头像：</label>
-			<div class="controls">
-				<form:input path="memberAvatar" htmlEscape="false" maxlength="50" class="input-xlarge "/>
-			</div>
-		</div>
-		<div class="control-group">
 			<label class="control-label">会员密码：</label>
 			<div class="controls">
 				<form:input path="memberPwd" htmlEscape="false" maxlength="64" class="input-xlarge required"/>

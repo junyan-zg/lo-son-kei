@@ -21,7 +21,6 @@ public class Member extends DataEntity<Member> {
 	private String memberAccount;		// 会员账号
 	private String memberName;		// 会员名称
 	private String memberTruename;		// 真实姓名
-	private String memberAvatar;		// 会员头像
 	private String memberPwd;		// 会员密码
 	private String memberPaypwd;		// 支付密码
 	private Date memberAddtime;		// 注册时间
@@ -31,6 +30,9 @@ public class Member extends DataEntity<Member> {
 	private String memberBalance;		// 会员余额
 
 
+	private String memberPwdAgain;
+	private String memberPaypwdAgain;
+
 	private Date beginMemberAddtime;		// 开始 注册时间
 	private Date endMemberAddtime;		// 结束 注册时间
 	private Integer beginMemberPoints;		// 开始 会员积分
@@ -38,11 +40,10 @@ public class Member extends DataEntity<Member> {
 	private String beginMemberLoginnum;		// 开始 登录次数
 	private String endMemberLoginnum;		// 结束 登录次数
 
-
 	public final static String STATE_ENABLED = "1";	//启用
 	public final static String STATE_DISABLED = "0";	//禁用
 
-	//private
+	private MemberDetails memberDetails;
 	
 	public Member() {
 		super();
@@ -77,15 +78,6 @@ public class Member extends DataEntity<Member> {
 
 	public void setMemberTruename(String memberTruename) {
 		this.memberTruename = memberTruename;
-	}
-	
-	@Length(min=0, max=50, message="会员头像长度必须介于 0 和 50 之间")
-	public String getMemberAvatar() {
-		return memberAvatar;
-	}
-
-	public void setMemberAvatar(String memberAvatar) {
-		this.memberAvatar = memberAvatar;
 	}
 	
 	@Length(min=1, max=64, message="会员密码长度必须介于 1 和 64 之间")
@@ -198,5 +190,28 @@ public class Member extends DataEntity<Member> {
 	public void setEndMemberLoginnum(String endMemberLoginnum) {
 		this.endMemberLoginnum = endMemberLoginnum;
 	}
-		
+
+	public String getMemberPwdAgain() {
+		return memberPwdAgain;
+	}
+
+	public void setMemberPwdAgain(String memberPwdAgain) {
+		this.memberPwdAgain = memberPwdAgain;
+	}
+
+	public String getMemberPaypwdAgain() {
+		return memberPaypwdAgain;
+	}
+
+	public void setMemberPaypwdAgain(String memberPaypwdAgain) {
+		this.memberPaypwdAgain = memberPaypwdAgain;
+	}
+
+	public MemberDetails getMemberDetails() {
+		return memberDetails;
+	}
+
+	public void setMemberDetails(MemberDetails memberDetails) {
+		this.memberDetails = memberDetails;
+	}
 }

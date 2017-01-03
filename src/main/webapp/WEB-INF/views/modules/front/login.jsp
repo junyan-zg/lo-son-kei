@@ -46,41 +46,41 @@
                             </form>
                         </div>
                         <div class="<c:if test="${not empty isLogin}">hide</c:if>">
-                            <form class="registed registed2" style="text-align: left;margin-bottom: 20px;padding: 30px;">
+                            <form:form modelAttribute="member" method="post" class="registed registed2" style="text-align: left;margin-bottom: 20px;padding: 30px;">
                                 <div style="border-bottom: 2px dashed #bdd1e9;margin-bottom: 20px;">
                                     <h2><b style="color: #eb6447;">必 填 信 息</b></h2>
                                 </div>
                                 <div>
                                     <strong>账 户</strong>
-                                    <input type="text" name="account" placeholder="登录账号" class="" value="">
+                                    <form:input path="memberAccount" placeholder="登录账号"/>
                                     <sup>*</sup>
                                 </div>
                                 <div>
                                     <strong>昵 称</strong>
-                                    <input type="text" name="account" placeholder="会员昵称" class="" value="">
+                                    <form:input path="memberName" placeholder="会员昵称" />
                                     <sup>*</sup>
                                 </div>
                                 <div>
                                     <strong>登 录 密 码</strong>
-                                    <input type="password" name="password" placeholder="登录密码" class="" value="">
+                                    <form:input path="memberPwd" placeholder="登录密码"/>
                                     <sup>*</sup>
                                     <span style="color: #eb6447;margin-left: 5px;">账号或密码不正确</span>
                                 </div>
                                 <div>
                                     <strong>确 认 密 码</strong>
-                                    <input type="password" name="password" placeholder="确认登录密码" class="" value="">
+                                    <form:input path="memberPwdAgain" placeholder="确认登录密码"/>
                                     <sup>*</sup>
                                     <span style="color: #eb6447;margin-left: 5px;">账号或密码不正确</span>
                                 </div>
                                 <div>
                                     <strong>支 付 密 码</strong>
-                                    <input type="password" name="password" placeholder="支付密码" class="" value="">
+                                    <form:input path="memberPaypwd" placeholder="支付密码"/>
                                     <sup>*</sup>
                                     <span style="color: #eb6447;margin-left: 5px;">账号或密码不正确</span>
                                 </div>
                                 <div>
                                     <strong>确 认 密 码</strong>
-                                    <input type="password" name="password" placeholder="确认支付密码" class="" value="">
+                                    <form:input path="memberPaypwdAgain" placeholder="确认支付密码"/>
                                     <sup>*</sup>
                                     <span style="color: #eb6447;margin-left: 5px;">账号或密码不正确</span>
                                 </div>
@@ -91,44 +91,45 @@
 
                                 <div>
                                     <strong>真 实 姓 名</strong>
-                                    <input type="text" name="account" placeholder="真实姓名" class="" value="">
+                                    <form:input path="memberTruename" placeholder="真实姓名"/>
                                 </div>
 
                                 <div style="margin-top: 8px;margin-bottom: 17px;">
                                     <strong>性 别</strong>
-                                    <%--<input type="text" name="account" placeholder="性别" class="" value="">--%>
-                                    <select class="selectBox" style="width: 420px;">
-                                        <option>男</option>
-                                        <option>女</option>
-                                    </select>
+                                    <%--<input type="text" name="account" placeholder="性别"/>--%>
+                                    <form:select path="memberDetails.memberSex" cssClass="selectBox" cssStyle="width: 420px;">
+                                        <form:option value="" label="请选择"/>
+                                        <form:options items="${fns:getDictList('sex')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+                                    </form:select>
                                 </div>
 
                                 <div>
                                     <strong>生 日</strong>
-                                    <input type="text" name="account" placeholder="生日" class="Wdate" value="" readonly
+                                    <input name="memberDetails.memberBirthday" placeholder="生日" class="Wdate" readonly type="text"
+                                    value="<fmt:formatDate value="${member.memberDetails.memberBirthday}" pattern="yyyy-MM-dd"/>"
                                     onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,isShowToday:false});" />
                                 </div>
 
                                 <div>
                                     <strong>手 机 号 码</strong>
-                                    <input type="text" name="account" placeholder="手机号码" class="" value="">
+                                    <form:input path="memberDetails.memberMobile" placeholder="手机号码"/>
                                 </div>
 
                                 <div>
                                     <strong>Q Q 号 码</strong>
-                                    <input type="text" name="account" placeholder="QQ号码" class="" value="">
+                                    <form:input path="memberDetails.memberQq" placeholder="QQ号码"/>
                                 </div>
 
                                 <div>
                                     <strong>电 子 邮 箱</strong>
-                                    <input type="text" name="account" placeholder="电子邮箱" class="" value="">
+                                    <form:input path="memberDetails.memberEmail" placeholder="电子邮箱"/>
                                 </div>
 
                                 <div class="submit">
                                     <input type="submit" value="注 册" style="width: 545px;">
                                 </div>
                                 <div class="clear"></div>
-                            </form>
+                            </form:form>
 
                         </div>
                     </div>

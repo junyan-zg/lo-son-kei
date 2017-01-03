@@ -1,8 +1,11 @@
 package com.zjy.losonkei.modules.front;
 
 import com.zjy.losonkei.common.web.BaseController;
+import com.zjy.losonkei.modules.member.entity.Member;
 import com.zjy.losonkei.modules.sys.security.Principal;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
@@ -12,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by zjy on 2016/12/19.
@@ -19,18 +24,20 @@ import javax.servlet.http.HttpServletRequest;
 @Controller("com.zjy.losonkei.modules.front.LoginController")
 public class LoginController extends BaseController{
 
+    @RequestMapping(value="/login",method = RequestMethod.GET)
+    public String login(Model model,Member member){
+        model.addAttribute("isLogin","yes");
+        return "modules/front/login";
+    }
 
-    @RequestMapping(value={"/login","/register"},method = RequestMethod.GET)
-    public String login(Model model, HttpServletRequest request){
-        if(request.getServletPath().contains("login")){
-            model.addAttribute("isLogin","yes");
-        }
+    @RequestMapping(value="/register")
+    public String register(Member member){
         return "modules/front/login";
     }
 
 
     @RequestMapping(value="/login",method = RequestMethod.POST)
-    public String loginCheck(Model model,HttpServletRequest request){
+    public String loginCheck(Model model,HttpServletRequest request,Member member){
         Subject subject = SecurityUtils.getSubject();
         Principal principal = (Principal)subject.getPrincipal();
         if(principal == null){
@@ -50,8 +57,9 @@ public class LoginController extends BaseController{
     }
 
     @RequestMapping(value="${frontPath}/success")
-    public String success(){
+    public String success(HttpServletResponse response) throws IOException {
         System.out.println("page success");
         return "modules/front/success";
     }
+
 }

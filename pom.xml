@@ -591,19 +591,19 @@
         </dependency>
 
 
-        <!-- JSP Support -->
-        <dependency>
+
+        <!--<dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>javax.servlet.jsp</artifactId>
             <version>2.2.3</version>
         </dependency>
-        <!--EL Support -->
+
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>javax.el</artifactId>
             <version>2.2.3</version>
         </dependency>
-        <!-- JSTL Support -->
+
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>javax.servlet.jsp.jstl</artifactId>
@@ -616,10 +616,10 @@
             </exclusions>
         </dependency>
 
-        <!-- Jetty -->
+
        <dependency> <groupId>org.eclipse.jetty.aggregate</groupId> <artifactId>jetty-all</artifactId>
             <version>8.0.4.v20111024</version> </dependency>
-
+-->
 
     </dependencies>
 
