@@ -64,13 +64,13 @@ public class MemberFormAuthenticationFilter extends org.apache.shiro.web.filter.
 		String className = e.getClass().getName(), message = "";
 		if (IncorrectCredentialsException.class.getName().equals(className)
 				|| UnknownAccountException.class.getName().equals(className)){
-			message = "用户或密码错误, 请重试.";
+			message = "账号或密码错误，请重试.";
 		}
 		else if (e.getMessage() != null && StringUtils.startsWith(e.getMessage(), "msg:")){
 			message = StringUtils.replace(e.getMessage(), "msg:", "");
 		}
 		else if(AuthenticationException.class.getName().equals(className)){
-			message = "用户或密码错误, 请重试.";
+			message = "账号或密码错误，请重试.";
 		}
 		else{
 			message = "系统出现点问题，请稍后再试！";

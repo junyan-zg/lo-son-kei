@@ -74,7 +74,7 @@
 	</bean>
 
 	<!--认证策略-->
-	<bean id="authenticator" class="org.apache.shiro.authc.pam.ModularRealmAuthenticator">
+	<bean id="authenticator" class="com.zjy.losonkei.common.security.shiro.ModularRealmAuthenticator">
 		<property name="authenticationStrategy">
 			<bean class="org.apache.shiro.authc.pam.FirstSuccessfulStrategy" />
 		</property>

@@ -12,10 +12,7 @@ import com.zjy.losonkei.modules.member.service.MemberService;
 import com.zjy.losonkei.modules.member.utils.MemberUtils;
 import com.zjy.losonkei.modules.sys.entity.User;
 import com.zjy.losonkei.modules.sys.service.SystemService;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -61,7 +58,7 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
 		Member member = memberService.getByAccount(token.getUsername());
 		if (member != null) {
 			if (Member.STATE_DISABLED.equals(member.getMemberState())){
-				throw new AuthenticationException("msg:该帐号已禁止登录.");
+				throw new LockedAccountException("msg:该帐号已禁止登录.");
 			}
 			User user = new User();
 			user.setId(member.getId());

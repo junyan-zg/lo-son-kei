@@ -23,17 +23,23 @@
                 <div class="tabs">
                     <div class="tab_box">
                         <div class="grid_12 registed_form<c:if test="${empty isLogin}"> hide</c:if>">
-                            <form class="registed" method="post" action="${ctx}/login" style="text-align: left;padding-left: 210px;margin-bottom: 20px;">
+                            <form class="registed" method="post" action="${ctx}/login" onsubmit="return loginForm();" style="text-align: left;padding-left: 210px;margin-bottom: 20px;">
+                                <c:if test="${not empty message}">
+                                    <div style="text-align: left;padding-left: 140px;">
+                                        <h2 style="color: #eb6447;font-weight: bolder;">${message}</h2>
+                                    </div>
+                                </c:if>
                                 <div>
                                     <strong>账 户</strong>
-                                    <input type="text" name="username" placeholder="请输入您的账号" value="${username}">
+                                    <input type="text" name="username" placeholder="请输入您的账号" value="${username}" class="required0">
                                     <sup>*</sup>
+                                    <span style="color: #eb6447;margin-left: 5px;" id="tips-username" ></span>
                                 </div>
                                 <div>
                                     <strong>密 码</strong>
-                                    <input type="password" name="password" placeholder="请输入您的密码">
+                                    <input type="password" name="password" placeholder="请输入您的密码" class="required0">
                                     <sup>*</sup>
-                                    <span style="color: #eb6447;margin-left: 5px;">账号或密码不正确</span>
+                                    <span style="color: #eb6447;margin-left: 5px;" id="tips-password"></span>
                                 </div>
                                 <div class="remember">
                                     <input class="niceCheck" type="checkbox" name="rememberMe" ${rememberMe ? 'checked' : ''}/>
@@ -46,43 +52,45 @@
                             </form>
                         </div>
                         <div class="<c:if test="${not empty isLogin}">hide</c:if>">
-                            <form:form modelAttribute="member" method="post" class="registed registed2" style="text-align: left;margin-bottom: 20px;padding: 30px;">
+                            <form:form modelAttribute="member" method="post" action="${ctx}/doRegister" class="registed registed2" onsubmit="return registerForm();" style="text-align: left;margin-bottom: 20px;padding: 30px;">
                                 <div style="border-bottom: 2px dashed #bdd1e9;margin-bottom: 20px;">
                                     <h2><b style="color: #eb6447;">必 填 信 息</b></h2>
                                 </div>
                                 <div>
                                     <strong>账 户</strong>
-                                    <form:input path="memberAccount" placeholder="登录账号"/>
+                                    <form:input path="memberAccount" placeholder="登录账号" cssClass="required"/>
                                     <sup>*</sup>
+                                    <span style="color: #eb6447;margin-left: 5px;" id="tips-memberAccount">${errorRegister}</span>
                                 </div>
                                 <div>
                                     <strong>昵 称</strong>
-                                    <form:input path="memberName" placeholder="会员昵称" />
+                                    <form:input path="memberName" placeholder="会员昵称" cssClass="required" />
                                     <sup>*</sup>
+                                    <span style="color: #eb6447;margin-left: 5px;" id="tips-memberName"></span>
                                 </div>
                                 <div>
                                     <strong>登 录 密 码</strong>
-                                    <form:input path="memberPwd" placeholder="登录密码"/>
+                                    <form:password path="memberPwd" placeholder="登录密码" cssClass="required"/>
                                     <sup>*</sup>
-                                    <span style="color: #eb6447;margin-left: 5px;">账号或密码不正确</span>
+                                    <span style="color:#eb6447;margin-left: 5px;" id="tips-memberPwd"></span>
                                 </div>
                                 <div>
                                     <strong>确 认 密 码</strong>
-                                    <form:input path="memberPwdAgain" placeholder="确认登录密码"/>
+                                    <form:password path="memberPwdAgain" placeholder="确认登录密码" cssClass="required"/>
                                     <sup>*</sup>
-                                    <span style="color: #eb6447;margin-left: 5px;">账号或密码不正确</span>
+                                    <span style="color: #eb6447;margin-left: 5px;" id="tips-memberPwdAgain"></span>
                                 </div>
                                 <div>
                                     <strong>支 付 密 码</strong>
-                                    <form:input path="memberPaypwd" placeholder="支付密码"/>
+                                    <form:password path="memberPaypwd" placeholder="支付密码" cssClass="required"/>
                                     <sup>*</sup>
-                                    <span style="color: #eb6447;margin-left: 5px;">账号或密码不正确</span>
+                                    <span style="color: #eb6447;margin-left: 5px;" id="tips-memberPaypwd"></span>
                                 </div>
                                 <div>
                                     <strong>确 认 密 码</strong>
-                                    <form:input path="memberPaypwdAgain" placeholder="确认支付密码"/>
+                                    <form:password path="memberPaypwdAgain" placeholder="确认支付密码" cssClass="required"/>
                                     <sup>*</sup>
-                                    <span style="color: #eb6447;margin-left: 5px;">账号或密码不正确</span>
+                                    <span style="color: #eb6447;margin-left: 5px;" id="tips-memberPaypwdAgain"></span>
                                 </div>
 
                                 <div style="border-bottom: 2px dashed #bdd1e9;margin-bottom: 10px;padding-top: 20px;">

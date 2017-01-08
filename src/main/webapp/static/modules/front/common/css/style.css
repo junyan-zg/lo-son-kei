@@ -7,6 +7,9 @@
 body{
     margin: 0;
 }
+.center{
+	text-align: center;
+}
 #top{
 	background: rgb(245,245,245);
 	height: 35px;

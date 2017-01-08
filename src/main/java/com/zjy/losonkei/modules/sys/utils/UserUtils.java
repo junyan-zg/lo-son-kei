@@ -6,6 +6,7 @@ package com.zjy.losonkei.modules.sys.utils;
 import java.util.List;
 
 import com.zjy.losonkei.common.utils.CacheUtils;
+import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.modules.sys.dao.AreaDao;
 import com.zjy.losonkei.modules.sys.dao.RoleDao;
 import com.zjy.losonkei.modules.sys.dao.UserDao;
@@ -120,10 +121,20 @@ public class UserUtils {
 	public static User getUser(){
 		Principal principal = getPrincipal();
 		if (principal!=null){
-			User user = get(principal.getId());
-			if (user != null){
-				return user;
+			if(principal.isCompanyUser()){
+				User user = get(principal.getId());
+				if (user != null){
+					return user;
+				}
+			}else{
+				//此处主要用于插入数据到数据库中得到的createBy,updateBy信息
+				if(StringUtils.isNotBlank(principal.getId())){
+					User user = new User();
+					user.setId(principal.getId());
+					return user;
+				}
 			}
+
 			return new User();
 		}
 		// 如果没有登录，则返回实例化空的User对象。

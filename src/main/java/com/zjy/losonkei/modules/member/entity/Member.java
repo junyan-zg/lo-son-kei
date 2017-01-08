@@ -4,6 +4,8 @@
 package com.zjy.losonkei.modules.member.entity;
 
 import org.hibernate.validator.constraints.Length;
+
+import java.math.BigDecimal;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import javax.validation.constraints.NotNull;
@@ -27,7 +29,7 @@ public class Member extends DataEntity<Member> {
 	private Integer memberPoints;		// 会员积分
 	private String memberState;		// 启用状态
 	private String memberLoginnum;		// 登录次数
-	private String memberBalance;		// 会员余额
+	private BigDecimal memberBalance;		// 会员余额
 
 
 	private String memberPwdAgain;
@@ -135,11 +137,11 @@ public class Member extends DataEntity<Member> {
 		this.memberLoginnum = memberLoginnum;
 	}
 	
-	public String getMemberBalance() {
+	public BigDecimal getMemberBalance() {
 		return memberBalance;
 	}
 
-	public void setMemberBalance(String memberBalance) {
+	public void setMemberBalance(BigDecimal memberBalance) {
 		this.memberBalance = memberBalance;
 	}
 	

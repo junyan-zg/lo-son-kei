@@ -1,7 +1,9 @@
 package com.zjy.losonkei.modules.front;
 
+import com.zjy.losonkei.common.utils.CommonUtils;
 import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.member.entity.Member;
+import com.zjy.losonkei.modules.member.service.MemberService;
 import com.zjy.losonkei.modules.sys.security.Principal;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -9,6 +11,7 @@ import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
@@ -24,9 +28,15 @@ import java.io.IOException;
 @Controller("com.zjy.losonkei.modules.front.LoginController")
 public class LoginController extends BaseController{
 
+    @Autowired
+    private MemberService memberService;
+
     @RequestMapping(value="/login",method = RequestMethod.GET)
-    public String login(Model model,Member member){
+    public String login(Model model,Member member,HttpSession session){
         model.addAttribute("isLogin","yes");
+
+        CommonUtils.sessionToRequset(session,model,"message");
+
         return "modules/front/login";
     }
 
@@ -35,6 +45,19 @@ public class LoginController extends BaseController{
         return "modules/front/login";
     }
 
+    @RequestMapping(value="/doRegister")
+    public String doRegister(Member member, HttpSession session,Model model){
+
+        String result = memberService.doRegister(member);
+        if("ok".equalsIgnoreCase(result)){
+            session.setAttribute("message","注册成功！请登录！");
+            return "redirect:/login";
+        }else{
+            model.addAttribute("errorRegister",result);
+        }
+
+        return "modules/front/login";
+    }
 
     @RequestMapping(value="/login",method = RequestMethod.POST)
     public String loginCheck(Model model,HttpServletRequest request,Member member){

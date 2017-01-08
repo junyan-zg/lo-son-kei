@@ -16,10 +16,7 @@ import com.zjy.losonkei.modules.sys.entity.Role;
 import com.zjy.losonkei.modules.sys.service.SystemService;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
@@ -57,6 +54,10 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 	 */
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
+		if (!(authcToken instanceof UsernamePasswordToken)){
+			return null;
+		}
+
 		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
 		
 		int activeSessionSize = getSystemService().getSessionDao().getActiveSessions(false).size();
@@ -77,7 +78,7 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 		User user = getSystemService().getUserByLoginName(token.getUsername());
 		if (user != null) {
 			if (Global.NO.equals(user.getLoginFlag())){
-				throw new AuthenticationException("msg:该已帐号禁止登录.");
+				throw new LockedAccountException("msg:该已帐号禁止登录.");
 			}
 			byte[] salt = Encodes.decodeHex(user.getPassword().substring(0,16));
 			return new SimpleAuthenticationInfo(new Principal(user, token.isMobileLogin()), 
