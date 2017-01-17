@@ -1,7 +1,7 @@
 package com.zjy.losonkei.common.utils;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.*;
 import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
@@ -30,7 +30,7 @@ public class ZxingHandler {
 
 	/**
 	 * 条形码编码
-	 * 
+	 *
 	 * @param contents
 	 * @param width
 	 * @param height
@@ -46,6 +46,32 @@ public class ZxingHandler {
 		try {
 			BitMatrix bitMatrix = new MultiFormatWriter().encode(contents,
 					BarcodeFormat.EAN_13, codeWidth, height, null);
+
+			MatrixToImageWriter
+					.writeToFile(bitMatrix, "png", new File(imgPath));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * 条形码编码
+	 *
+	 * @param contents
+	 * @param width
+	 * @param height
+	 * @param imgPath
+	 */
+	public static void encodePng(String contents, int width, int height, String imgPath) {
+		int codeWidth = 3 + // start guard
+				(7 * 6) + // left bars
+				5 + // middle guard
+				(7 * 6) + // right bars
+				3; // end guard
+		codeWidth = Math.max(codeWidth, width);
+		try {
+			BitMatrix bitMatrix = new MultiFormatWriter().encode(contents,
+					BarcodeFormat.CODE_39, 120, height, null);
 
 			MatrixToImageWriter
 					.writeToFile(bitMatrix, "png", new File(imgPath));
@@ -137,7 +163,7 @@ public class ZxingHandler {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main1(String[] args) {
 
 		// 条形码
 		String imgPath = "target\\zxing_EAN13.png";
@@ -166,5 +192,17 @@ public class ZxingHandler {
 		System.out.println("finished zxing decode.");
 		
 	}
-    
+
+	public static void main(String[] args) throws IOException {
+
+		BufferedReader buf = new BufferedReader(new InputStreamReader(
+				new FileInputStream(new File("F:\\testdemo2\\周仪\\src\\txt.txt"))));
+		String abc = "";
+		int i = 1;
+		while ((abc = buf.readLine()) != null) {
+
+			encodePng(abc,1,60,"d:/test/"+i+".png");
+			i++;
+		}
+	}
 }

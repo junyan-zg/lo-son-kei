@@ -423,6 +423,7 @@ form.search:hover .search_button{
 	height: 38px;
 	padding: 0 15px;
 	text-transform: uppercase;
+	font-size: 20px;
 }
 .primary ul li a:hover,
 .primary ul li:hover a{
@@ -616,17 +617,17 @@ aside h4.sub_title{
 	border: 0 none;
 	color: #444;
 	display: block;
-	font:normal 12px/33px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, Arial, Verdana, sans-serif;
+	font:normal 18px/33px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, Arial, Verdana, sans-serif;
 	height: 33px;
 	padding: 0 0 0 16px;
 	text-transform: uppercase;
 }
 .right_menu ul li:hover a{
-	background: #f5f5f5;
+	background: #EEEEEE;
 	color: #eb6447;
 }
 .right_menu ul li.current a{
-	background: #f5f5f5!important;
+	background: #EEEEEE!important;
 	color: #444!important;
 }
 
@@ -1068,7 +1069,9 @@ h1.page_title{
 	width: 70px;
 }
 .sort{
-	padding: 0 0 0 20px;
+	padding: 0 25px 0 20px;
+	border-right: 1px solid #e0e0e0;
+	margin-right: 25px;
 }
 .sort .selectBox{
 	margin: 0 5px;
@@ -1076,7 +1079,7 @@ h1.page_title{
 }
 .sort a.sort_up{
 	color: #777!important;
-	font:bold 12px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, Arial, Verdana, sans-serif;
+	font:bold 18px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, Arial, Verdana, sans-serif;
 	text-decoration: none!important;
 }
 .sort a:hover.sort_up{

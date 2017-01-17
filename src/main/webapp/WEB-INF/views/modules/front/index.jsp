@@ -11,11 +11,10 @@
 <content tag="nav">
     <ul>
         <li class="curent"><a href="${ctx}/index">首 页</a></li>
-        <li><a href="catalog_grid.html">新 品</a></li>
         <li><a href="catalog_grid.html">热 销</a></li>
-        <li><a href="javascript:;" onclick="$('html,body').animate({scrollTop:$('#brands').offset().top}, 800);">分 类</a>
-        </li>
-        <li><a href="catalog_grid.html">更 多</a></li>
+        <li><a href="catalog_grid.html">新 品</a></li>
+        <li><a href="javascript:;">优惠</a></li>
+        <li><a href="${ctx}/goods">更 多</a></li>
         <%--<li class="parent">
                 <a href="catalog_grid.html">新 品</a>
                 <ul class="sub">
