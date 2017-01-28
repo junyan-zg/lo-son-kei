@@ -72,11 +72,36 @@
         </div>
     </div>
     <div class="control-group">
+        <label class="control-label">标记：</label>
+
+        <div class="controls">
+            <form:select path="flag" class="input-medium "  disabled="true">
+                <form:option value="" label="无"/>
+                <form:options items="${fns:getDictList('goods_flag')}" itemLabel="label" itemValue="value"
+                              htmlEscape="false"/>
+            </form:select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">排序：</label>
+
+        <div class="controls">
+            ${goods.sort}
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">总销量：</label>
+
+        <div class="controls">
+            ${goods.salesAmount}
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label">上架时间：</label>
 
         <div class="controls">
             <fmt:formatDate value="${goods.onShelfTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
-            <span style="color: #9f9f9f;margin-left: 10px;">当前时间超过上架时间，且状态为“在售”时自动上架</span>
+            <span style="color: #9f9f9f;margin-left: 10px;">（上架时自动更新）</span>
         </div>
     </div>
 
@@ -145,7 +170,7 @@
     </div>
     </c:if>
     <div class="control-group">
-        <label class="control-label">备注：</label>
+        <label class="control-label">描述：</label>
 
         <div class="controls">
             <form:textarea path="remarks" readonly="true" htmlEscape="false" rows="2" maxlength="255" class="input-xxlarge "/>

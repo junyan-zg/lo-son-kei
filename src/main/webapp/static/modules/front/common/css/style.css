@@ -1078,9 +1078,10 @@ h1.page_title{
 	width: 120px;
 }
 .sort a.sort_up{
-	color: #777!important;
-	font:bold 18px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, Arial, Verdana, sans-serif;
+	color: #eb6447!important;
 	text-decoration: none!important;
+	font-weight: bolder;
+	font-size: 23px;
 }
 .sort a:hover.sort_up{
 	text-decoration: none;
@@ -1094,7 +1095,6 @@ h1.page_title{
 	border-radius: 19px;
 	-moz-border-radius: 19px;
 	-khtml-border-radius: 19px;
-	behavior: url(PIE.htc);
 	display: block;
 	float: left;
 	height: 38px;

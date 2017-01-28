@@ -28,6 +28,12 @@
 			<li><label>商品名称：</label>
 				<form:input path="goodsName" htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
+			<li><label>商品分类：</label>
+				<sys:treeselect id="parent" name="parent.id" value="${goodsCategory.parent.id}" labelName="parent.categoryName"
+								labelValue="${goodsCategory.parent.categoryName}"
+								title="商品分类" url="/goods/goodsCategory/treeData" extId="${goodsCategory.id}" cssStyle="width:100px;"
+								allowClear="true"/>
+			</li>
 			<li><label>上架时间：</label>
 				<input name="beginOnShelfTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${goods.beginOnShelfTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
@@ -36,37 +42,35 @@
 					value="<fmt:formatDate value="${goods.endOnShelfTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
 			</li>
+			<li><label>关键词：</label>
+				<form:input path="keywords" htmlEscape="false" maxlength="50" class="input-medium"/>
+			</li>
+			<li><label>现价：</label>
+				<form:input path="beginPrice" htmlEscape="false" class="input-small"/> -
+				<form:input path="endPrice" htmlEscape="false" class="input-small"/>
+			</li>
 			<li><label>季节：</label>
-				<form:select path="season" class="input-medium">
-					<form:option value="" label=""/>
+				<form:select path="season" class="input-small">
+					<form:option value="" label="所有"/>
 					<form:options items="${fns:getDictList('season')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</li>
 			<li><label>推荐人群：</label>
-				<form:select path="sex" class="input-medium">
-					<form:option value="" label=""/>
+				<form:select path="sex" class="input-small">
+					<form:option value="" label="所有"/>
 					<form:options items="${fns:getDictList('sex')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</li>
-			<li><label>关键词：</label>
-				<form:input path="keywords" htmlEscape="false" maxlength="50" class="input-medium"/>
-			</li>
-			<li><label>商品分类：</label>
-				<sys:treeselect id="parent" name="parent.id" value="${goodsCategory.parent.id}" labelName="parent.categoryName"
-								labelValue="${goodsCategory.parent.categoryName}"
-								title="商品分类id上级" url="/goods/goodsCategory/treeData" extId="${goodsCategory.id}" cssClass=""
-								allowClear="true"/>
-			</li>
-			<li><label>现价：</label>
-				<form:input path="price" htmlEscape="false" class="input-medium"/>
-			</li>
-			<li><label>原价：</label>
-				<form:input path="srcPrice" htmlEscape="false" class="input-medium"/>
-			</li>
 			<li><label>状态：</label>
-				<form:select path="state" class="input-medium">
-					<form:option value="" label=""/>
+				<form:select path="state" class="input-small">
+					<form:option value="" label="所有"/>
 					<form:options items="${fns:getDictList('goods_state')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</li>
+			<li><label>标记：</label>
+				<form:select path="flag" class="input-small">
+					<form:option value="" label="所有"/>
+					<form:options items="${fns:getDictList('goods_flag')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
@@ -86,7 +90,7 @@
 				<th>现价</th>
 				<th>原价</th>
 				<th>状态</th>
-				<th>备注</th>
+				<th>描述</th>
 				<th>更新时间</th>
 				<shiro:hasPermission name="goods:goods:edit"><th>操作</th></shiro:hasPermission>
 			</tr>

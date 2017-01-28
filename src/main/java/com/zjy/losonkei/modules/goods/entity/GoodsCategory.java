@@ -31,6 +31,16 @@ public class GoodsCategory extends TreeEntity<GoodsCategory> {
 		super(id);
 	}
 
+	public GoodsCategory(String pid,Object obj){
+		super();
+		this.parent = new GoodsCategory(pid);
+	}
+
+	public GoodsCategory(GoodsCategory parent){
+		super();
+		this.parent = parent;
+	}
+
 	@Length(min=1, max=32, message="分类名称长度必须介于 1 和 32 之间")
 	public String getCategoryName() {
 		return categoryName;

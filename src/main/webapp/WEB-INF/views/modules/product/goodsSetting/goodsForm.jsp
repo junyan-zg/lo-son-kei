@@ -181,7 +181,7 @@
     </div>
     </c:if>
     <div class="control-group">
-        <label class="control-label">备注：</label>
+        <label class="control-label">描述：</label>
 
         <div class="controls">
             <form:textarea path="remarks" htmlEscape="false" rows="2" maxlength="255" class="input-xxlarge "/>

@@ -126,5 +126,24 @@
 		WHERE id = #{id} <!--OR parent_ids LIKE '%,'||#{id}||',%'-->
 		OR parent_ids LIKE #{parentIds}
 	</update>
+
+	<select id="getCategoryListBySearchKey" parameterType="com.zjy.losonkei.modules.goods.entity.Goods" resultType="GoodsCategory">
+		SELECT DISTINCT
+		a.id AS "id",
+		a.category_name AS "categoryName"
+		FROM goods g LEFT JOIN goods_category a
+		on g.goods_category_id = a.id
+		<where>
+			( g.goods_name LIKE
+			<if test="dbName == 'oracle'">'%'||#{keywords}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{keywords}+'%'</if>
+			<if test="dbName == 'mysql'">concat('%',#{keywords},'%')</if>
+			OR g.keywords LIKE
+			<if test="dbName == 'oracle'">'%'||#{keywords}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{keywords}+'%'</if>
+			<if test="dbName == 'mysql'">concat('%',#{keywords},'%')</if>
+			) AND g.state = #{state}
+		</where>
+	</select>
 	
 </mapper>

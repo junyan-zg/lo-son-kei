@@ -40,17 +40,17 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
 	@Autowired
 	private MemberService memberService;
 
+	@Override
+	public boolean supports(AuthenticationToken token) {
+		return !(token instanceof UsernamePasswordToken);
+	}
+
 	/**
 	 * 认证回调函数, 登录时调用
 	 */
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
 		System.out.println("认证");
-
-		if(authcToken instanceof UsernamePasswordToken){
-			return null;
-		}
-		System.out.println("认证2");
 
 		org.apache.shiro.authc.UsernamePasswordToken token = (org.apache.shiro.authc.UsernamePasswordToken) authcToken;
 

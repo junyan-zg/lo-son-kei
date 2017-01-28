@@ -49,14 +49,16 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 	
 	private SystemService systemService;
 
+	@Override
+	public boolean supports(AuthenticationToken token) {
+		return token instanceof UsernamePasswordToken;
+	}
+
 	/**
 	 * 认证回调函数, 登录时调用
 	 */
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
-		if (!(authcToken instanceof UsernamePasswordToken)){
-			return null;
-		}
 
 		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
 		

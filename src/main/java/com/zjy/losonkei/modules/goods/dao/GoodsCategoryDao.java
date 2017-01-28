@@ -5,7 +5,10 @@ package com.zjy.losonkei.modules.goods.dao;
 
 import com.zjy.losonkei.common.persistence.TreeDao;
 import com.zjy.losonkei.common.persistence.annotation.MyBatisDao;
+import com.zjy.losonkei.modules.goods.entity.Goods;
 import com.zjy.losonkei.modules.goods.entity.GoodsCategory;
+
+import java.util.List;
 
 /**
  * 商品分类DAO接口
@@ -14,5 +17,5 @@ import com.zjy.losonkei.modules.goods.entity.GoodsCategory;
  */
 @MyBatisDao
 public interface GoodsCategoryDao extends TreeDao<GoodsCategory> {
-	
+    public List<GoodsCategory> getCategoryListBySearchKey(Goods goods);
 }

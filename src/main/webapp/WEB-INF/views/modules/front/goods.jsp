@@ -69,39 +69,37 @@
         <div id="content" class="grid_10">
             <h1 class="page_title">&nbsp;</h1>
 
+            <form:form modelAttribute="goodsSearch" action="${ctx}/goods" method="get" id="searchForm" onsubmit="$('#keywordsHidden').val($('#keywords').val());">
+            <input type="hidden" name="keywords" id="keywordsHidden" value="${goodsSearch.keywords}">
             <div class="options" style="font-size: 15px!important;">
                 <div class="show">
                     我想要
-                    <select>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                        <option>6</option>
-                        <option>7</option>
-                        <option>8</option>
-                        <option>9</option>
-                        <option>10</option>
-                        <option>11</option>
-                        <option>12</option>
-                    </select>
+                    <form:select path="categoryId" onchange="$('#searchForm').submit();" cssStyle="width:120px!important;">
+                        <form:option value="" label="全部"/>
+                        <form:options items="${goodsSearch.categories}" itemValue="id" itemLabel="categoryName"/>
+                    </form:select>
                 </div><!-- .show -->
 
                 <div class="sort">
                     排序
-                    <select>
-                        <option>价格</option>
-                        <option>销量</option>
-                    </select>
-
-                    <a class="sort_up" href="#">&#8593;</a>
+                    <form:select path="sortBy" onchange="$('#searchForm').submit();">
+                        <form:option value="0" label="综合"/>
+                        <form:option value="1" label="价格"/>
+                        <form:option value="2" label="销量"/>
+                    </form:select>
+                    <form:hidden path="sort"/>
+                    <c:if test="${empty goodsSearch.sort || goodsSearch.sort eq 'asc'}">
+                        <a class="sort_up" href="javascript:$('#sort').val('desc');$('#searchForm').submit();">&#8593;</a>
+                    </c:if>
+                    <c:if test="${not empty goodsSearch.sort && goodsSearch.sort eq 'desc'}">
+                        <a class="sort_up" href="javascript:$('#sort').val('asc');$('#searchForm').submit();">&#8595;</a>
+                    </c:if>
                 </div><!-- .sort -->
 
                 <div>
                     价格
-                    <input type="text" placeholder="￥" style="margin-left:10px;width: 50px;height: 30px;"> -
-                    <input type="text" placeholder="￥" style="width: 50px;height: 30px;">
+                    <form:input path="priceB" placeholder="￥" style="margin-left:10px;width: 50px;height: 30px;"/> -
+                    <form:input path="priceE" placeholder="￥" style="width: 50px;height: 30px;"/>
                     <button style="display: inline-block;margin-left: 10px; height: 26px;width: 50px;">确定</button>
                 </div>
 
@@ -111,6 +109,7 @@
                 </div><!-- .grid-list -->--%>
 
             </div><!-- .options -->
+            </form:form>
             <div class="clear"></div>
 
             <div class="products catalog">
@@ -363,8 +362,8 @@
 
                 <nav class="right_menu">
                     <ul>
-                        <c:forEach items="${goodsCategoryList}" var="gcl">
-                            <li><a href="#">${gcl.categoryName}</a></li>
+                        <c:forEach items="${firstLevelCategoryList}" var="gcl">
+                            <li<c:if test="${gcl.id eq goodsSearch.firstLevelCategoryId}"> class="current"</c:if>><a href="${ctx}/goods?firstLevelCategoryId=${gcl.id}">${gcl.categoryName}</a></li>
                         </c:forEach>
                         <%--<li><a href="#">Home</a></li>
                         <li><a href="#">Wedding</a></li>

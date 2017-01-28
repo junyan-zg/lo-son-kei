@@ -129,13 +129,38 @@
         </div>
     </div>
     <div class="control-group">
+        <label class="control-label">标记：</label>
+
+        <div class="controls">
+            <form:select path="flag" class="input-medium ">
+                <form:option value="" label="无"/>
+                <form:options items="${fns:getDictList('goods_flag')}" itemLabel="label" itemValue="value"
+                              htmlEscape="false"/>
+            </form:select>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">排序：</label>
+
+        <div class="controls">
+            <form:input path="sort" htmlEscape="false" maxlength="128" cssClass="input-medium digits"/>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">总销量：</label>
+
+        <div class="controls">
+            ${goods.salesAmount}
+        </div>
+    </div>
+    <div class="control-group">
         <label class="control-label">上架时间：</label>
 
         <div class="controls">
-            <input name="onShelfTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate "
+            <input name="onShelfTime" type="text" readonly="readonly" disabled maxlength="20" class="input-medium Wdate "
                    value="<fmt:formatDate value="${goods.onShelfTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
                    onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
-            <span style="color: #9f9f9f;margin-left: 10px;">当前时间超过上架时间，且状态为“在售”时自动上架</span>
+            <span style="color: #9f9f9f;margin-left: 10px;">（上架时自动更新）</span>
         </div>
     </div>
 
@@ -209,7 +234,7 @@
     </div>
     </c:if>
     <div class="control-group">
-        <label class="control-label">备注：</label>
+        <label class="control-label">描述：</label>
 
         <div class="controls">
             <form:textarea path="remarks" htmlEscape="false" rows="2" maxlength="255" class="input-xxlarge "/>

@@ -51,7 +51,7 @@
 				<th>推荐人群</th>
 				<th>商品分类</th>
 				<th>状态</th>
-				<th>备注</th>
+				<th>描述</th>
 				<th>更新时间</th>
 				<shiro:hasPermission name="product:newGoodsSetting:edit"><th>操作</th></shiro:hasPermission>
 			</tr>

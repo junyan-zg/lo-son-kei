@@ -84,9 +84,9 @@
                     </li>
                 </ul><!-- .cart_nav -->
 
-                <form class="search">
+                <form class="search" action="${ctx}/goods" method="get">
                     <input type="submit" class="search_button" value="">
-                    <input type="text" name="search" class="search_form" value="" placeholder="请输入要查找的商品...">
+                    <input type="text" name="keywords" id="keywords" class="search_form" value="${goodsSearch.keywords}" placeholder="请输入要查找的商品...">
                 </form><!-- .search -->
             </div><!-- .top_header -->
 

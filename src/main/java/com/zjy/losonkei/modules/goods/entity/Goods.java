@@ -38,6 +38,9 @@ public class Goods extends DataEntity<Goods> {
 	private String state;		// 状态
 	private String thumbImgUrl;		// 缩略图url
 	private String imgUrl;		// 图片展示url
+	private Integer sort;		// 排序
+	private Long salesAmount;	//销售总量,由定时任务更新
+	private String flag;		//1新品2热销3优惠
 
 	private List<GoodsAll> goodsAlls;
 
@@ -46,8 +49,6 @@ public class Goods extends DataEntity<Goods> {
 	private Date endOnShelfTime;		// 结束 上架时间
 	private BigDecimal beginPrice;		// 开始 现价
 	private BigDecimal endPrice;		// 结束 现价
-	private BigDecimal beginSrcPrice;		// 开始 原价
-	private BigDecimal endSrcPrice;		// 结束 原价
 
 	public static final String STATE_ON_SALE = "0";	//在售
 	public static final String STATE_OFF_SALE = "1";	//下架
@@ -67,6 +68,10 @@ public class Goods extends DataEntity<Goods> {
 	public static final String REQUIRED_YES = "1";
 
 	public static final String DEL_FLAG_TURE_DELETE = "3";
+
+	public static final String FLAG_NEW = "1";
+	public static final String FLAG_HOT = "2";
+	public static final String FLAG_DISCOUNT = "3";
 
 	public Goods() {
 		super();
@@ -199,22 +204,6 @@ public class Goods extends DataEntity<Goods> {
 	public void setEndPrice(BigDecimal endPrice) {
 		this.endPrice = endPrice;
 	}
-		
-	public BigDecimal getBeginSrcPrice() {
-		return beginSrcPrice;
-	}
-
-	public void setBeginSrcPrice(BigDecimal beginSrcPrice) {
-		this.beginSrcPrice = beginSrcPrice;
-	}
-	
-	public BigDecimal getEndSrcPrice() {
-		return endSrcPrice;
-	}
-
-	public void setEndSrcPrice(BigDecimal endSrcPrice) {
-		this.endSrcPrice = endSrcPrice;
-	}
 
 	public List<GoodsAll> getGoodsAlls() {
 		return goodsAlls;
@@ -238,5 +227,29 @@ public class Goods extends DataEntity<Goods> {
 		if (!this.isNewRecord){
 			setId(GoodsAllUtils.createId("GD"));
 		}
+	}
+
+	public Integer getSort() {
+		return sort;
+	}
+
+	public void setSort(Integer sort) {
+		this.sort = sort;
+	}
+
+	public Long getSalesAmount() {
+		return salesAmount;
+	}
+
+	public void setSalesAmount(Long salesAmount) {
+		this.salesAmount = salesAmount;
+	}
+
+	public String getFlag() {
+		return flag;
+	}
+
+	public void setFlag(String flag) {
+		this.flag = flag;
 	}
 }
