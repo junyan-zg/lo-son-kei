@@ -96,14 +96,6 @@
             ${goods.salesAmount}
         </div>
     </div>
-    <div class="control-group">
-        <label class="control-label">上架时间：</label>
-
-        <div class="controls">
-            <fmt:formatDate value="${goods.onShelfTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
-            <span style="color: #9f9f9f;margin-left: 10px;">（上架时自动更新）</span>
-        </div>
-    </div>
 
     <c:if test="${not empty goodsAttrList && fn:length(goodsAttrList) > 0}">
         <c:forEach var="list" items="${goodsAttrList}" varStatus="status">

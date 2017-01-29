@@ -25,31 +25,29 @@
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
+			<li><label>商品编号：</label>
+				<form:input path="id" htmlEscape="false" maxlength="128" class="input-medium"/>
+			</li>
 			<li><label>商品名称：</label>
 				<form:input path="goodsName" htmlEscape="false" maxlength="128" class="input-medium"/>
 			</li>
 			<li><label>商品分类：</label>
-				<sys:treeselect id="parent" name="parent.id" value="${goodsCategory.parent.id}" labelName="parent.categoryName"
-								labelValue="${goodsCategory.parent.categoryName}"
-								title="商品分类" url="/goods/goodsCategory/treeData" extId="${goodsCategory.id}" cssStyle="width:100px;"
-								allowClear="true"/>
+				<sys:treeselect id="par" name="goodsCategory.id" value="${goods.goodsCategory.id}" labelName="goodsCategory.categoryName"
+								labelValue="${goods.goodsCategory.categoryName}"
+								title="商品分类" url="/goods/goodsCategory/treeData"  cssStyle="width:100px;"
+								allowClear="true"/><%--extId="${goods.goodsCategory.id}"--%>
 			</li>
-			<li><label>上架时间：</label>
-				<input name="beginOnShelfTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${goods.beginOnShelfTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/> - 
-				<input name="endOnShelfTime" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${goods.endOnShelfTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
-					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
-			</li>
-			<li><label>关键词：</label>
-				<form:input path="keywords" htmlEscape="false" maxlength="50" class="input-medium"/>
+			<li><label>标记：</label>
+				<form:select path="flag" class="input-small">
+					<form:option value="" label="所有"/>
+					<form:options items="${fns:getDictList('goods_flag')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
 			</li>
 			<li><label>现价：</label>
 				<form:input path="beginPrice" htmlEscape="false" class="input-small"/> -
 				<form:input path="endPrice" htmlEscape="false" class="input-small"/>
 			</li>
-			<li><label>季节：</label>
+			<%--<li><label>季节：</label>
 				<form:select path="season" class="input-small">
 					<form:option value="" label="所有"/>
 					<form:options items="${fns:getDictList('season')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
@@ -60,17 +58,16 @@
 					<form:option value="" label="所有"/>
 					<form:options items="${fns:getDictList('sex')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
+			</li>--%>
+
+			<li><label>关键词：</label>
+				<form:input path="keywords" htmlEscape="false" maxlength="50" class="input-medium"/>
 			</li>
+
 			<li><label>状态：</label>
 				<form:select path="state" class="input-small">
 					<form:option value="" label="所有"/>
 					<form:options items="${fns:getDictList('goods_state')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
-				</form:select>
-			</li>
-			<li><label>标记：</label>
-				<form:select path="flag" class="input-small">
-					<form:option value="" label="所有"/>
-					<form:options items="${fns:getDictList('goods_flag')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
@@ -81,10 +78,10 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
+				<th>商品编号</th>
 				<th>商品名称</th>
-				<th>上架时间</th>
-				<th>季节</th>
-				<th>推荐人群</th>
+				<%--<th>季节</th>
+				<th>推荐人群</th>--%>
 				<th>关键词</th>
 				<th>商品分类</th>
 				<th>现价</th>
@@ -99,17 +96,17 @@
 		<c:forEach items="${page.list}" var="goods">
 			<tr>
 				<td><a href="${ctx}/goods/goods/view?id=${goods.id}">
-					${goods.goodsName}
+					${goods.id}
 				</a></td>
 				<td>
-					<fmt:formatDate value="${goods.onShelfTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+					${goods.goodsName}
 				</td>
-				<td>
+				<%--<td>
 					${fns:getDictLabel(goods.season, 'season', '')}
 				</td>
 				<td>
 					${fns:getDictLabel(goods.sex, 'sex', '')}
-				</td>
+				</td>--%>
 				<td>
 					${goods.keywords}
 				</td>

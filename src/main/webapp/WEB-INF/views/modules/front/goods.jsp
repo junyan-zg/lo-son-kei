@@ -1,3 +1,4 @@
+<%@ page import="com.zjy.losonkei.modules.goods.entity.Goods" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/views/include/taglib-front.jsp" %>
 <html>
@@ -70,8 +71,9 @@
             <h1 class="page_title">&nbsp;</h1>
 
             <form:form modelAttribute="goodsSearch" action="${ctx}/goods" method="get" id="searchForm" onsubmit="$('#keywordsHidden').val($('#keywords').val());">
-            <input type="hidden" name="keywords" id="keywordsHidden" value="${goodsSearch.keywords}">
-            <div class="options" style="font-size: 15px!important;">
+                <input type="hidden" name="keywords" id="keywordsHidden" value="${goodsSearch.keywords}">
+                <form:hidden path="firstLevelCategoryId" />
+                <div class="options" style="font-size: 15px!important;">
                 <div class="show">
                     我想要
                     <form:select path="categoryId" onchange="$('#searchForm').submit();" cssStyle="width:120px!important;">
@@ -113,225 +115,45 @@
             <div class="clear"></div>
 
             <div class="products catalog">
-                <article class="grid_3 article">
-                    <img class="sale" src="img/sale.png" alt="Sale">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product1.png" alt="Product 1" title=""></a>
-                    </div><!-- .prev -->
+                <c:set var="FLAG_NEW" value="<%=Goods.FLAG_NEW%>"/>
+                <c:set var="FLAG_HOT" value="<%=Goods.FLAG_HOT%>"/>
+                <c:set var="FLAG_DISCOUNT" value="<%=Goods.FLAG_DISCOUNT%>"/>
+                <c:forEach items="${page.list}" var="goods">
+                    <article class="grid_3 article">
+                        <c:if test="${FLAG_NEW eq goods.flag}">
+                            <img class="sale" src="${ctxStaticFront}/common/img/new.png" alt="Sale">
+                        </c:if>
+                        <c:if test="${FLAG_HOT eq goods.flag}">
+                            <img class="sale" src="${ctxStaticFront}/common/img/sale.png" alt="Sale">
+                        </c:if>
+                        <c:if test="${FLAG_DISCOUNT eq goods.flag}">
+                            <img class="sale" src="${ctxStaticFront}/common/img/top.png" alt="Sale">
+                        </c:if>
+                        <div class="prev">
+                            <a href="product_page.html"><img src="${goods.thumbImgUrl}"></a>
+                        </div><!-- .prev -->
 
-                    <h3 class="title">handmade Emerald Cut<br> Emerald Ring</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $550.00
-                                <div class="price_old">$725.00</div>
+                        <h3 class="title">${goods.goodsName}</h3>
+                        <div class="cart">
+                            <div class="price">
+                                <div class="vert">
+                                    <c:if test="${not empty goods.price}">
+                                        ￥${goods.price}
+                                    </c:if>
+                                    <div class="price_old">
+                                        <c:if test="${not empty goods.srcPrice}">
+                                            ￥${goods.srcPrice}
+                                        </c:if>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
+                            <%--<a href="#" class="obn"></a>
+                            <a href="#" class="like"></a>--%>
+                            <a href="#" class="bay"><img src="${ctxStaticFront}/common/img/bg_cart.png" alt="Buy" title=""></a>
+                        </div><!-- .cart -->
+                    </article><!-- .grid_3.article -->
+                </c:forEach>
 
-                <article class="grid_3 article">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product2.png" alt="Product 2" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">beautiful Valentine And Engagement</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $550.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
-
-                <article class="grid_3 article">
-                    <img class="sale" src="img/new.png" alt="New">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product3.png" alt="Product 3" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">Emerald Cut Emerald Ring</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $550.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
-
-                <article class="grid_3 article">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product4.png" alt="Product 4" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">Diamond Necklaces and Pendants</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $550.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
-
-                <article class="grid_3 article">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product5.png" alt="Product 5" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">Emerald Diamond Solitaire</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $550.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
-
-                <article class="grid_3 article">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product6.png" alt="Product 6" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">Diamond Necklaces and Pendants</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $550.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
-
-                <article class="grid_3 article">
-                    <img class="sale" src="img/top.png" alt="Top">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product7.png" alt="Product 7" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">Gold Pearl Bracelet</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $550.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
-
-                <article class="grid_3 article">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product8.png" alt="Product 8" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">beautiful Valentine And Engagement</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $550.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
-
-                <article class="grid_3 article">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product9.png" alt="Product 9" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">Golden Charm Cluster Necklace</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $1,750.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
-
-                <article class="grid_3 article">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product10.png" alt="Product 10" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">HandMade Pearl Necklace</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $2,300.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
-
-                <article class="grid_3 article">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product11.png" alt="Product 11" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">Valentine And Engagement Charm Cluster </h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $1,350.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
-
-                <article class="grid_3 article">
-                    <div class="prev">
-                        <a href="product_page.html"><img src="img/content/product12.png" alt="Product 12" title=""></a>
-                    </div><!-- .prev -->
-
-                    <h3 class="title">Gold Bangle Bracelets Brooch</h3>
-                    <div class="cart">
-                        <div class="price">
-                            <div class="vert">
-                                $930.00
-                            </div>
-                        </div>
-                        <a href="#" class="obn"></a>
-                        <a href="#" class="like"></a>
-                        <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                    </div><!-- .cart -->
-                </article><!-- .grid_3.article -->
 
                 <div class="clear"></div>
             </div><!-- .products -->

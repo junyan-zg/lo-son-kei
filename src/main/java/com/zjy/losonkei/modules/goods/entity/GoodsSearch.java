@@ -1,5 +1,7 @@
 package com.zjy.losonkei.modules.goods.entity;
 
+import com.zjy.losonkei.common.utils.StringUtils;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -24,6 +26,8 @@ public class GoodsSearch implements Serializable {
     private String firstLevelCategoryId;//一般是一级分类，如果categoryId本身是一级分类，则两者相同
 
     private List<GoodsCategory> categories;
+
+    private String pageNo;
 
     public String getCategoryId() {
         return categoryId;
@@ -87,6 +91,36 @@ public class GoodsSearch implements Serializable {
 
     public void setFirstLevelCategoryId(String firstLevelCategoryId) {
         this.firstLevelCategoryId = firstLevelCategoryId;
+    }
+
+
+    public String getOrderBy(){
+        if (this.sort == null){
+            this.sort = "asc";
+        }else {
+            this.sort = this.sort.toLowerCase().trim();
+            if (!"asc".equals(this.sort) &&  !"desc".equals(this.sort)){
+                this.sort = "asc";
+            }
+        }
+        String result;
+        if ("1".equals(this.sortBy)){
+            result = "a.price " + this.sort + ", a.sort desc";
+        }else if ("2".equals(this.sortBy)){
+            result = "a.sales_amount " + this.sort + ", a.sort desc";
+        }else{
+            this.sortBy = "0";
+            result = "a.sort desc";
+        }
+        return result;
+    }
+
+    public String getPageNo() {
+        return pageNo;
+    }
+
+    public void setPageNo(String pageNo) {
+        this.pageNo = pageNo;
     }
 }
 //规则

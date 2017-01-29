@@ -5,7 +5,6 @@
 	<sql id="goodsColumns">
 		a.id AS "id",
 		a.goods_name AS "goodsName",
-		a.on_shelf_time AS "onShelfTime",
 		a.season AS "season",
 		a.sex AS "sex",
 		a.keywords AS "keywords",
@@ -59,19 +58,6 @@
 					<if test="dbName == 'mssql'">'%'+#{goodsName}+'%'</if>
 					<if test="dbName == 'mysql'">concat('%',#{goodsName},'%')</if>
 			</if>
-			<choose>
-				<when test="beginOnShelfTime != null and endOnShelfTime != null">
-					AND a.on_shelf_time BETWEEN #{beginOnShelfTime} AND #{endOnShelfTime}
-				</when>
-				<otherwise>
-					<if test="beginOnShelfTime != null">
-						AND a.on_shelf_time &gt;= #{beginOnShelfTime}
-					</if>
-					<if test="endOnShelfTime != null">
-						AND a.on_shelf_time &lt;= #{endOnShelfTime}
-					</if>
-				</otherwise>
-			</choose>
 			<if test="season != null and season != ''">
 				AND a.season = #{season}
 			</if>
@@ -88,10 +74,10 @@
 					<if test="dbName == 'mysql'">concat('%',#{keywords},'%')</if>
 			</if>
 			<if test="goodsCategory != null and goodsCategory.id != null and goodsCategory.id != ''">
-				AND a.goods_category_id LIKE 
-					<if test="dbName == 'oracle'">'%'||#{goodsCategory.id}</if>
-					<if test="dbName == 'mssql'">'%'+#{goodsCategory.id}</if>
-					<if test="dbName == 'mysql'">concat('%',#{goodsCategory.id})</if>
+				AND b.id = #{goodsCategory.id} OR b.parent_ids LIKE
+					<if test="dbName == 'oracle'">'%'||#{goodsCategory.id}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{goodsCategory.id}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{goodsCategory.id},'%')</if>
 			</if>
 			<choose>
 				<when test="beginPrice != null and endPrice != null and beginPrice != '' and endPrice != ''">
@@ -120,7 +106,71 @@
 				ORDER BY ${page.orderBy}
 			</when>
 			<otherwise>
-				ORDER BY a.sort ASC
+				ORDER BY a.sort DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findListFront" resultType="Goods">
+		SELECT
+		a.id AS "id",
+		a.goods_name AS "goodsName",
+		a.price AS "price",
+		a.src_price AS "srcPrice",
+		a.state AS "state",
+		a.thumb_img_url AS "thumbImgUrl",
+		a.sales_amount AS "salesAmount",
+		a.flag AS "flag"
+		FROM goods a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="keywords != null and keywords != ''">
+			AND ( a.goods_name LIKE
+			<if test="dbName == 'oracle'">'%'||#{keywords}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{keywords}+'%'</if>
+			<if test="dbName == 'mysql'">concat('%',#{keywords},'%')</if>
+			OR a.keywords LIKE
+			<if test="dbName == 'oracle'">'%'||#{keywords}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{keywords}+'%'</if>
+			<if test="dbName == 'mysql'">concat('%',#{keywords},'%')</if>
+			)
+			</if>
+			AND a.state = #{state}
+			<if test="flag != null and flag != ''">
+				AND a.flag = #{flag}
+			</if>
+			<choose>
+				<when test="goodsCategory != null and goodsCategory.id != null and goodsCategory.id != ''">
+					AND a.goods_category_id = #{goodsCategory.id}
+				</when>
+				<when test="categoryIds != null">
+					AND a.goods_category_id IN
+					<foreach collection="categoryIds" item="categoryId" index="index"
+									  open="(" close=")" separator=",">
+					#{categoryId}
+					</foreach>
+				</when>
+			</choose>
+			<choose>
+				<when test="beginPrice != null and endPrice != null">
+					AND a.price BETWEEN #{beginPrice} AND #{endPrice}
+				</when>
+				<otherwise>
+					<if test="beginPrice != null">
+						AND a.price &gt;= #{beginPrice}
+					</if>
+					<if test="endPrice != null">
+						AND a.price &lt;= #{endPrice}
+					</if>
+				</otherwise>
+			</choose>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sort DESC
 			</otherwise>
 		</choose>
 	</select>
@@ -146,7 +196,6 @@
 		INSERT INTO goods(
 			id,
 			goods_name,
-			on_shelf_time,
 			season,
 			sex,
 			keywords,
@@ -167,7 +216,6 @@
 		) VALUES (
 			#{id},
 			#{goodsName},
-			#{onShelfTime},
 			#{season},
 			#{sex},
 			#{keywords},
@@ -191,7 +239,6 @@
 	<update id="update">
 		UPDATE goods SET 	
 			goods_name = #{goodsName},
-			on_shelf_time = #{onShelfTime},
 			season = #{season},
 			sex = #{sex},
 			keywords = #{keywords},
@@ -221,5 +268,5 @@
 			</otherwise>
 		</choose>
 	</update>
-	
+
 </mapper>

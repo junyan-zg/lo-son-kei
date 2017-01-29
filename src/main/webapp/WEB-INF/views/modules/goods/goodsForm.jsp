@@ -149,21 +149,11 @@
     <div class="control-group">
         <label class="control-label">总销量：</label>
 
-        <div class="controls">
+        <div class="controls" style="padding-top: 3px;">
+            <c:if test="${empty goods.salesAmount}">0</c:if>
             ${goods.salesAmount}
         </div>
     </div>
-    <div class="control-group">
-        <label class="control-label">上架时间：</label>
-
-        <div class="controls">
-            <input name="onShelfTime" type="text" readonly="readonly" disabled maxlength="20" class="input-medium Wdate "
-                   value="<fmt:formatDate value="${goods.onShelfTime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
-                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
-            <span style="color: #9f9f9f;margin-left: 10px;">（上架时自动更新）</span>
-        </div>
-    </div>
-
     <c:if test="${not empty goodsAttrList && fn:length(goodsAttrList) > 0}">
         <c:forEach var="list" items="${goodsAttrList}" varStatus="status">
             <div class="control-group">

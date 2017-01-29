@@ -28,7 +28,6 @@ public class Goods extends DataEntity<Goods> {
 	
 	private static final long serialVersionUID = 1L;
 	private String goodsName;		// 商品名称
-	private Date onShelfTime;		// 上架时间
 	private String season;		// 季节
 	private String sex;		// 推荐人群
 	private String keywords;		// 关键词
@@ -44,9 +43,9 @@ public class Goods extends DataEntity<Goods> {
 
 	private List<GoodsAll> goodsAlls;
 
+	private String[] categoryIds;
+
 	//SEACH
-	private Date beginOnShelfTime;		// 开始 上架时间
-	private Date endOnShelfTime;		// 结束 上架时间
 	private BigDecimal beginPrice;		// 开始 现价
 	private BigDecimal endPrice;		// 结束 现价
 
@@ -92,15 +91,6 @@ public class Goods extends DataEntity<Goods> {
 
 	public void setGoodsName(String goodsName) {
 		this.goodsName = goodsName;
-	}
-	
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	public Date getOnShelfTime() {
-		return onShelfTime;
-	}
-
-	public void setOnShelfTime(Date onShelfTime) {
-		this.onShelfTime = onShelfTime;
 	}
 	
 	@Length(min=0, max=2, message="季节长度必须介于 0 和 2 之间")
@@ -172,22 +162,6 @@ public class Goods extends DataEntity<Goods> {
 	public void setThumbImgUrl(String thumbImgUrl) {
 		this.thumbImgUrl = thumbImgUrl;
 	}
-
-	public Date getBeginOnShelfTime() {
-		return beginOnShelfTime;
-	}
-
-	public void setBeginOnShelfTime(Date beginOnShelfTime) {
-		this.beginOnShelfTime = beginOnShelfTime;
-	}
-	
-	public Date getEndOnShelfTime() {
-		return endOnShelfTime;
-	}
-
-	public void setEndOnShelfTime(Date endOnShelfTime) {
-		this.endOnShelfTime = endOnShelfTime;
-	}
 		
 	public BigDecimal getBeginPrice() {
 		return beginPrice;
@@ -251,5 +225,13 @@ public class Goods extends DataEntity<Goods> {
 
 	public void setFlag(String flag) {
 		this.flag = flag;
+	}
+
+	public String[] getCategoryIds() {
+		return categoryIds;
+	}
+
+	public void setCategoryIds(String[] categoryIds) {
+		this.categoryIds = categoryIds;
 	}
 }

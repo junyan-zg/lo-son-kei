@@ -1,10 +1,13 @@
 package com.zjy.losonkei.modules.front;
 
+import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
+import com.zjy.losonkei.modules.goods.entity.Goods;
 import com.zjy.losonkei.modules.goods.entity.GoodsCategory;
 import com.zjy.losonkei.modules.goods.entity.GoodsSearch;
 import com.zjy.losonkei.modules.goods.service.GoodsCategoryService;
+import com.zjy.losonkei.modules.goods.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
@@ -14,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,11 +30,14 @@ public class GoodsController extends BaseController{
 
     @Autowired
     private GoodsCategoryService goodsCategoryService;
+    @Autowired
+    private GoodsService goodsService;
 
     @RequestMapping("/goods")
     public String list(Model model, GoodsSearch goodsSearch, HttpServletRequest request) throws UnsupportedEncodingException {
         if (request.getQueryString() != null && request.getQueryString().contains("keywords")) {
-            goodsSearch.setKeywords(new String(request.getParameter("keywords").getBytes("ISO-8859-1"), "UTF-8"));
+           goodsSearch.setKeywords(new String(request.getParameter("keywords").getBytes("ISO-8859-1"), "UTF-8"));
+           //goodsSearch.setKeywords(URLDecoder.decode(request.getParameter("keywords"), "UTF-8"));
         }
 
         //右侧分类UI
@@ -77,6 +86,49 @@ public class GoodsController extends BaseController{
 
         model.addAttribute("goodsSearch",goodsSearch);
 
+
+        //search goods start
+        Goods goods;
+        if (StringUtils.isNotBlank(goodsSearch.getCategoryId())){
+            goods = new Goods(new GoodsCategory(goodsSearch.getCategoryId()));
+        }else{
+            goods = new Goods();
+            List<GoodsCategory> categories = goodsSearch.getCategories();
+            if (categories != null && !categories.isEmpty()){
+                String[] cIds = new String[categories.size()];
+                for (int i = 0; i < cIds.length; i++){
+                    cIds[i] = categories.get(i).getId();
+                }
+                goods.setCategoryIds(cIds);
+            }
+        }
+        goods.setKeywords(goodsSearch.getKeywords());
+        goods.setState(Goods.STATE_ON_SALE);
+        try{
+            goods.setBeginPrice(new BigDecimal(goodsSearch.getPriceB()));
+        }catch (Exception e){goodsSearch.setPriceB(null);}
+        try{
+            goods.setEndPrice(new BigDecimal(goodsSearch.getPriceE()));
+        }catch (Exception e){goodsSearch.setPriceE(null);}
+
+        int pageNo = 1;
+        try {
+            String pageNoStr = goodsSearch.getPageNo();
+            if(StringUtils.isNotBlank(pageNoStr)){
+                pageNo = Integer.valueOf(pageNoStr);
+                if (pageNo < 1){
+                    pageNo = 1;
+                }
+            }
+        }catch (Exception e){goodsSearch.setPageNo(1+"");}
+        Page<Goods> page = new Page<Goods>();
+        page.setPageSize(12);
+        page.setPageNo(pageNo);
+        page.setOrderBy(goodsSearch.getOrderBy());
+        goodsService.findPageFront(page,goods);
+        model.addAttribute("page",page);
+        //search goods end
+        System.out.println(page.getCount());
         return "modules/front/goods";
     }
 
