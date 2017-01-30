@@ -95,11 +95,15 @@ public class GoodsController extends BaseController{
             goods = new Goods();
             List<GoodsCategory> categories = goodsSearch.getCategories();
             if (categories != null && !categories.isEmpty()){
-                String[] cIds = new String[categories.size()];
-                for (int i = 0; i < cIds.length; i++){
-                    cIds[i] = categories.get(i).getId();
+                if (categories.size() == 1){
+                    goods.setGoodsCategory(new GoodsCategory(categories.get(0)));
+                }else{
+                    String[] cIds = new String[categories.size()];
+                    for (int i = 0; i < cIds.length; i++){
+                        cIds[i] = categories.get(i).getId();
+                    }
+                    goods.setCategoryIds(cIds);
                 }
-                goods.setCategoryIds(cIds);
             }
         }
         goods.setKeywords(goodsSearch.getKeywords());

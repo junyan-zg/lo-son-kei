@@ -7,7 +7,12 @@
 <head>
     <title>商品</title>
     <script>
-        //浏览器出现滚动条时变化
+        function page(n){
+            $("#pageNo").val(n);
+            $("#searchForm").submit();
+            return false;
+        }
+    <%--    //浏览器出现滚动条时变化
         /*$(window).resize(function(){
             if($(window).width()<1150){     //浏览器宽度小于1150时
                 $(".left-nav").css({
@@ -33,7 +38,7 @@
                 });
             }
         });*/
-
+--%>
     </script>
 </head>
 <body>
@@ -50,7 +55,6 @@
 
 
 <script>
-
     $(window).scroll(function(){
         if($(window).scrollTop()>200){    //垂直滚动条钓offset 大于90时。
             $("#sidebar").css({
@@ -73,6 +77,7 @@
             <form:form modelAttribute="goodsSearch" action="${ctx}/goods" method="get" id="searchForm" onsubmit="$('#keywordsHidden').val($('#keywords').val());">
                 <input type="hidden" name="keywords" id="keywordsHidden" value="${goodsSearch.keywords}">
                 <form:hidden path="firstLevelCategoryId" />
+                <form:hidden path="pageNo" />
                 <div class="options" style="font-size: 15px!important;">
                 <div class="show">
                     我想要
@@ -160,6 +165,10 @@
             <div class="clear"></div>
 
             <div class="pagination">
+                ${page.frontHtml}
+            </div>
+
+            <%--<div class="pagination">
                 <ul>
                     <li class="prev"><span>&#8592;</span></li>
                     <li class="curent"><a href="#">1</a></li>
@@ -171,7 +180,7 @@
                     <li><a href="#">100</a></li>
                     <li class="next"><a href="#">&#8594;</a></li>
                 </ul>
-            </div><!-- .pagination -->
+            </div><!-- .pagination -->--%>
 
             <div class="clear"></div>
         </div><!-- #content -->

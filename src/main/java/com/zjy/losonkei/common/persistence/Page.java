@@ -280,6 +280,85 @@ public class Page<T> {
 		
 		return sb.toString();
 	}
+
+	/**
+	 * 默认输出当前分页标签
+	 * <div class="pagination">${page.frontHtml}</div>
+	 */
+	public String getFrontHtml() {
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("<ul>\n");
+
+		if (pageNo == first) {// 如果是首页
+			sb.append("<li class=\"prev\"><span>&#8592;</span></li>\n");
+		} else {
+			sb.append("<li class=\"prev\"><a href=\"javascript:\" onclick=\""+funcName+"("+prev+",'"+funcParam+"');\">&#8592;</a></li>\n");
+		}
+
+		int begin = pageNo - (length / 2);
+
+		if (begin < first) {
+			begin = first;
+		}
+
+		int end = begin + length - 1;
+
+		if (end >= last) {
+			end = last;
+			begin = end - length + 1;
+			if (begin < first) {
+				begin = first;
+			}
+		}
+
+		if (begin > first) {
+			int i = 0;
+			for (i = first; i < first + slider && i < begin; i++) {
+				sb.append("<li><a href=\"javascript:\" onclick=\""+funcName+"("+i+","+pageSize+",'"+funcParam+"');\">"
+						+ (i + 1 - first) + "</a></li>\n");
+			}
+			if (i < begin) {
+				sb.append("<li><span>...</span></li>\n");
+			}
+		}
+
+		for (int i = begin; i <= end; i++) {
+			if (i == pageNo) {
+				sb.append("<li class=\"curent\"><a href=\"javascript:\">" + (i + 1 - first)
+						+ "</a></li>\n");
+			} else {
+				sb.append("<li><a href=\"javascript:\" onclick=\""+funcName+"("+i+",'"+funcParam+"');\">"
+						+ (i + 1 - first) + "</a></li>\n");
+			}
+		}
+
+		if (last - end > slider) {
+			sb.append("<li><span>...</span></li>\n");
+			end = last - slider;
+		}
+
+		for (int i = end + 1; i <= last; i++) {
+			sb.append("<li><a href=\"javascript:\" onclick=\""+funcName+"("+i+",'"+funcParam+"');\">"
+					+ (i + 1 - first) + "</a></li>\n");
+		}
+
+		if (pageNo == last) {
+			sb.append("<li class=\"next\"><span>&#8594;</span></li>\n");
+		} else {
+			sb.append("<li class=\"next\"><a href=\"javascript:\" onclick=\""+funcName+"("+next+",'"+funcParam+"');\">"
+					+ "&#8594;</a></li>\n");
+		}
+
+		sb.append("</ul>\n");
+		/*sb.insert(0,"<ul>\n").append("</ul>\n");*/
+
+		sb.append("<div style=\"clear:both;\"></div>");
+
+//		sb.insert(0,"<div class=\"page\">\n").append("</div>\n");
+
+		return sb.toString();
+	}
 	
 	/**
 	 * 获取分页HTML代码
