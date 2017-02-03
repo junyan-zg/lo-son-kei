@@ -1,0 +1,18 @@
+.spec-select{
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 4px 6px;
+    border-style: solid;
+    border-color: #ee7b62;
+    border-width: 1px;
+    cursor: default;
+}
+.spec-no-select{
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 4px 6px;
+    border-style: solid;
+    border-color: #9b9c91;
+    border-width: 1px;
+    cursor: pointer;
+}

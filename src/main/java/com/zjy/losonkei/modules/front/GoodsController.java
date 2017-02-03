@@ -96,7 +96,7 @@ public class GoodsController extends BaseController{
             List<GoodsCategory> categories = goodsSearch.getCategories();
             if (categories != null && !categories.isEmpty()){
                 if (categories.size() == 1){
-                    goods.setGoodsCategory(new GoodsCategory(categories.get(0)));
+                    goods.setGoodsCategory(new GoodsCategory(categories.get(0).getId()));
                 }else{
                     String[] cIds = new String[categories.size()];
                     for (int i = 0; i < cIds.length; i++){

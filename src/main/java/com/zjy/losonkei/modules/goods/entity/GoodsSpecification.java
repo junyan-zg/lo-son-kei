@@ -57,4 +57,8 @@ public class GoodsSpecification extends DataEntity<GoodsSpecification> {
 		this.sort = sort;
 	}
 
+	@Override
+	public int hashCode() {
+		return this.getId().hashCode();
+	}
 }

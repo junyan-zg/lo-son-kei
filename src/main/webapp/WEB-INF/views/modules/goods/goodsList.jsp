@@ -131,7 +131,8 @@
 				<shiro:hasPermission name="goods:goods:edit"><td>
 					<a href="${ctx}/goods/goods/view?id=${goods.id}">查看</a>
     				<a href="${ctx}/goods/goods/form?id=${goods.id}">修改</a>
-					<a href="${ctx}/goods/goods/delete?id=${goods.id}" onclick="return confirmx('确认要删除该商品吗？', this.href)">删除</a>
+					<%--<a href="${ctx}/goods/goods/delete?id=${goods.id}" onclick="return confirmx('确认要删除该商品吗？', this.href)">删除</a>--%>
+					<a href="${pageContext.request.contextPath}/goodsDetails/${goods.id}" target="_blank">访问</a>
 				</td></shiro:hasPermission>
 			</tr>
 		</c:forEach>

@@ -57,6 +57,48 @@
 			</otherwise>
 		</choose>
 	</select>
+
+	<select id="getGoodsSpecificationValueListByGoodsId" resultType="GoodsSpecificationValue" parameterType="com.zjy.losonkei.modules.goods.entity.Goods">
+		SELECT s.specification_name AS "goodsSpecification.specificationName",
+		v.specification_id AS "goodsSpecification.id",
+		v.specification_group,
+		v.specification_value
+		FROM goods_specification_value v
+		LEFT JOIN goods_specification s ON v.specification_id = s.id
+		<where>
+			v.specification_group IN
+			( SELECT g.specification_group FROM goods_all g WHERE g.del_flag = #{DEL_FLAG_NORMAL} and g.goods_id = #{id} )
+			AND v.goods_id = #{id}
+			AND v.specification_value != ''
+			AND s.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		  GROUP BY v.specification_value,s.specification_name
+		  ORDER BY s.sort,v.specification_group
+	</select>
+
+	<select id="getSpecificationGroup" parameterType="com.zjy.losonkei.modules.goods.entity.GoodsAll" resultType="java.lang.Integer">
+		SELECT a.specification_group FROM goods_specification_value a
+		<foreach collection="goodsSpecificationValues" item="item" index="index">
+			<if test="index > 0">
+				LEFT JOIN goods_specification_value b${index}
+				ON b${index}.goods_id = a.goods_id
+				AND b${index}.specification_group = a.specification_group
+			</if>
+		</foreach>
+		<where>
+			a.goods_id = #{goodsId}
+			<foreach collection="goodsSpecificationValues" item="item" index="index">
+				<if test="index == 0">
+					AND a.specification_id = #{item.goodsSpecification.id}
+					AND a.specification_value = #{item.specificationValue}
+				</if>
+				<if test="index > 0">
+					AND b${index}.specification_id = #{item.goodsSpecification.id}
+					AND b${index}.specification_value = #{item.specificationValue}
+				</if>
+			</foreach>
+		</where>
+	</select>
 	
 	<select id="findAllList" resultType="GoodsSpecificationValue">
 		SELECT 

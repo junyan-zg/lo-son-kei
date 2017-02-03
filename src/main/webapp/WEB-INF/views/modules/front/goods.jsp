@@ -135,7 +135,7 @@
                             <img class="sale" src="${ctxStaticFront}/common/img/top.png" alt="Sale">
                         </c:if>
                         <div class="prev">
-                            <a href="product_page.html"><img src="${goods.thumbImgUrl}"></a>
+                            <a href="${ctx}/goodsDetails/${goods.id}"><img src="${goods.thumbImgUrl}"></a>
                         </div><!-- .prev -->
 
                         <h3 class="title">${goods.goodsName}</h3>
@@ -146,11 +146,13 @@
                                         ￥${goods.price}
                                     </c:if>
                                     <div class="price_old">
+                                        <div style="position: absolute;font-size: 13px;color: #000000; margin-left: -60px;">销量 ${goods.salesAmount}</div>
                                         <c:if test="${not empty goods.srcPrice}">
                                             ￥${goods.srcPrice}
                                         </c:if>
                                     </div>
                                 </div>
+
                             </div>
                             <%--<a href="#" class="obn"></a>
                             <a href="#" class="like"></a>--%>

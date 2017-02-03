@@ -1,13 +1,26 @@
 <%@ page import="com.zjy.losonkei.modules.goods.entity.Goods" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/views/include/taglib-front.jsp" %>
+
+<c:set var="STATE_ON_SALE" value="<%=Goods.STATE_ON_SALE%>"/>
+<c:set var="STATE_OFF_SALE" value="<%=Goods.STATE_OFF_SALE%>"/>
+<c:set var="STATE_OUT_OF_STOCK" value="<%=Goods.STATE_OUT_OF_STOCK%>"/>
+<c:set var="STATE_NO_PUSH" value="<%=Goods.STATE_NO_PUSH%>"/>
 <html>
 <content tag="moduleName">goodsDetails</content>
 <meta name="decorator" content="front"/>
 <head>
-    <title>商品详情</title>
+    <title>${goods.goodsName}</title>
 
     <script>
+        function ajaxGetPrice(){
+            $.post("${ctx}/goodsPriceInfo",$('#specForm').serialize(),function(data){
+               console.log(data);
+            });
+        }
+        $(document).ready(function(){
+            ajaxGetPrice();
+        });
     </script>
 </head>
 <body>
@@ -26,14 +39,14 @@
     <div class="container_12">
         <div id="content" class="grid_12">
             <header>
-                <h1 class="page_title" style="font-size: 26px;margin-top: 27px;">雪海梅乡_韩话梅200G瓶装 雪花梅蜜饯果脯青梅子果干酸甜休闲零食</h1>
+                <h1 class="page_title" style="font-size: 26px;margin-top: 27px;">${goods.goodsName}</h1>
             </header>
 
             <article class="product_page">
                 <div class="grid_5 img_slid" id="products">
-<c:set var="FLAG_NEW" value="<%=Goods.FLAG_NEW%>"/>
-<c:set var="FLAG_HOT" value="<%=Goods.FLAG_HOT%>"/>
-<c:set var="FLAG_DISCOUNT" value="<%=Goods.FLAG_DISCOUNT%>"/>
+                    <c:set var="FLAG_NEW" value="<%=Goods.FLAG_NEW%>"/>
+                    <c:set var="FLAG_HOT" value="<%=Goods.FLAG_HOT%>"/>
+                    <c:set var="FLAG_DISCOUNT" value="<%=Goods.FLAG_DISCOUNT%>"/>
                     <c:if test="${FLAG_NEW eq goods.flag}">
                         <img class="sale" src="${ctxStaticFront}/common/img/new.png" alt="Sale">
                     </c:if>
@@ -59,10 +72,14 @@
                     <ul class="small_img clearfix" id="thumblist">
                         <c:forEach items="${imgUrlList}" var="imgUrl" varStatus="status">
                             <c:if test="${status.index == 0}">
-                                <li><a class="zoomThumbActive" href='javascript:void(0);' rel="{gallery: 'gal1', smallimage: '${imgUrl}',largeimage: '${imgUrl}'}"><img src="${imgUrl}"></a></li>
+                                <li><a class="zoomThumbActive" href='javascript:void(0);'
+                                       rel="{gallery: 'gal1', smallimage: '${imgUrl}',largeimage: '${imgUrl}'}"><img
+                                        src="${imgUrl}"></a></li>
                             </c:if>
                             <c:if test="${status.index > 0}">
-                                <li><a href='javascript:void(0);' rel="{gallery: 'gal1', smallimage: '${imgUrl}',largeimage: '${imgUrl}'}"><img src="${imgUrl}"></a></li>
+                                <li><a href='javascript:void(0);'
+                                       rel="{gallery: 'gal1', smallimage: '${imgUrl}',largeimage: '${imgUrl}'}"><img
+                                        src="${imgUrl}"></a></li>
                             </c:if>
                         </c:forEach>
                     </ul><!-- .small_img -->
@@ -71,73 +88,120 @@
                 </div><!-- .grid_5 -->
 
                 <div class="grid_7">
-                    <div class="entry_content">
-                        <div class="soc">
-                            <img src="${ctxStaticFront}/common/img/soc.png" alt="Soc">
-                        </div><!-- .soc -->
+                    <div class="entry_content" style="padding-left: 50px;padding-right: 30px;">
+                        <%-- <div class="soc">
+                             <img src="${ctxStaticFront}/common/img/soc.png" alt="Soc">
+                         </div><!-- .soc -->
 
-                        <div class="review">
-                            <a class="plus" href="#"></a>
-                            <a class="plus" href="#"></a>
-                            <a class="plus" href="#"></a>
-                            <a href="#"></a>
-                            <a href="#"></a>
-                            <span><strong>3</strong> REVIEW(S)</span>
-                            <span class="separator">|</span>
-                            <a class="add_review" href="#">ADD YOUR REVIEW</a>
-                        </div>
+                         <div class="review">
+                             <a class="plus" href="#"></a>
+                             <a class="plus" href="#"></a>
+                             <a class="plus" href="#"></a>
+                             <a href="#"></a>
+                             <a href="#"></a>
+                             <span><strong>3</strong> REVIEW(S)</span>
+                             <span class="separator">|</span>
+                             <a class="add_review" href="#">ADD YOUR REVIEW</a>
+                         </div>--%>
 
-                        <p>${goods.remarks}</p>
+                        <p style="color:#ee7b62;font-size: 14px;">${goods.remarks}</p>
+                            <div class="ava_price">
+                                <div class="price">
+                                    <div class="price_old"><c:if
+                                            test="${not empty goods.srcPrice}">￥${goods.srcPrice}</c:if></div>
+                                    <c:if test="${not empty goods.price}">￥${goods.price}</c:if>
+                                </div><!-- .price -->
 
-                        <div class="ava_price">
-                            <div class="price">
-                                <div class="price_old"><c:if test="${not empty goods.srcPrice}">￥${goods.srcPrice}</c:if></div>
-                                <c:if test="${not empty goods.price}">￥${goods.price}</c:if>
-                            </div><!-- .price -->
+                                <div class="availability_sku">
+                                    <%--<div class="availability">
+                                        Availability: <span>In stock</span>
+                                    </div>
+                                    <div class="sku">
+                                        SKU: <span>Candles OV</span>
+                                    </div>--%>
+                                    <div>交易成功</div>
+                                    <div style="margin-top: 10px; font-size: 30px; color:#ee7b62;">
+                                        ${goods.salesAmount}
+                                    </div>
+                                </div><!-- .availability_sku -->
+                                <div class="clear"></div>
+                            </div>
+                            <!-- .ava_price -->
+                        <c:if test="${goods.state eq STATE_ON_SALE}">
+                            <div class="parameter_selection">
+                                <form action="" id="specForm" onsubmit="return checkBuyAmount();" method="post">
+                                    <input type="hidden" name="goodsId" value="${goods.id}">
+                                <c:forEach var="item" items="${goodsSpecificationMap}" varStatus="status">
+                                    <div style="margin-bottom: 30px;">
+                                        <span style="font-size: 13px;">${item.key.specificationName}</span>
+                                        <input type="hidden" name="specificationIds" value="${item.key.id}"/>
+                                        <input type="hidden" name="spec-${item.key.id}" id="spec-${item.key.id}"
+                                               value="${item.value[0]}">
+                                        <c:forEach items="${item.value}" var="v" varStatus="st">
+                                            <c:if test="${st.index == 0}">
+                                            <span class="spec-select"
+                                                  onclick="selectSpec(this,'spec-${item.key.id}');">${v}</span>
+                                            </c:if>
+                                            <c:if test="${st.index != 0}">
+                                            <span class="spec-no-select"
+                                                  onclick="selectSpec(this,'spec-${item.key.id}');">${v}</span>
+                                            </c:if>
+                                        </c:forEach>
+                                    </div>
+                                </c:forEach>
 
-                            <div class="availability_sku">
-                                <div class="availability">
-                                    Availability: <span>In stock</span>
-                                </div>
-                                <div class="sku">
-                                    SKU: <span>Candles OV</span>
-                                </div>
-                            </div><!-- .availability_sku -->
-                            <div class="clear"></div>
-                        </div><!-- .ava_price -->
+                                <input type="text" name="amount" onchange="checkBuyAmount();" id="amount" style="margin-bottom: 5px;margin-right: 5px;"/>(库存 <span id="stock">1</span> 件)<br>
+                                <span id="errMsg" style="color:#ee7b62;"></span>
+                                </form>
+                            </div>
+                            <!-- .parameter_selection -->
 
-                        <div class="parameter_selection">
-                            <select>
-                                <option>Select a size</option>
-                                <option>Select a size</option>
-                            </select>
-                            <select>
-                                <option>Choose a material</option>
-                                <option>Choose a material</option>
-                            </select>
-                        </div><!-- .parameter_selection -->
+                            <div class="cart">
+                                <a href="javascript:;" class="bay" style="padding-left: 10px;width: 100px;"><img src="${ctxStaticFront}/common/img/bg_cart.png">加入购物车</a>
+                                <button style="width: 120px;margin-left: 200px;"><img src="${ctxStaticFront}/common/img/bg_cart.png">立即购买</button>
 
-                        <div class="cart">
-                            <a href="#" class="bay"><img src="${ctxStaticFront}/common/img/bg_cart.png" alt="Buy" title="">Add to Cart</a>
-                            <a href="#" class="like"><img src="${ctxStaticFront}/common/img/like.png" alt="" title=""> Add to Compare</a>
-                            <a href="#" class="obn"><img src="${ctxStaticFront}/common/img/obl.png" alt="" title="">Add to Compare</a>
-                        </div><!-- .cart -->
-
+                                    <%--
+                                <a href="#" class="like"><img src="${ctxStaticFront}/common/img/like.png" alt=""
+                                                              title="">
+                                    Add to Compare</a>
+                                <a href="#" class="obn"><img src="${ctxStaticFront}/common/img/obl.png" alt="" title="">Add
+                                    to Compare</a>--%>
+                            </div>
+                            <!-- .cart -->
+                        </c:if>
+                        <c:if test="${goods.state ne STATE_ON_SALE}">
+                            <h1 style="margin-top: 100px;margin-left: 40px; font-weight: bolder;font-family: '黑体';font-stretch: expanded;font-style: italic;">
+                            <c:if test="${goods.state eq STATE_NO_PUSH}">
+                                该商品尚未上市！
+                            </c:if>
+                            <c:if test="${goods.state eq STATE_OUT_OF_STOCK}">
+                                该商品暂不供货！
+                            </c:if>
+                            <c:if test="${goods.state eq STATE_OFF_SALE}">
+                                该商品已下架！
+                            </c:if>
+                            </h1>
+                        </c:if>
                     </div><!-- .entry_content -->
                 </div><!-- .grid_7 -->
                 <div class="clear"></div>
 
-                <div class="grid_12" >
+                <div class="grid_12">
                     <div id="wrapper_tab" class="tab1">
-                        <a href="#" class="tab1 tab_link">Description</a>
-                        <a href="#" class="tab2 tab_link">Reviews</a>
-                        <a href="#" class="tab3 tab_link">Custom Tab</a>
+                        <a href="#" class="tab1 tab_link">商品详情</a>
+                        <a href="#" class="tab2 tab_link">商品规格</a>
 
                         <div class="clear"></div>
 
                         <div class="tab1 tab_body">
                             <h4>About This Item</h4>
-                            <p>Suspendisse at placerat turpis. Duis luctus erat vel magna pharetra aliquet. Maecenas tincidunt feugiat ultricies. Phasellus et dui risus. Vestibulum adipiscing, eros quis lobortis dictum. Etiam mollis volutpat odio, id euismod justo gravida a. Aliquam erat volutpat. Phasellus faucibus venenatis lorem, vitae commodo elit pretium et. Duis rhoncus lobortis congue. Vestibulum et purus dui, vel porta lectus. Sed vulputate pulvinar adipiscing.</p>
+
+                            <p>Suspendisse at placerat turpis. Duis luctus erat vel magna pharetra aliquet. Maecenas
+                                tincidunt feugiat ultricies. Phasellus et dui risus. Vestibulum adipiscing, eros quis
+                                lobortis dictum. Etiam mollis volutpat odio, id euismod justo gravida a. Aliquam erat
+                                volutpat. Phasellus faucibus venenatis lorem, vitae commodo elit pretium et. Duis
+                                rhoncus lobortis congue. Vestibulum et purus dui, vel porta lectus. Sed vulputate
+                                pulvinar adipiscing.</p>
                             <ul>
                                 <li>She was walking to the mall.</li>
                                 <li>Ted might eat the cake.</li>
@@ -146,7 +210,10 @@
                                 <li>The teacher is writing a report.</li>
                             </ul>
 
-                            <p>Here are some verb phrase examples where the verb phrase is the predicate of a sentence. In this case, the verb phrase consists of the main verb plus any auxiliary, or helping, verbs. Nulla nec velit. Mauris pulvinar erat non massa. Suspendisse tortor turpis, porta nec, tempus vitae, iaculis semper, pede.</p>
+                            <p>Here are some verb phrase examples where the verb phrase is the predicate of a sentence.
+                                In this case, the verb phrase consists of the main verb plus any auxiliary, or helping,
+                                verbs. Nulla nec velit. Mauris pulvinar erat non massa. Suspendisse tortor turpis, porta
+                                nec, tempus vitae, iaculis semper, pede.</p>
                             <ol>
                                 <li>Shipping & Delivery.</li>
                                 <li>Privacy & Security.</li>
@@ -154,16 +221,30 @@
                                 <li>Payment, Pricing & Promotions.</li>
                                 <li>Viewing Orders.</li>
                             </ol>
-                            <p>Next are some verb phrase examples of verb phrases where the phrase has a single function which means it can act like an adverb or an adjective. The phrase would include the verb and any modifiers, complements, or objects. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Morbi luctus. Duis lobortis.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur nec posuere odio. Proin vel ultrices erat.</p>
+                            <p>Next are some verb phrase examples of verb phrases where the phrase has a single function
+                                which means it can act like an adverb or an adjective. The phrase would include the verb
+                                and any modifiers, complements, or objects. Lorem ipsum dolor sit amet, consectetuer
+                                adipiscing elit. Morbi luctus. Duis lobortis. Lorem ipsum dolor sit amet, consectetur
+                                adipiscing elit. Curabitur nec posuere odio. Proin vel ultrices erat.</p>
+
                             <div class="clear"></div>
                         </div><!-- .tab1 .tab_body -->
 
                         <div class="tab2 tab_body">
-                            <h4>Customer reviews</h4>
+                            <div style="padding-left: 30px;">
+                                <c:forEach items="${goodsAttrValueList}" var="goodsAttrValue">
+                                    <c:if test="${not empty goodsAttrValue.attrValue}">
+                                        <p>${goodsAttrValue.goodsAttr.attrName}：${goodsAttrValue.attrValue}</p>
+                                    </c:if>
+                                </c:forEach>
+                            </div>
+                            <%--<h4>Customer reviews</h4>
 
                             <ul class="comments">
                                 <li>
-                                    <div class="autor">Mike Example</div>, <time datetime="2012-11-03">03.11.2012</time>
+                                    <div class="autor">Mike Example</div>
+                                    ,
+                                    <time datetime="2012-11-03">03.11.2012</time>
 
                                     <div class="evaluation">
                                         <div class="quality">
@@ -185,11 +266,16 @@
                                         <div class="clear"></div>
                                     </div><!-- .evaluation -->
 
-                                    <p>Suspendisse at placerat turpis. Duis luctus erat vel magna pharetra aliquet. Maecenas tincidunt feugiat ultricies. Phasellus et dui risus. Vestibulum adipiscing, eros quis lobortis dictum.  It enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                    <p>Suspendisse at placerat turpis. Duis luctus erat vel magna pharetra aliquet.
+                                        Maecenas tincidunt feugiat ultricies. Phasellus et dui risus. Vestibulum
+                                        adipiscing, eros quis lobortis dictum. It enim ad minim veniam, quis nostrud
+                                        exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
                                 </li>
 
                                 <li>
-                                    <div class="autor">Mike Example</div>, <time datetime="2012-11-03">01.11.2012</time>
+                                    <div class="autor">Mike Example</div>
+                                    ,
+                                    <time datetime="2012-11-03">01.11.2012</time>
 
                                     <div class="evaluation">
                                         <div class="quality">
@@ -211,7 +297,11 @@
                                         <div class="clear"></div>
                                     </div><!-- .evaluation -->
 
-                                    <p>Etiam mollis volutpat odio, id euismod justo gravida a. Aliquam erat volutpat. Phasellus faucibus venenatis lorem, vitae commodo elit pretium et. Duis rhoncus lobortis congue. Vestibulum et purus dui, vel porta lectus. Sed vulputate pulvinar adipiscing. It enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                    <p>Etiam mollis volutpat odio, id euismod justo gravida a. Aliquam erat volutpat.
+                                        Phasellus faucibus venenatis lorem, vitae commodo elit pretium et. Duis rhoncus
+                                        lobortis congue. Vestibulum et purus dui, vel porta lectus. Sed vulputate
+                                        pulvinar adipiscing. It enim ad minim veniam, quis nostrud exercitation ullamco
+                                        laboris nisi ut aliquip ex ea commodo consequat.</p>
                                 </li>
                             </ul><!-- .comments -->
 
@@ -221,19 +311,29 @@
                                 <div class="evaluation">
                                     <div class="quality">
                                         Quality<sup>*</sup>
-                                        <input class="niceRadio" type="radio" name="quality" value="1"><span class="eva_num">1</span>
-                                        <input class="niceRadio" type="radio" name="quality" value="2"><span class="eva_num">2</span>
-                                        <input class="niceRadio" type="radio" name="quality" value="3"><span class="eva_num">3</span>
-                                        <input class="niceRadio" type="radio" name="quality" value="4"><span class="eva_num">4</span>
-                                        <input class="niceRadio" type="radio" name="quality" value="5"><span class="eva_num">5</span>
+                                        <input class="niceRadio" type="radio" name="quality" value="1"><span
+                                            class="eva_num">1</span>
+                                        <input class="niceRadio" type="radio" name="quality" value="2"><span
+                                            class="eva_num">2</span>
+                                        <input class="niceRadio" type="radio" name="quality" value="3"><span
+                                            class="eva_num">3</span>
+                                        <input class="niceRadio" type="radio" name="quality" value="4"><span
+                                            class="eva_num">4</span>
+                                        <input class="niceRadio" type="radio" name="quality" value="5"><span
+                                            class="eva_num">5</span>
                                     </div>
                                     <div class="price">
                                         Price<sup>*</sup>
-                                        <input class="niceRadio" type="radio" name="price" value="1"><span class="eva_num">1</span>
-                                        <input class="niceRadio" type="radio" name="price" value="2"><span class="eva_num">2</span>
-                                        <input class="niceRadio" type="radio" name="price" value="3"><span class="eva_num">3</span>
-                                        <input class="niceRadio" type="radio" name="price" value="4"><span class="eva_num">4</span>
-                                        <input class="niceRadio" type="radio" name="price" value="5"><span class="eva_num">5</span>
+                                        <input class="niceRadio" type="radio" name="price" value="1"><span
+                                            class="eva_num">1</span>
+                                        <input class="niceRadio" type="radio" name="price" value="2"><span
+                                            class="eva_num">2</span>
+                                        <input class="niceRadio" type="radio" name="price" value="3"><span
+                                            class="eva_num">3</span>
+                                        <input class="niceRadio" type="radio" name="price" value="4"><span
+                                            class="eva_num">4</span>
+                                        <input class="niceRadio" type="radio" name="price" value="5"><span
+                                            class="eva_num">5</span>
                                     </div>
                                     <div class="clear"></div>
                                 </div><!-- .evaluation -->
@@ -257,150 +357,22 @@
                                 <div class="clear"></div>
 
 
-
                                 <input type="submit" value="Submit Review">
-                            </form><!-- .add_comments -->
+                            </form><!-- .add_comments -->--%>
                             <div class="clear"></div>
                         </div><!-- .tab2 .tab_body -->
 
-                        <div class="tab3 tab_body">
-                            <h4>Custom Tab</h4>
-                            <div class="clear"></div>
-                        </div><!-- .tab3 .tab_body -->
                         <div class="clear"></div>
-                    </div>?<!-- #wrapper_tab -->
+                    </div><!-- #content -->
+
                     <div class="clear"></div>
-                </div><!-- .grid_12 -->
+                </div>
+                <!-- #wrapper_tab -->
+                <div class="clear"></div>
 
             </article><!-- .product_page -->
 
-            <div class="related grid_12">
-
-                <div class="c_header">
-                    <div class="grid_10">
-                        <h2>Related Products</h2>
-                    </div><!-- .grid_10 -->
-
-                    <div class="grid_2">
-                        <a id="next_c1" class="next arows" href="#"><span>Next</span></a>
-                        <a id="prev_c1" class="prev arows" href="#"><span>Prev</span></a>
-                    </div><!-- .grid_2 -->
-                </div><!-- .c_header -->
-
-                <div class="related_list">
-                    <ul id="listing" class="products">
-                        <li>
-                            <article class="grid_3 article">
-                                <img class="sale" src="img/sale.png" alt="Sale">
-                                <div class="prev">
-                                    <a href="product_page.html"><img src="img/content/product1.png" alt="Product 1" title=""></a>
-                                </div><!-- .prev -->
-
-                                <h3 class="title">handmade Emerald Cut<br> Emerald Ring</h3>
-                                <div class="cart">
-                                    <div class="price">
-                                        <div class="vert">
-                                            $550.00
-                                            <div class="price_old">$725.00</div>
-                                        </div>
-                                    </div>
-                                    <a href="#" class="obn"></a>
-                                    <a href="#" class="like"></a>
-                                    <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                                </div><!-- .cart -->
-                            </article><!-- .grid_3.article -->
-                        </li>
-
-                        <li>
-                            <article class="grid_3 article">
-                                <div class="prev">
-                                    <a href="product_page.html"><img src="img/content/product2.png" alt="Product 2" title=""></a>
-                                </div><!-- .prev -->
-
-                                <h3 class="title">beautiful Valentine And Engagement</h3>
-                                <div class="cart">
-                                    <div class="price">
-                                        <div class="vert">
-                                            $550.00
-                                            <div class="price_old">$725.00</div>
-                                        </div>
-                                    </div>
-                                    <a href="#" class="obn"></a>
-                                    <a href="#" class="like"></a>
-                                    <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                                </div><!-- .cart -->
-                            </article><!-- .grid_3.article -->
-                        </li>
-
-                        <li>
-                            <article class="grid_3 article">
-                                <img class="sale" src="img/new.png" alt="New">
-                                <div class="prev">
-                                    <a href="product_page.html"><img src="img/content/product3.png" alt="Product 3" title=""></a>
-                                </div><!-- .prev -->
-
-                                <h3 class="title">Emerald Cut Emerald Ring</h3>
-                                <div class="cart">
-                                    <div class="price">
-                                        <div class="vert">
-                                            $550.00
-                                            <div class="price_old">$725.00</div>
-                                        </div>
-                                    </div>
-                                    <a href="#" class="obn"></a>
-                                    <a href="#" class="like"></a>
-                                    <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                                </div><!-- .cart -->
-                            </article><!-- .grid_3.article -->
-                        </li>
-
-                        <li>
-                            <article class="grid_3 article">
-                                <div class="prev">
-                                    <a href="product_page.html"><img src="img/content/product4.png" alt="Product 4" title=""></a>
-                                </div><!-- .prev -->
-
-                                <h3 class="title">Diamond Necklaces and Pendants</h3>
-                                <div class="cart">
-                                    <div class="price">
-                                        <div class="vert">
-                                            $550.00
-                                            <div class="price_old">$725.00</div>
-                                        </div>
-                                    </div>
-                                    <a href="#" class="obn"></a>
-                                    <a href="#" class="like"></a>
-                                    <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                                </div><!-- .cart -->
-                            </article><!-- .grid_3.article -->
-                        </li>
-
-                        <li>
-                            <article class="grid_3 article">
-                                <div class="prev">
-                                    <a href="product_page.html"><img src="img/content/product5.png" alt="Product 5" title=""></a>
-                                </div><!-- .prev -->
-
-                                <h3 class="title">Emerald Diamond Solitaire</h3>
-                                <div class="cart">
-                                    <div class="price">
-                                        <div class="vert">
-                                            $550.00
-                                            <div class="price_old">$725.00</div>
-                                        </div>
-                                    </div>
-                                    <a href="#" class="obn"></a>
-                                    <a href="#" class="like"></a>
-                                    <a href="#" class="bay"><img src="img/bg_cart.png" alt="Buy" title=""></a>
-                                </div><!-- .cart -->
-                            </article><!-- .grid_3.article -->
-                        </li>
-                    </ul><!-- #listing -->
-                </div><!-- .brands_list -->
-            </div><!-- .related -->
-
-            <div class="clear"></div>
-        </div><!-- #content -->
+        </div><!-- .grid_12 -->
 
         <div class="clear"></div>
 
