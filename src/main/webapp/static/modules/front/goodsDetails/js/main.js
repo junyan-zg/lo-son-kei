@@ -10,6 +10,26 @@ function selectSpec(dom,id){
     return;
 }
 
+function showInfo(data){
+    if(data.price){
+        $("#price").html("￥" + data.price);
+    }else{
+        $("#price").html("￥0.00");
+    }
+    if(data.srcPrice){
+        if (data.srcPrice==0)
+            $(".price_old").html("");
+        $(".price_old").html("￥" + data.srcPrice);
+    }else{
+        $(".price_old").html("");
+    }
+    if(data.stock){
+        $("#stock").html(data.stock);
+    }else{
+        $("#stock").html("0");
+    }
+}
+
 function checkBuyAmount(){
     var v = $('#amount').val().trim();
     $('#amount').val(v);

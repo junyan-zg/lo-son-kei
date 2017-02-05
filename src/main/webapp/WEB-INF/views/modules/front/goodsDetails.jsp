@@ -15,7 +15,7 @@
     <script>
         function ajaxGetPrice(){
             $.post("${ctx}/goodsPriceInfo",$('#specForm').serialize(),function(data){
-               console.log(data);
+                showInfo(data);
             });
         }
         $(document).ready(function(){
@@ -109,7 +109,7 @@
                                 <div class="price">
                                     <div class="price_old"><c:if
                                             test="${not empty goods.srcPrice}">￥${goods.srcPrice}</c:if></div>
-                                    <c:if test="${not empty goods.price}">￥${goods.price}</c:if>
+                                    <div id="price"><c:if test="${not empty goods.price}">￥${goods.price}</c:if></div>
                                 </div><!-- .price -->
 
                                 <div class="availability_sku">
