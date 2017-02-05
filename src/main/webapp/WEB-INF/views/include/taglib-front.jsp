@@ -9,3 +9,4 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 <c:set var="ctxStatic" value="${pageContext.request.contextPath}/static"/>
 <c:set var="ctxStaticFront" value="${pageContext.request.contextPath}/static/modules/front"/>
+<c:set var="ctxFront" value="${ctx}${fns:getFrontPath()}"/>

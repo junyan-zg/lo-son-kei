@@ -4,7 +4,12 @@
         <div class="grid_5">
             <div class="lang">
                 <ul>
-                    <li><a style="width:170px;cursor: default;">欢迎光临罗信记网上商城！</a></li>
+                    <c:set value="${fns:getMember()}" var="currMember"/>
+                    <li><a style="width:370px;cursor: default;text-align: left;margin-left: 10px;">
+                        <c:if test="${not empty currMember && not empty currMember.memberName}">
+                            您好！尊敬的<b>${currMember.memberName}</b>，
+                        </c:if>欢迎光临罗信记网上商城！</a></li>
+
                 </ul>
             </div><!-- .lang -->
         </div>
@@ -13,11 +18,16 @@
             <nav>
                 <ul>
                     <li class="current"><a href="${ctx}/index">商城首页</a></li>
-                    <li><a href="">个人中心</a></li>
+                    <li><a href="${ctxFront}/home">个人中心</a></li>
                     <li><a href="#">购物车</a></li>
                     <li><a href="#">我的订单</a></li>
-                    <li><a href="${ctx}/login">登录</a></li>
-                    <li><a href="${ctx}/register">注册</a></li>
+                    <c:if test="${not empty currMember}">
+                    <li><a href="${ctxFront}/logout">登出</a></li>
+                    </c:if>
+                    <c:if test="${empty currMember}">
+                        <li><a href="${ctx}/login">登录</a></li>
+                        <li><a href="${ctx}/register">注册</a></li>
+                    </c:if>
                 </ul>
             </nav>
         </div><!-- .grid_9 -->
