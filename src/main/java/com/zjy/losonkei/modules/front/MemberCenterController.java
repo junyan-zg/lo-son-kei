@@ -1,5 +1,6 @@
 package com.zjy.losonkei.modules.front;
 
+import com.zjy.losonkei.common.config.Global;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.member.dao.MemberDetailsDao;
@@ -12,7 +13,9 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -48,7 +51,25 @@ public class MemberCenterController extends BaseController {
 
     @RequestMapping("home")
     public String home(Member member){
+        return "modules/front/member/home";
+    }
 
+    @RequestMapping("home/saveBasic")
+    public String saveBasic(Member member){
+        memberService.save(member);
+        memberDetailsService.save(member.getMemberDetails());
+        return "redirect:"+ Global.getFrontPath()+"/home";
+    }
+
+    @RequestMapping("home/go/{type}pwd")
+    public String goUpdatePwd(@PathVariable("type") String type, Model model){
+        model.addAttribute("type",type);
+        return "modules/front/member/updatePwd";
+    }
+
+    @RequestMapping("home/save/{type}Pwd")
+    public String updatePwd(@PathVariable("type") String type, Model model){
+        model.addAttribute("type",type);
         return "modules/front/member/home";
     }
 }

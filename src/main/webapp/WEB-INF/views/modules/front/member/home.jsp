@@ -44,55 +44,37 @@
 <section id="main1">
     <div class="container_12">
         <div id="content" class="grid_10">
-            <h1 class="page_title">&nbsp;</h1>
+           <%-- <h1 class="page_title">&nbsp;</h1>--%>
 
 
             <div class="clear"></div>
 
-            <div class="products catalog">
-                    <form:form modelAttribute="member" method="post" action="${ctx}/doRegister" class="registed registed2" onsubmit="return registerForm();" style="text-align: left;margin-bottom: 20px;padding: 30px;">
+            <div class="products catalog" style="width: 810px;">
+                    <form:form modelAttribute="member" method="post" action="${ctxFront}/home/saveBasic" class="registed registed2" style="text-align: left;margin-bottom: 20px;padding: 30px;">
                         <div style="border-bottom: 2px dashed #bdd1e9;margin-bottom: 20px;">
-                            <h2><b style="color: #eb6447;">必 填 信 息</b></h2>
+                            <h2><b style="color: #eb6447;">个 人 资 料</b></h2>
                         </div>
                         <div>
-                            <strong>账 户</strong>
-                            <form:input path="memberAccount" placeholder="登录账号" cssClass="required"/>
-                            <sup>*</sup>
-                            <span style="color: #eb6447;margin-left: 5px;" id="tips-memberAccount">${errorRegister}</span>
+                            <strong>账 户</strong> ${member.memberAccount}
+                            <span style="color: #eb6447;margin-left: 20px;"><b>请牢记您的登陆凭据，不可修改</b></span>
                         </div>
-                        <div>
+                        <div style="margin-top: 20px;">
                             <strong>昵 称</strong>
                             <form:input path="memberName" placeholder="会员昵称" cssClass="required" />
                             <sup>*</sup>
                             <span style="color: #eb6447;margin-left: 5px;" id="tips-memberName"></span>
                         </div>
-                        <div>
+                        <div style="padding-top: 10px;">
                             <strong>登 录 密 码</strong>
-                            <form:password path="memberPwd" placeholder="登录密码" cssClass="required"/>
-                            <sup>*</sup>
-                            <span style="color:#eb6447;margin-left: 5px;" id="tips-memberPwd"></span>
+                            <span style="color:#eb6447;margin-left: 5px;"><b>密</b><a href="${ctxFront}/home/go/pwd" style="margin-left: 30px;">修改</a></span>
                         </div>
-                        <div>
-                            <strong>确 认 密 码</strong>
-                            <form:password path="memberPwdAgain" placeholder="确认登录密码" cssClass="required"/>
-                            <sup>*</sup>
-                            <span style="color: #eb6447;margin-left: 5px;" id="tips-memberPwdAgain"></span>
-                        </div>
-                        <div>
+                        <div style="margin-top: 10px;">
                             <strong>支 付 密 码</strong>
-                            <form:password path="memberPaypwd" placeholder="支付密码" cssClass="required"/>
-                            <sup>*</sup>
-                            <span style="color: #eb6447;margin-left: 5px;" id="tips-memberPaypwd"></span>
-                        </div>
-                        <div>
-                            <strong>确 认 密 码</strong>
-                            <form:password path="memberPaypwdAgain" placeholder="确认支付密码" cssClass="required"/>
-                            <sup>*</sup>
-                            <span style="color: #eb6447;margin-left: 5px;" id="tips-memberPaypwdAgain"></span>
+                            <span style="color:#eb6447;margin-left: 5px;"><b>密</b><a href="${ctxFront}/home/go/paypwd" style="margin-left: 30px;">修改</a></span>
                         </div>
 
-                        <div style="border-bottom: 2px dashed #bdd1e9;margin-bottom: 10px;padding-top: 20px;">
-                            <h2><b style="color: #eb6447;">其 他 信 息</b></h2>
+                        <div style="border-bottom: 2px dashed #bdd1e9;margin-bottom: 10px;padding-top:20px;margin-top: 20px;">
+                            <h2><b style="color: #eb6447;">详 细 信 息</b></h2>
                         </div>
 
                         <div>
@@ -132,32 +114,13 @@
                         </div>
 
                         <div class="submit">
-                            <input type="submit" value="注 册" style="width: 545px;">
+                            <input type="submit" value="保 存" style="width: 545px;">
                         </div>
                         <div class="clear"></div>
                     </form:form>
 
                 <div class="clear"></div>
-            </div><!-- .products -->
-            <div class="clear"></div>
-
-            <div class="pagination">
-                ${page.frontHtml}
             </div>
-
-            <%--<div class="pagination">
-                <ul>
-                    <li class="prev"><span>&#8592;</span></li>
-                    <li class="curent"><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5</a></li>
-                    <li><span>...</span></li>
-                    <li><a href="#">100</a></li>
-                    <li class="next"><a href="#">&#8594;</a></li>
-                </ul>
-            </div><!-- .pagination -->--%>
 
             <div class="clear"></div>
         </div><!-- #content -->
@@ -170,18 +133,9 @@
 
                 <nav class="right_menu">
                     <ul>
-                        <li class="current"><a href="#">个人信息</a></li>
+                        <li class="current"><a href="${ctxFront}/home">个人信息</a></li>
                         <li><a href="#">收货地址</a></li>
                         <li><a href="#">账单</a></li>
-                        <c:forEach items="${firstLevelCategoryList}" var="gcl">
-                            <li<c:if test="${gcl.id eq goodsSearch.firstLevelCategoryId}"> class="current"</c:if>><a href="${ctx}/goods?firstLevelCategoryId=${gcl.id}">${gcl.categoryName}</a></li>
-                        </c:forEach>
-                        <%--<li><a href="#">Home</a></li>
-                        <li><a href="#">Wedding</a></li>
-                        <li class="current"><a href="#">Rings</a></li>
-                        <li><a href="#">Necklaces</a></li>
-                        <li><a href="#">Earrings</a></li>
-                        <li><a href="#">Bracelets</a></li>--%>
                     </ul>
                 </nav><!-- .right_menu -->
             </aside><!-- #categories_nav -->

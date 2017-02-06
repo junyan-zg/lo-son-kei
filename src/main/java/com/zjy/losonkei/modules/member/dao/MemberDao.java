@@ -16,4 +16,6 @@ import com.zjy.losonkei.modules.member.entity.Member;
 public interface MemberDao extends CrudDao<Member> {
 
     public Member getByAccount(String memberAccount);
+
+    public void updateLoginNum(String memberId);
 }

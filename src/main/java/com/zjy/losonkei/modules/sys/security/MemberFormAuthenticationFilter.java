@@ -4,11 +4,15 @@
 package com.zjy.losonkei.modules.sys.security;
 
 import com.zjy.losonkei.common.utils.StringUtils;
+import com.zjy.losonkei.modules.member.service.MemberService;
+import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletRequest;
@@ -28,6 +32,9 @@ public class MemberFormAuthenticationFilter extends org.apache.shiro.web.filter.
 	private final String SUCCESS_URL = "";
 
 	private final String LOGIN_URL = "/login";
+
+	@Autowired
+	private MemberService memberService;
 
 	protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) {
 		System.out.println("createToken");
@@ -80,5 +87,10 @@ public class MemberFormAuthenticationFilter extends org.apache.shiro.web.filter.
         request.setAttribute(DEFAULT_MESSAGE_PARAM, message);
         return true;
 	}
-	
+
+	@Override
+	protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) throws Exception {
+		memberService.updateLoginNum(UserUtils.getPrincipal().getId());
+		return super.onLoginSuccess(token, subject, request, response);
+	}
 }

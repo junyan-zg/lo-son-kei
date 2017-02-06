@@ -28,7 +28,7 @@ public class Member extends DataEntity<Member> {
 	private Date memberAddtime;		// 注册时间
 	private Integer memberPoints;		// 会员积分
 	private String memberState;		// 启用状态
-	private String memberLoginnum;		// 登录次数
+	private Integer memberLoginnum;		// 登录次数
 	private BigDecimal memberBalance;		// 会员余额
 
 
@@ -39,8 +39,8 @@ public class Member extends DataEntity<Member> {
 	private Date endMemberAddtime;		// 结束 注册时间
 	private Integer beginMemberPoints;		// 开始 会员积分
 	private Integer endMemberPoints;		// 结束 会员积分
-	private String beginMemberLoginnum;		// 开始 登录次数
-	private String endMemberLoginnum;		// 结束 登录次数
+	private Integer beginMemberLoginnum;		// 开始 登录次数
+	private Integer endMemberLoginnum;		// 结束 登录次数
 
 	public final static String STATE_ENABLED = "1";	//启用
 	public final static String STATE_DISABLED = "0";	//禁用
@@ -129,11 +129,11 @@ public class Member extends DataEntity<Member> {
 	}
 	
 	@Length(min=0, max=10, message="登录次数长度必须介于 0 和 10 之间")
-	public String getMemberLoginnum() {
+	public Integer getMemberLoginnum() {
 		return memberLoginnum;
 	}
 
-	public void setMemberLoginnum(String memberLoginnum) {
+	public void setMemberLoginnum(Integer memberLoginnum) {
 		this.memberLoginnum = memberLoginnum;
 	}
 	
@@ -177,19 +177,19 @@ public class Member extends DataEntity<Member> {
 		this.endMemberPoints = endMemberPoints;
 	}
 		
-	public String getBeginMemberLoginnum() {
+	public Integer getBeginMemberLoginnum() {
 		return beginMemberLoginnum;
 	}
 
-	public void setBeginMemberLoginnum(String beginMemberLoginnum) {
+	public void setBeginMemberLoginnum(Integer beginMemberLoginnum) {
 		this.beginMemberLoginnum = beginMemberLoginnum;
 	}
 	
-	public String getEndMemberLoginnum() {
+	public Integer getEndMemberLoginnum() {
 		return endMemberLoginnum;
 	}
 
-	public void setEndMemberLoginnum(String endMemberLoginnum) {
+	public void setEndMemberLoginnum(Integer endMemberLoginnum) {
 		this.endMemberLoginnum = endMemberLoginnum;
 	}
 

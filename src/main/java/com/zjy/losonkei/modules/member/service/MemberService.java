@@ -70,6 +70,7 @@ public class MemberService extends CrudService<MemberDao, Member> {
 		member.setMemberState(Member.STATE_ENABLED);
 		member.setMemberBalance(new BigDecimal(2000));
 		member.setMemberPoints(0);
+		member.setMemberLoginnum(0);
 		member.setMemberAddtime(new Date());
 		member.setMemberPwd(MemberUtils.entryptPassword(member.getMemberPwd()));
 		member.setMemberPaypwd(MemberUtils.entryptPassword(member.getMemberPaypwd()));
@@ -85,5 +86,10 @@ public class MemberService extends CrudService<MemberDao, Member> {
 		memberDetailsDao.insert(memberDetails);
 
 		return "OK";
+	}
+
+	@Transactional(readOnly = false)
+	public void updateLoginNum(String memberId){
+		dao.updateLoginNum(memberId);
 	}
 }

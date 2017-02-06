@@ -45,8 +45,8 @@
         </div><!-- .grid_3 -->
 
         <div class="grid_10">
-            <div class="top_header">
-                <ul id="cart_nav">
+            <div class="top_header" style="padding-right: 100px;">
+                <%--<ul id="cart_nav">
                     <li>
                         <a class="cart_li" href="#">
                             <div class="cart_ico"></div>
@@ -92,7 +92,7 @@
                             </li>
                         </ul>
                     </li>
-                </ul><!-- .cart_nav -->
+                </ul><!-- .cart_nav -->--%>
 
                 <form class="search" action="${ctx}/goods" method="get">
                     <input type="submit" class="search_button" value="">

@@ -156,7 +156,13 @@
 			update_date = #{updateDate}
 		WHERE id = #{id}
 	</update>
-	
+
+	<update id="updateLoginNum">
+		UPDATE member SET
+		member_loginnum = member_loginnum + 1
+		WHERE id = #{memberId}
+	</update>
+
 	<update id="delete">
 		UPDATE member SET 
 			del_flag = #{DEL_FLAG_DELETE}
