@@ -122,7 +122,7 @@
         }
 
         if(subFlag){
-            $.post("",$("#myForm").serialize(),function(data){
+            $.post("${ctxFront}/home/save/${type}Pwd",$("#myForm").serialize(),function(data){
                 if (data=="ok"){
                     alert("修改成功！");
                     window.location.href = "${ctxFront}/home";

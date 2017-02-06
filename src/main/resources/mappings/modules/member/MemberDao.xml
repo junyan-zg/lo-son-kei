@@ -163,6 +163,22 @@
 		WHERE id = #{memberId}
 	</update>
 
+	<update id="updatePayPwd">
+		UPDATE member SET
+		member_paypwd = #{memberPaypwd},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updatePwd">
+		UPDATE member SET
+		member_pwd = #{memberPwd},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
 	<update id="delete">
 		UPDATE member SET 
 			del_flag = #{DEL_FLAG_DELETE}

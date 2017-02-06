@@ -92,4 +92,16 @@ public class MemberService extends CrudService<MemberDao, Member> {
 	public void updateLoginNum(String memberId){
 		dao.updateLoginNum(memberId);
 	}
+
+	@Transactional(readOnly = false)
+	public void updatePwd(Member member){
+		member.preUpdate();
+		dao.updatePwd(member);
+	}
+
+	@Transactional(readOnly = false)
+	public void updatePayPwd(Member member){
+		member.preUpdate();
+		dao.updatePayPwd(member);
+	}
 }

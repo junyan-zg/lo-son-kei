@@ -18,4 +18,8 @@ public interface MemberDao extends CrudDao<Member> {
     public Member getByAccount(String memberAccount);
 
     public void updateLoginNum(String memberId);
+
+    public void updatePwd(Member member);
+
+    public void updatePayPwd(Member member);
 }
