@@ -3,21 +3,24 @@ package com.zjy.losonkei.modules.front;
 import com.zjy.losonkei.common.config.Global;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
-import com.zjy.losonkei.modules.member.dao.MemberDetailsDao;
 import com.zjy.losonkei.modules.member.entity.Member;
-import com.zjy.losonkei.modules.member.entity.MemberDetails;
+import com.zjy.losonkei.modules.member.entity.MemberAddress;
+import com.zjy.losonkei.modules.member.service.MemberAddressService;
 import com.zjy.losonkei.modules.member.service.MemberDetailsService;
 import com.zjy.losonkei.modules.member.service.MemberService;
 import com.zjy.losonkei.modules.member.utils.MemberUtils;
 import com.zjy.losonkei.modules.sys.security.Principal;
+import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.security.Security;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/2/5.
@@ -82,4 +85,6 @@ public class MemberCenterController extends BaseController {
             return "error";
         }
     }
+
+
 }
