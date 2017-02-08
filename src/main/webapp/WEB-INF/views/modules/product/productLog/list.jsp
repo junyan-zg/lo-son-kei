@@ -45,16 +45,27 @@
 	<sys:message content="${message}"/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
-			<tr>
+			<%--<tr>
 				<th>内容</th>
-			</tr>
+			</tr>--%>
 		</thead>
 		<tbody>
 		<c:forEach items="${page.list}" var="productLog">
 			<tr>
-				<td><a href="${ctx}/product/productLog/form?id=${productLog.id}">
-					${productLog.content}
-				</a></td>
+				<td style="padding-left: 20px;padding-right:16px;border:2px dashed #e1e1e1;">
+					<div class="row-fluid">
+						<div class="span6" style="font-size: 16px;">
+							<b>${fns:getUserById(productLog.createBy.id).name} ：</b>
+						</div>
+						<div class="pull-right">
+							<fmt:formatDate value="${productLog.createDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+						</div>
+					</div>
+					<div style="font-size:14px; padding: 5px;">
+						${productLog.content}<br><br>
+						共花费${productLog.cost}元。
+					</div>
+				</td>
 			</tr>
 		</c:forEach>
 		</tbody>

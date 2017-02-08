@@ -6,6 +6,8 @@ package com.zjy.losonkei.modules.member.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zjy.losonkei.modules.member.entity.MemberDetails;
+import com.zjy.losonkei.modules.member.service.MemberDetailsService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,6 +35,8 @@ public class MemberController extends BaseController {
 
 	@Autowired
 	private MemberService memberService;
+	@Autowired
+	private MemberDetailsService memberDetailsService;
 	
 	@ModelAttribute
 	public Member get(@RequestParam(required=false) String id) {
@@ -58,15 +62,19 @@ public class MemberController extends BaseController {
 	@RequestMapping(value = "form")
 	public String form(Member member, Model model) {
 		model.addAttribute("member", member);
+		if(StringUtils.isNotBlank(member.getId())){
+			MemberDetails memberDetails = memberDetailsService.get(member.getId());
+			member.setMemberDetails(memberDetails);
+		}
 		return "modules/member/memberForm";
 	}
 
 	@RequiresPermissions("member:member:edit")
 	@RequestMapping(value = "save")
 	public String save(Member member, Model model, RedirectAttributes redirectAttributes) {
-		if (!beanValidator(model, member)){
+		/*if (!beanValidator(model, member)){
 		//	return form(member, model);
-		}
+		}*/
 		memberService.save(member);
 		addMessage(redirectAttributes, "保存会员成功");
 		return "redirect:"+Global.getAdminPath()+"/member/member/?repage";

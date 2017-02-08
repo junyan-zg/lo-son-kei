@@ -19,7 +19,7 @@
 <body>
 	<ul class="nav nav-tabs">
 		<li class="active"><a href="${ctx}/member/member/">会员列表</a></li>
-		<shiro:hasPermission name="member:member:edit"><li><a href="${ctx}/member/member/form">会员添加</a></li></shiro:hasPermission>
+		<%--<shiro:hasPermission name="member:member:edit"><li><a href="${ctx}/member/member/form">会员添加</a></li></shiro:hasPermission>--%>
 	</ul>
 	<form:form id="searchForm" modelAttribute="member" action="${ctx}/member/member/" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
@@ -42,18 +42,18 @@
 					value="<fmt:formatDate value="${member.endMemberAddtime}" pattern="yyyy-MM-dd HH:mm:ss"/>"
 					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
 			</li>
-			<li><label>会员积分：</label>
+			<%--<li><label>会员积分：</label>
 				<form:input path="memberPoints" htmlEscape="false" maxlength="11" class="input-medium"/>
-			</li>
+			</li>--%>
 			<li><label>启用状态：</label>
 				<form:select path="memberState" class="input-medium">
 					<form:option value="" label=""/>
 					<form:options items="${fns:getDictList('member_state')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</li>
-			<li><label>登录次数：</label>
+			<%--<li><label>登录次数：</label>
 				<form:input path="memberLoginnum" htmlEscape="false" maxlength="10" class="input-medium"/>
-			</li>
+			</li>--%>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
 			<li class="clearfix"></li>
 		</ul>
@@ -69,7 +69,7 @@
 				<th>会员积分</th>
 				<th>启用状态</th>
 				<th>登录次数</th>
-				<shiro:hasPermission name="member:member:edit"><th>操作</th></shiro:hasPermission>
+				<%--<shiro:hasPermission name="member:member:edit"><th>操作</th></shiro:hasPermission>--%>
 			</tr>
 		</thead>
 		<tbody>
@@ -96,10 +96,10 @@
 				<td>
 					${member.memberLoginnum}
 				</td>
-				<shiro:hasPermission name="member:member:edit"><td>
+				<%--<shiro:hasPermission name="member:member:edit"><td>
     				<a href="${ctx}/member/member/form?id=${member.id}">修改</a>
 					<a href="${ctx}/member/member/delete?id=${member.id}" onclick="return confirmx('确认要删除该会员吗？', this.href)">删除</a>
-				</td></shiro:hasPermission>
+				</td></shiro:hasPermission>--%>
 			</tr>
 		</c:forEach>
 		</tbody>
