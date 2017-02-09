@@ -1,10 +1,13 @@
 package com.zjy.losonkei.modules.front;
 
 import com.zjy.losonkei.common.config.Global;
+import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.member.entity.Member;
+import com.zjy.losonkei.modules.member.entity.MemberAccount;
 import com.zjy.losonkei.modules.member.entity.MemberAddress;
+import com.zjy.losonkei.modules.member.service.MemberAccountService;
 import com.zjy.losonkei.modules.member.service.MemberAddressService;
 import com.zjy.losonkei.modules.member.service.MemberDetailsService;
 import com.zjy.losonkei.modules.member.service.MemberService;
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -34,6 +39,8 @@ public class MemberCenterController extends BaseController {
     private MemberService memberService;
     @Autowired
     private MemberDetailsService memberDetailsService;
+    @Autowired
+    private MemberAccountService memberAccountService;
 
     @ModelAttribute
     public Member get() {
@@ -86,5 +93,13 @@ public class MemberCenterController extends BaseController {
         }
     }
 
+    @RequestMapping("account")
+    public String account(HttpServletRequest request, HttpServletResponse response){
+        MemberAccount memberAccount = new MemberAccount();
+        memberAccount.setMemberId(UserUtils.getPrincipal().getId());
+        Page<MemberAccount> page = memberAccountService.findPage(new Page<MemberAccount>(request, response), memberAccount);
+        request.setAttribute("page",page);
+        return "modules/front/member/account";
+    }
 
 }

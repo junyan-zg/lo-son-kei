@@ -80,7 +80,7 @@
                     <ul>
                         <li><a href="${ctxFront}/home">个人信息</a></li>
                         <li class="current"><a href="${ctxFront}/address">收货地址</a></li>
-                        <li><a href="#">账单</a></li>
+                        <li><a href="${ctxFront}/account">账单</a></li>
                     </ul>
                 </nav><!-- .right_menu -->
             </aside><!-- #categories_nav -->
@@ -90,6 +90,6 @@
     </div><!-- .container_12 -->
 </section><!-- #main -->
 <div class="clear"></div>
-<div style="height: 50px;"></div>
+<div style="height: 145px;"></div>
 </body>
 </html>
