@@ -28,6 +28,11 @@ function showInfo(data){
     }else{
         $("#stock").html("0");
     }
+    if(data.goodsNo){
+        $("#goodsNo").val(data.goodsNo);
+    }else{
+        $("#goodsNo").val("");
+    }
 }
 
 function checkBuyAmount(){

@@ -18,6 +18,27 @@
                 showInfo(data);
             });
         }
+        var cartSub = true;
+        function addShoppingCart(){
+            if(checkBuyAmount() && cartSub){
+                cartSub = false;
+                $.post("${ctx}/addShoppingCart",$('#specForm').serialize(),function(data){
+                    if(data=="login"){
+                        if(confirm("请先登录！")){
+                            window.location.href = "${ctx}/login";
+                        }
+                    }else if(data=="error"){
+                        alert("本页面已过期！请先刷新页面！");
+                        window.location.reload();
+                    }else{
+                        if(confirm("添加成功！是否马上结算？")){
+                            window.location.href = "${ctxFront}/shoppingCart";
+                        }
+                    }
+                    cartSub = true;
+                });
+            }
+        }
         $(document).ready(function(){
             ajaxGetPrice();
         });
@@ -131,7 +152,8 @@
                             <div class="parameter_selection">
                                 <form action="" id="specForm" onsubmit="return checkBuyAmount();" method="post">
                                     <input type="hidden" name="goodsId" value="${goods.id}">
-                                <c:forEach var="item" items="${goodsSpecificationMap}" varStatus="status">
+                                    <input type="hidden" name="goodsNo" id="goodsNo" value=""/>
+                                    <c:forEach var="item" items="${goodsSpecificationMap}" varStatus="status">
                                     <div style="margin-bottom: 30px;">
                                         <span style="font-size: 13px;">${item.key.specificationName}</span>
                                         <input type="hidden" name="specificationIds" value="${item.key.id}"/>
@@ -149,7 +171,7 @@
                                         </c:forEach>
                                     </div>
                                 </c:forEach>
-
+                                <span style="font-size: 13px;">购买数量：</span>
                                 <input type="text" name="amount" onchange="checkBuyAmount();" id="amount" style="margin-bottom: 5px;margin-right: 5px;"/>(库存 <span id="stock">1</span> 件)<br>
                                 <span id="errMsg" style="color:#ee7b62;"></span>
                                 </form>
@@ -157,7 +179,7 @@
                             <!-- .parameter_selection -->
 
                             <div class="cart">
-                                <a href="javascript:;" class="bay" style="padding-left: 10px;width: 100px;"><img src="${ctxStaticFront}/common/img/bg_cart.png">加入购物车</a>
+                                <a href="javascript:addShoppingCart();" class="bay" style="padding-left: 10px;width: 100px;"><img src="${ctxStaticFront}/common/img/bg_cart.png">加入购物车</a>
                                 <button style="width: 120px;margin-left: 200px;"><img src="${ctxStaticFront}/common/img/bg_cart.png">立即购买</button>
 
                                     <%--

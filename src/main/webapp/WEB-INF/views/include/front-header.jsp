@@ -19,7 +19,7 @@
                 <ul>
                     <li class="current"><a href="${ctx}/index">商城首页</a></li>
                     <li><a href="${ctxFront}/home">个人中心</a></li>
-                    <li><a href="#">购物车</a></li>
+                    <li><a href="${ctxFront}/shoppingCart">购物车</a></li>
                     <li><a href="#">我的订单</a></li>
                     <c:if test="${not empty currMember}">
                     <li><a href="${ctxFront}/logout">登出</a></li>

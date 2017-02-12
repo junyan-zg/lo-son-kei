@@ -1,5 +1,6 @@
 package com.zjy.losonkei.modules.front;
 
+import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.goods.entity.*;
 import com.zjy.losonkei.modules.goods.service.GoodsAllService;
@@ -7,13 +8,15 @@ import com.zjy.losonkei.modules.goods.service.GoodsAttrValueService;
 import com.zjy.losonkei.modules.goods.service.GoodsService;
 import com.zjy.losonkei.modules.goods.service.GoodsSpecificationValueService;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
+import com.zjy.losonkei.modules.orders.entity.ShoppingCart;
+import com.zjy.losonkei.modules.orders.service.ShoppingCartService;
+import com.zjy.losonkei.modules.sys.entity.User;
+import com.zjy.losonkei.modules.sys.security.Principal;
+import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -35,6 +38,8 @@ public class GoodsDetailsController extends BaseController{
     private GoodsAttrValueService goodsAttrValueService;
     @Autowired
     private GoodsAllService goodsAllService;
+    @Autowired
+    private ShoppingCartService shoppingCartService;
 
     @RequestMapping("/goodsDetails/{id}")
     public String goodsDetails(@PathVariable("id")String goodsId, Model model){
@@ -81,7 +86,7 @@ public class GoodsDetailsController extends BaseController{
 
         GoodsAll goodsAllSearch = new GoodsAll();
         goodsAllSearch.setGoodsId(request.getParameter("goodsId"));
-        goodsAllSearch.setDelFlag(null);
+        goodsAllSearch.setDelFlag(GoodsAll.DEL_FLAG_NORMAL);
 
 
         GoodsAll goodsAll;
@@ -118,8 +123,59 @@ public class GoodsDetailsController extends BaseController{
         map.put("srcPrice",goodsAll.getSrcPrice());
         map.put("price",goodsAll.getPrice());
         map.put("stock",goodsAll.getStock());
-
+        map.put("goodsNo",goodsAll.getId());
         return map;
     }
 
+
+    @RequestMapping("addShoppingCart")
+    @ResponseBody
+    public String addShoppingCart(String goodsNo,@RequestParam("amount")String amountStr){
+        Principal principal = UserUtils.getPrincipal();
+        if (principal == null || StringUtils.isBlank(principal.getId()) || principal.isCompanyUser()){
+            return "login";
+        }
+        if (StringUtils.isBlank(goodsNo)){
+            return "error";
+        }
+
+        int amount = 0;
+        try {
+            amount = Integer.valueOf(amountStr);
+            if (amount <= 0){
+                return "error";
+            }
+        }catch (Exception e){
+            return "error";
+        }
+
+        GoodsAll goodsAll = goodsAllService.get(goodsNo);
+        if (goodsAll == null){
+            return "error";
+        }
+        if (GoodsAll.DEL_FLAG_NORMAL.equals(goodsAll.getDelFlag()) && Goods.STATE_ON_SALE.equals(goodsService.get(goodsAll.getGoodsId()).getState())){
+            if (amount > goodsAll.getStock()){
+                return "error";
+            }
+            ShoppingCart shoppingCart = new ShoppingCart();
+            shoppingCart.setMemberId(principal.getId());
+            shoppingCart.setGoodsNo(goodsNo);
+            //购物车已存在该商品，叠加
+            List<ShoppingCart> list = shoppingCartService.findList(shoppingCart);
+            if (list != null && !list.isEmpty()){
+                shoppingCart = list.get(0);
+            }
+            Integer goodsAmountDB = shoppingCart.getGoodsAmount();
+            if (goodsAmountDB == null){
+                goodsAmountDB = 0;
+            }
+            shoppingCart.setGoodsAmount(amount + goodsAmountDB);
+            shoppingCartService.save(shoppingCart);
+            return "ok";
+        }else {
+            return "error";
+        }
+
+
+    }
 }
