@@ -71,4 +71,16 @@ public class GoodsAllUtils {
         sb.append(i);
         return sb.toString();
     }
+
+    public static String getAllSpecificationDesc(GoodsAll goodsAll){
+        StringBuilder sb = new StringBuilder();
+        List<GoodsSpecificationValue> goodsSpecificationValues = goodsAll.getGoodsSpecificationValues();
+        if (goodsSpecificationValues != null){
+            for (GoodsSpecificationValue value : goodsSpecificationValues){
+                sb.append(" ");
+                sb.append(value.getSpecificationValue());
+            }
+        }
+        return sb.toString();
+    }
 }

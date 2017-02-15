@@ -3,6 +3,7 @@
  */
 package com.zjy.losonkei.modules.orders.entity;
 
+import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import org.hibernate.validator.constraints.Length;
 
 import com.zjy.losonkei.common.persistence.DataEntity;
@@ -18,6 +19,8 @@ public class ShoppingCart extends DataEntity<ShoppingCart> {
 	private String memberId;		// 会员id
 	private String goodsNo;		// good_all	goods_no
 	private Integer goodsAmount;		// 商品购买数量，在购物车时，不能减少实际库存
+
+	private GoodsAll goodsAll;
 	
 	public ShoppingCart() {
 		super();
@@ -52,5 +55,12 @@ public class ShoppingCart extends DataEntity<ShoppingCart> {
 	public void setGoodsAmount(Integer goodsAmount) {
 		this.goodsAmount = goodsAmount;
 	}
-	
+
+	public GoodsAll getGoodsAll() {
+		return goodsAll;
+	}
+
+	public void setGoodsAll(GoodsAll goodsAll) {
+		this.goodsAll = goodsAll;
+	}
 }

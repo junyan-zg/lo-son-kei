@@ -1,0 +1,12 @@
+.cart-ico{
+    background: url(../../common/img/bg_cart.png) no-repeat 50% 50% #eb6447;
+    border-radius: 19px;
+    -moz-border-radius: 19px;
+    -khtml-border-radius: 19px;
+    display: block;
+    float: left;
+    height: 38px;
+    margin-top: -8px;
+    margin-right: 10px;
+    width: 38px;
+}

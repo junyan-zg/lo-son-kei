@@ -43,12 +43,14 @@
                         </div>
                         <c:forEach var="list" items="${memberAddressList}" varStatus="status">
                             <div style="margin-bottom: 20px;">
-                                <strong>地址 ${status.index + 1}</strong>
+                                <strong>地址${status.index + 1}:</strong>
                                 <span style="width:500px;display: inline-block;">
-                                <span style="margin-left: 20px;">${list.province.name}</span>
-                                <span style="margin-left: 20px;">${list.city.name}</span>
-                                <span style="margin-left: 20px;">${list.area.name}</span>
-                                <span style="margin-left: 20px;">${list.address}</span>
+                                    <span style="margin-left: 10px;">${list.province.name}</span>
+                                    <span style="margin-left: 10px;">${list.city.name}</span>
+                                    <span style="margin-left: 10px;">${list.area.name}</span>
+                                    <span style="margin-left: 10px;">${list.address}</span>
+                                    <span style="margin-left: 10px;">${list.trueName}</span>
+                                    <span style="margin-left: 10px;">${list.phone}</span>
                                 </span>
                                 <c:if test="${list.defaultFlag == '0'}">
                                     <span style="color: #eb6447;margin-left: 100px;"><a href="${ctxFront}/address/default?id=${list.id}" style="color: #eb6447;text-decoration: none;">设为默认</a></span>

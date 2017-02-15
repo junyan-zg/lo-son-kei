@@ -63,6 +63,18 @@
                             </c:if>
                         </div>
                         <div style="padding-top: 30px;">
+                            <strong>收 货 人 姓 名</strong>
+                            <form:input path="trueName" placeholder="请输入真实姓名" class="required" />
+                            <sup>*</sup>
+                            <span style="color:#eb6447;margin-left: 5px;" id="tips-trueName"></span>
+                        </div>
+                        <div style="padding-top: 30px;">
+                            <strong>电 话 号 码</strong>
+                            <form:input path="phone" placeholder="请输入您的电话号码" class="required" />
+                            <sup>*</sup>
+                            <span style="color:#eb6447;margin-left: 5px;" id="tips-phone"></span>
+                        </div>
+                        <div style="padding-top: 30px;">
                             <strong>地 址</strong>
                             <form:input path="address" placeholder="请输入详细地址" class="required" />
                             <sup>*</sup>

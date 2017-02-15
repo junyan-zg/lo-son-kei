@@ -29,6 +29,12 @@ public class MemberAddressService extends CrudService<MemberAddressDao, MemberAd
 	public List<MemberAddress> findList(MemberAddress memberAddress) {
 		return super.findList(memberAddress);
 	}
+
+	public List<MemberAddress> findListByMemberId(String memberId) {
+		MemberAddress memberAddress = new MemberAddress();
+		memberAddress.setMemberId(memberId);
+		return super.findList(memberAddress);
+	}
 	
 	public Page<MemberAddress> findPage(Page<MemberAddress> page, MemberAddress memberAddress) {
 		return super.findPage(page, memberAddress);

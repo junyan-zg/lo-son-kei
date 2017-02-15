@@ -20,6 +20,7 @@ public class Orders extends DataEntity<Orders> {
 	private static final long serialVersionUID = 1L;
 	private String memberId;		// 会员id
 	private String trueName;		// 真实姓名
+	private String phone;
 	private String processInstanceId;		// 流程实例id
 	private String processState;		// 当前流程状态
 	private Double priceAll;		// 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
@@ -223,5 +224,13 @@ public class Orders extends DataEntity<Orders> {
 
 	public void setOrdersDetailsList(List<OrdersDetails> ordersDetailsList) {
 		this.ordersDetailsList = ordersDetailsList;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 }

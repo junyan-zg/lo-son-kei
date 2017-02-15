@@ -6,6 +6,7 @@
 		a.id AS "id",
 		a.member_id AS "memberId",
 		a.true_name AS "trueName",
+		a.phone AS "phone",
 		a.process_instance_id AS "processInstanceId",
 		a.process_state AS "processState",
 		a.price_all AS "priceAll",
@@ -117,6 +118,7 @@
 			id,
 			member_id,
 			true_name,
+			phone,
 			process_instance_id,
 			process_state,
 			price_all,
@@ -141,6 +143,7 @@
 			#{id},
 			#{memberId},
 			#{trueName},
+			#{phone},
 			#{processInstanceId},
 			#{processState},
 			#{priceAll},
@@ -167,6 +170,7 @@
 	<update id="update">
 		UPDATE orders SET 	
 			true_name = #{trueName},
+			phone = #{phone},
 			process_instance_id = #{processInstanceId},
 			process_state = #{processState},
 			price_all = #{priceAll},

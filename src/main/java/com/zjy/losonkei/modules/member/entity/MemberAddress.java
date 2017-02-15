@@ -20,6 +20,8 @@ public class MemberAddress extends DataEntity<MemberAddress> {
 	private CountryArea city;		// 所在城市id
 	private CountryArea province;		// 所在省份id
 	private String address;		// 地址
+	private String trueName;		// 真实姓名
+	private String phone;
 	private String defaultFlag;		// 是否默认地址，0否，1是
 	private String memberId;		// 会员id
 
@@ -81,5 +83,20 @@ public class MemberAddress extends DataEntity<MemberAddress> {
 	public void setMemberId(String memberId) {
 		this.memberId = memberId;
 	}
-	
+
+	public String getTrueName() {
+		return trueName;
+	}
+
+	public void setTrueName(String trueName) {
+		this.trueName = trueName;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 }

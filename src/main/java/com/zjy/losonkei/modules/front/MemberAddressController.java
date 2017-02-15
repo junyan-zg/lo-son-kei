@@ -42,9 +42,7 @@ public class MemberAddressController extends BaseController {
     @RequestMapping("address")
     public String viewAddress(Model model){
         String memberId = UserUtils.getPrincipal().getId();
-        MemberAddress memberAddress = new MemberAddress();
-        memberAddress.setMemberId(memberId);
-        List<MemberAddress> memberAddressList = memberAddressService.findList(memberAddress);
+        List<MemberAddress> memberAddressList = memberAddressService.findListByMemberId(memberId);
         model.addAttribute("memberAddressList",memberAddressList);
         return "modules/front/member/address";
     }
