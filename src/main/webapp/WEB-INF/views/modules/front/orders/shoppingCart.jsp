@@ -11,6 +11,39 @@
             font-size: 15px !important;
         }
     </style>
+    <script>
+        function delCart(id){
+            if(window.confirm("您确定要删除该宝贝吗？")){
+                $.get("${ctxFront}/delCart?id="+id,function(data){
+                    if (data == 'ok'){
+                        alert("删除宝贝成功！");
+                    }else{
+                        alert("删除宝贝失败！请稍后重试！");
+                    }
+                    window.location.reload();
+                });
+            }
+        }
+
+
+        function updatePrice(){
+            $.post("${ctxFront}/dealCart",$("#myForm").serialize(), function(data){
+                var info = data[0];
+                if($(".amount").length != info.length){
+                    window.location.reload();
+                }else{
+                    for(var i in info){
+                        $("#"+info[i].id).val(info[i].amount);
+                        $("#stock-"+info[i].id).html(info[i].stock);
+                        $("#total-"+info[i].id).html(info[i].total);
+                    }
+                    $("#total-price").html(data[1]);
+                }
+            });
+        }
+
+
+    </script>
 </head>
 <body>
 
@@ -43,8 +76,7 @@
                 </div>
             </c:if>
             <c:if test="${fn:length(shoppingCartList) > 0}">
-            <form id="myForm" method="post" class="registed registed2"
-                  style="text-align: left;margin-bottom: 20px;padding: 30px;margin-top: 10px;">
+            <form id="myForm" class="registed registed2" onsubmit="return false;" style="text-align: left;margin-bottom: 20px;padding: 30px;margin-top: 10px;">
                 <div style="/*border-bottom: 2px dashed #bdd1e9;*/margin-bottom: 20px;margin-top: 10px;">
                     <div class="cart-ico"></div>
                     <h2><b style="color: #eb6447;">购 物 车</b></h2>
@@ -55,43 +87,56 @@
                         <tr class="bg">
                             <th class="images"></th>
                             <th class="name">宝贝名称</th>
-                            <th class="edit"></th>
+                            <th class="edit">规格</th>
                             <th class="price">单价</th>
                             <th class="qty">数量</th>
+                            <th class="price">库存</th>
                             <th class="subtotal">总价</th>
                             <th class="close"></th>
                         </tr>
+                        <c:set var="total">0.00</c:set>
                         <c:forEach items="${shoppingCartList}" var="cart">
                             <tr class="font15">
                                 <td class="images"><a href="${ctx}/goodsDetails/${cart.goodsAll.goods.id}"><img
                                         src="${cart.goodsAll.goods.thumbImgUrl}"></a></td>
-                                <td class="name">${cart.goodsAll.goods.goodsName}${cart.goodsAll.remarks}</td>
-                                <td class="edit"><a title="Edit" href="#">Edit</a></td>
+                                <td class="name">${cart.goodsAll.goods.goodsName}</td>
+                                <td class="edit"><%--<a title="Edit" href="#">Edit</a>--%>${cart.goodsAll.remarks}</td>
                                 <td class="price">${cart.goodsAll.price}</td>
-                                <td class="qty"><input type="text" name="" value="${cart.goodsAmount}"
-                                                       placeholder="1000"></td>
-                                <td class="subtotal">${cart.goodsAmount * cart.goodsAll.price}</td>
-                                <td class="close"><a title="close" class="close" href="#"></a></td>
+                                <td class="qty">
+                                    <input class="font15 amount" type="text" onchange="updatePrice();" name="cart-amount-${cart.id}" id="${cart.id}" value="${cart.goodsAmount}">
+                                </td>
+                                <td class="price" id="stock-${cart.id}">${cart.goodsAll.stock}</td>
+                                <td class="subtotal" style="color: #EB6447;" id="total-${cart.id}">${cart.goodsAmount * cart.goodsAll.price}</td>
+                                <td class="close"><a title="close" class="close" href="javascript:delCart('${cart.id}');"></a></td>
                             </tr>
+                            <c:set var="total">${total + cart.goodsAmount * cart.goodsAll.price}</c:set>
                         </c:forEach>
                         <tr>
-                            <td colspan="7" class="cart_but">
-                                <a href="#" class="continue"><img src="${ctxStaticFront}/common/img/cont.png"> 继续购物</a>
-                                <a href="#" class="update"><img src="${ctxStaticFront}/common/img/update.png"> 更新购物车</a>
+                            <td colspan="8" class="cart_but">
+                                <a href="${ctx}/goods" class="continue"><img src="${ctxStaticFront}/common/img/cont.png"> 继续购物</a>
+                                <a href="javascript:updatePrice();" class="update"><img src="${ctxStaticFront}/common/img/update.png"> 更新购物车</a>
                             </td>
                         </tr>
                     </table>
 
                     <div>
                         <div class="grid_6" style="width:550px;">
-                            <div class="bottom_block estimate">
+                            <div class="bottom_block estimate" style="min-height: auto;">
                                 <h1 style="color:#7698c1;">请选择收货地址</h1>
-                                <c:forEach var="address" items="${memberAddressList}" varStatus="status">
-                                    <p onclick="changeRadio($(this).find('span'));">
-                                        <input type="radio" class="niceRadio" name="addressId" <c:if test="${status.index == 0}">checked</c:if>/>
-                                        ${address.address}<b style="margin: 0 20px;">收件人：${address.trueName}</b> 电话：${address.phone}
-                                    </p>
-                                </c:forEach>
+                                <c:choose>
+                                    <c:when test="${fn:length(memberAddressList) == 0}">
+                                        <p style="font-size: 20px;padding-left: 30px;">请先在完成下单前先填写一个收货地址！</p>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:forEach var="address" items="${memberAddressList}" varStatus="status">
+                                            <p onclick="changeRadio($(this).find('span'));">
+                                                <input type="radio" class="niceRadio" name="addressId" <c:if test="${status.index == 0}">checked</c:if>/>
+                                                    ${address.address}<b style="margin: 0 20px;">收件人：${address.trueName}</b> 电话：${address.phone}
+                                            </p>
+                                        </c:forEach>
+                                    </c:otherwise>
+                                </c:choose>
+                                <p><a href="${ctxFront}/address" style="text-decoration: none;color:#EB6447;"><b>&lt;&lt;管理收货地址</b></a></p>
 
                             </div><!-- .estimate -->
                         </div><!-- .grid_4 -->
@@ -101,7 +146,7 @@
                             <div class="bottom_block total">
                                 <div style="font-size: 20px;text-align: center;margin-top: 30px;margin-bottom: 20px; color:#eb6447; ">
                                     <div class="grid_1" style=""><b>总价:</b></div>
-                                    <div class="grid_2" style="font-size: 30px;">￥<span>1111.00</span></div>
+                                    <div class="grid_2" style="font-size: 30px;">￥<span id="total-price">${total}</span></div>
                                     <div class="clear"></div>
                                 </div>
                                 <button class="checkout" style="font-size: 20px; letter-spacing:18px;">马上下单</button>
