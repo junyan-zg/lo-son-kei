@@ -3,8 +3,11 @@
  */
 package com.zjy.losonkei.modules.orders.entity;
 
+import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import org.hibernate.validator.constraints.Length;
 import com.zjy.losonkei.modules.sys.entity.CountryArea;
+
+import java.math.BigDecimal;
 import java.util.List;
 import com.google.common.collect.Lists;
 
@@ -23,8 +26,8 @@ public class Orders extends DataEntity<Orders> {
 	private String phone;
 	private String processInstanceId;		// 流程实例id
 	private String processState;		// 当前流程状态
-	private Double priceAll;		// 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
-	private Double costAll;		// 总成本价
+	private BigDecimal priceAll;		// 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
+	private BigDecimal costAll;		// 总成本价
 	private CountryArea area;		// 所在地区id
 	private CountryArea city;		// 所在城市id
 	private CountryArea province;		// 所在省份id
@@ -33,20 +36,96 @@ public class Orders extends DataEntity<Orders> {
 	private String goodsState;		// 1待发货，2已发货，3已取消，4已退回，5无货
 	private String payState;		// 1未付款，2已付款，3已退款
 	private String flag;		// 0进行中1交易成功2交易失败,待发货前全额退款都是失败
-	private Double refund;		// 退款
-	private Double income;		// 收益，交易成功时price_all-cost_all-refund
-	private Double beginPriceAll;		// 开始 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
-	private Double endPriceAll;		// 结束 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
-	private Double beginIncome;		// 开始 收益，交易成功时price_all-cost_all-refund
-	private Double endIncome;		// 结束 收益，交易成功时price_all-cost_all-refund
+	private BigDecimal refund;		// 退款
+	private BigDecimal income;		// 收益，交易成功时price_all-cost_all-refund
+	private BigDecimal beginPriceAll;		// 开始 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
+	private BigDecimal endPriceAll;		// 结束 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
+	private BigDecimal beginIncome;		// 开始 收益，交易成功时price_all-cost_all-refund
+	private BigDecimal endIncome;		// 结束 收益，交易成功时price_all-cost_all-refund
 	private List<OrdersDetails> ordersDetailsList = Lists.newArrayList();		// 子表列表
-	
+
+
+	/**
+	 * 有效
+	 */
+	public static final String ORDERS_STATE1 = "1";
+	/**
+	 * 无效
+	 */
+	public static final String ORDERS_STATE2 = "2";
+	/**
+	 * 用户于待发货时取消
+	 */
+	public static final String ORDERS_STATE3 = "3";
+	/**
+	 * 用户收货后退单
+	 */
+	public static final String ORDERS_STATE4 = "4";
+	/**
+	 * 商家缺货退单
+	 */
+	public static final String ORDERS_STATE5 = "5";
+
+	/**
+	 * 进行中
+	 */
+	public static final String FLAG_DOING = "0";
+	/**
+	 * 交易成功
+	 */
+	public static final String FLAG_SUCCESS = "1";
+	/**
+	 * 交易失败
+	 */
+	public static final String FLAG_FAILED = "2";
+
+	/**
+	 * 待发货
+	 */
+	public static final String GOODS_STATE1 = "1";
+	/**
+	 * 已发货
+	 */
+	public static final String GOODS_STATE2 = "2";
+	/**
+	 * 已取消
+	 */
+	public static final String GOODS_STATE3 = "3";
+	/**
+	 * 已退回
+	 */
+	public static final String GOODS_STATE4 = "4";
+	/**
+	 * 无货
+	 */
+	public static final String GOODS_STATE5 = "5";
+	/**
+	 * 未付款
+	 */
+	public static final String PAY_STATE1 = "1";
+	/**
+	 * 已付款
+	 */
+	public static final String PAY_STATE2 = "2";
+	/**
+	 * 已退款
+	 */
+	public static final String PAY_STATE3 = "3";
+
 	public Orders() {
 		super();
 	}
 
 	public Orders(String id){
 		super(id);
+	}
+
+	@Override
+	public void preInsert() {
+		super.preInsert();
+		if (!this.isNewRecord){
+			setId(GoodsAllUtils.createId("OD"));
+		}
 	}
 
 	@Length(min=0, max=64, message="会员id长度必须介于 0 和 64 之间")
@@ -85,19 +164,19 @@ public class Orders extends DataEntity<Orders> {
 		this.processState = processState;
 	}
 	
-	public Double getPriceAll() {
+	public BigDecimal getPriceAll() {
 		return priceAll;
 	}
 
-	public void setPriceAll(Double priceAll) {
+	public void setPriceAll(BigDecimal priceAll) {
 		this.priceAll = priceAll;
 	}
 	
-	public Double getCostAll() {
+	public BigDecimal getCostAll() {
 		return costAll;
 	}
 
-	public void setCostAll(Double costAll) {
+	public void setCostAll(BigDecimal costAll) {
 		this.costAll = costAll;
 	}
 	
@@ -170,51 +249,51 @@ public class Orders extends DataEntity<Orders> {
 		this.flag = flag;
 	}
 	
-	public Double getRefund() {
+	public BigDecimal getRefund() {
 		return refund;
 	}
 
-	public void setRefund(Double refund) {
+	public void setRefund(BigDecimal refund) {
 		this.refund = refund;
 	}
 	
-	public Double getIncome() {
+	public BigDecimal getIncome() {
 		return income;
 	}
 
-	public void setIncome(Double income) {
+	public void setIncome(BigDecimal income) {
 		this.income = income;
 	}
 	
-	public Double getBeginPriceAll() {
+	public BigDecimal getBeginPriceAll() {
 		return beginPriceAll;
 	}
 
-	public void setBeginPriceAll(Double beginPriceAll) {
+	public void setBeginPriceAll(BigDecimal beginPriceAll) {
 		this.beginPriceAll = beginPriceAll;
 	}
 	
-	public Double getEndPriceAll() {
+	public BigDecimal getEndPriceAll() {
 		return endPriceAll;
 	}
 
-	public void setEndPriceAll(Double endPriceAll) {
+	public void setEndPriceAll(BigDecimal endPriceAll) {
 		this.endPriceAll = endPriceAll;
 	}
 		
-	public Double getBeginIncome() {
+	public BigDecimal getBeginIncome() {
 		return beginIncome;
 	}
 
-	public void setBeginIncome(Double beginIncome) {
+	public void setBeginIncome(BigDecimal beginIncome) {
 		this.beginIncome = beginIncome;
 	}
 	
-	public Double getEndIncome() {
+	public BigDecimal getEndIncome() {
 		return endIncome;
 	}
 
-	public void setEndIncome(Double endIncome) {
+	public void setEndIncome(BigDecimal endIncome) {
 		this.endIncome = endIncome;
 	}
 		

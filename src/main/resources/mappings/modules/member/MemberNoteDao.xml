@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zjy.losonkei.modules.orders.dao.OrdersDetailsDao">
+<mapper namespace="com.zjy.losonkei.modules.member.dao.MemberNoteDao">
     
-	<sql id="ordersDetailsColumns">
+	<sql id="memberNoteColumns">
 		a.id AS "id",
+		a.content AS "content",
+		a.member_id AS "member.id",
 		a.orders_id AS "ordersId",
-		a.goods_no AS "goodsNo",
-		a.goods_amount AS "goodsAmount",
-		a.cost AS "cost",
-		a.price AS "price",
-		a.price_all AS "priceAll",
 		a.remarks AS "remarks",
 		a.create_by AS "createBy.id",
 		a.create_date AS "createDate",
@@ -18,25 +15,27 @@
 		a.del_flag AS "delFlag"
 	</sql>
 	
-	<sql id="ordersDetailsJoins">
-
+	<sql id="memberNoteJoins">
 	</sql>
     
-	<select id="get" resultType="OrdersDetails">
+	<select id="get" resultType="MemberNote">
 		SELECT 
-			<include refid="ordersDetailsColumns"/>
-		FROM orders_details a
-		<include refid="ordersDetailsJoins"/>
+			<include refid="memberNoteColumns"/>
+		FROM member_note a
+		<include refid="memberNoteJoins"/>
 		WHERE a.id = #{id}
 	</select>
 	
-	<select id="findList" resultType="OrdersDetails">
+	<select id="findList" resultType="MemberNote">
 		SELECT 
-			<include refid="ordersDetailsColumns"/>
-		FROM orders_details a
-		<include refid="ordersDetailsJoins"/>
+			<include refid="memberNoteColumns"/>
+		FROM member_note a
+		<include refid="memberNoteJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="member != null and member.id != null and member.id != ''">
+				AND a.member_id = #{member.id}
+			</if>
 			<if test="ordersId != null and ordersId != ''">
 				AND a.orders_id = #{ordersId}
 			</if>
@@ -46,16 +45,16 @@
 				ORDER BY ${page.orderBy}
 			</when>
 			<otherwise>
-				ORDER BY a.create_date ASC
+				ORDER BY a.update_date DESC
 			</otherwise>
 		</choose>
 	</select>
 	
-	<select id="findAllList" resultType="OrdersDetails">
+	<select id="findAllList" resultType="MemberNote">
 		SELECT 
-			<include refid="ordersDetailsColumns"/>
-		FROM orders_details a
-		<include refid="ordersDetailsJoins"/>
+			<include refid="memberNoteColumns"/>
+		FROM member_note a
+		<include refid="memberNoteJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
 		</where>		
@@ -64,20 +63,17 @@
 				ORDER BY ${page.orderBy}
 			</when>
 			<otherwise>
-				ORDER BY a.create_date ASC
+				ORDER BY a.update_date DESC
 			</otherwise>
 		</choose>
 	</select>
 	
 	<insert id="insert">
-		INSERT INTO orders_details(
+		INSERT INTO member_note(
 			id,
+			content,
+			member_id,
 			orders_id,
-			goods_no,
-			goods_amount,
-			cost,
-			price,
-			price_all,
 			remarks,
 			create_by,
 			create_date,
@@ -86,12 +82,9 @@
 			del_flag
 		) VALUES (
 			#{id},
+			#{content},
+			#{member.id},
 			#{ordersId},
-			#{goodsNo},
-			#{goodsAmount},
-			#{cost},
-			#{price},
-			#{priceAll},
 			#{remarks},
 			#{createBy.id},
 			#{createDate},
@@ -102,30 +95,16 @@
 	</insert>
 	
 	<update id="update">
-		UPDATE orders_details SET 	
-			orders_id = #{ordersId},
-			goods_no = #{goodsNo},
-			goods_amount = #{goodsAmount},
-			cost = #{cost},
-			price = #{price},
-			price_all = #{priceAll},
-			remarks = #{remarks},
+		UPDATE member_note SET 	
 			update_by = #{updateBy.id},
 			update_date = #{updateDate}
 		WHERE id = #{id}
 	</update>
 	
 	<update id="delete">
-		UPDATE orders_details SET 
+		UPDATE member_note SET 
 			del_flag = #{DEL_FLAG_DELETE}
-		<choose>
-			<when test="id != null and id != ''">
-				WHERE id = #{id}
-			</when>
-			<otherwise>
-				WHERE orders_id = #{ordersId}
-			</otherwise>
-		</choose>
+		WHERE id = #{id}
 	</update>
 	
 </mapper>

@@ -7,6 +7,8 @@ import org.hibernate.validator.constraints.Length;
 
 import com.zjy.losonkei.common.persistence.DataEntity;
 
+import java.math.BigDecimal;
+
 /**
  * 订单Entity
  * @author zjy
@@ -15,12 +17,12 @@ import com.zjy.losonkei.common.persistence.DataEntity;
 public class OrdersDetails extends DataEntity<OrdersDetails> {
 	
 	private static final long serialVersionUID = 1L;
-	private Orders ordersId;		// 订单id 父类
+	private String ordersId;		// 订单id 父类
 	private String goodsNo;		// goods_all goods_no
 	private Integer goodsAmount;		// 购买数量
-	private Double cost;		// 单个成本
-	private Double price;		// 单个售价，直接等于商品售价
-	private Double priceAll;		// amount个商品的总售价
+	private BigDecimal cost;		// 单个成本
+	private BigDecimal price;		// 单个售价，直接等于商品售价
+	private BigDecimal priceAll;		// amount个商品的总售价
 	
 	public OrdersDetails() {
 		super();
@@ -30,16 +32,16 @@ public class OrdersDetails extends DataEntity<OrdersDetails> {
 		super(id);
 	}
 
-	public OrdersDetails(Orders ordersId){
-		this.ordersId = ordersId;
+	public OrdersDetails(Orders orders){
+		this.ordersId = orders.getId();
 	}
 
 	@Length(min=0, max=64, message="订单id长度必须介于 0 和 64 之间")
-	public Orders getOrdersId() {
+	public String getOrdersId() {
 		return ordersId;
 	}
 
-	public void setOrdersId(Orders ordersId) {
+	public void setOrdersId(String ordersId) {
 		this.ordersId = ordersId;
 	}
 	
@@ -60,27 +62,27 @@ public class OrdersDetails extends DataEntity<OrdersDetails> {
 		this.goodsAmount = goodsAmount;
 	}
 	
-	public Double getCost() {
+	public BigDecimal getCost() {
 		return cost;
 	}
 
-	public void setCost(Double cost) {
+	public void setCost(BigDecimal cost) {
 		this.cost = cost;
 	}
 	
-	public Double getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
 
-	public void setPrice(Double price) {
+	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
 	
-	public Double getPriceAll() {
+	public BigDecimal getPriceAll() {
 		return priceAll;
 	}
 
-	public void setPriceAll(Double priceAll) {
+	public void setPriceAll(BigDecimal priceAll) {
 		this.priceAll = priceAll;
 	}
 	

@@ -419,4 +419,18 @@ public class ActivitiService extends BaseService {
 	public RepositoryService getRepositoryService() {
 		return repositoryService;
 	}
+
+
+
+
+	@Transactional(readOnly = false)
+	public ProcessInstance startShoppingProcess(String memberId,String ordersId){
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put(ActivitiUtils.VAR_MEMBER, memberId);
+		variables.put(ActivitiUtils.VAR_TIMEOUT_PAY,ActivitiUtils.TIME_TIMEOUT_PAY);
+		identityService.setAuthenticatedUserId(memberId);
+		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ActivitiUtils.PROCESS_KEY_SHOPPING, ordersId, variables);
+		return processInstance;
+	}
 }
+

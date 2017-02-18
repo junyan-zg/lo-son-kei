@@ -39,6 +39,13 @@
                 });
             }
         }
+
+        function quicklyBuy(){
+            if(checkBuyAmount()){
+                window.location.href = '${ctxFront}/quicklyBuy/' + $("#goodsNo").val() + "/" + $("#amount").val();
+            }
+        }
+
         $(document).ready(function(){
             ajaxGetPrice();
         });
@@ -180,7 +187,7 @@
 
                             <div class="cart">
                                 <a href="javascript:addShoppingCart();" class="bay" style="padding-left: 10px;width: 100px;"><img src="${ctxStaticFront}/common/img/bg_cart.png">加入购物车</a>
-                                <button style="width: 120px;margin-left: 200px;"><img src="${ctxStaticFront}/common/img/bg_cart.png">立即购买</button>
+                                <button onclick="quicklyBuy();" style="width: 120px;margin-left: 200px;"><img src="${ctxStaticFront}/common/img/bg_cart.png">立即购买</button>
 
                                     <%--
                                 <a href="#" class="like"><img src="${ctxStaticFront}/common/img/like.png" alt=""

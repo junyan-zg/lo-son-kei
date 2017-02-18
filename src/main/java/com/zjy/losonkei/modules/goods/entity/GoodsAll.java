@@ -32,6 +32,8 @@ public class GoodsAll extends DataEntity<GoodsAll> {
 
 	private List<GoodsSpecificationValue> goodsSpecificationValues;
 
+	private boolean valid;//是否有效，可购买
+
 	private Goods goods;
 
 	public GoodsAll() {
@@ -113,5 +115,13 @@ public class GoodsAll extends DataEntity<GoodsAll> {
 		if (!this.isNewRecord){
 			setId(GoodsAllUtils.createId("GA"));
 		}
+	}
+
+	public boolean isValid() {
+		return valid;
+	}
+
+	public void setValid(boolean valid) {
+		this.valid = valid;
 	}
 }

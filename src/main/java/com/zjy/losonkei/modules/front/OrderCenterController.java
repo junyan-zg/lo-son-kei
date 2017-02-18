@@ -7,14 +7,18 @@ import com.zjy.losonkei.modules.goods.entity.GoodsSpecificationValue;
 import com.zjy.losonkei.modules.goods.service.GoodsAllService;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import com.zjy.losonkei.modules.member.entity.MemberAddress;
+import com.zjy.losonkei.modules.member.entity.MemberNote;
 import com.zjy.losonkei.modules.member.service.MemberAddressService;
+import com.zjy.losonkei.modules.member.service.MemberNoteService;
 import com.zjy.losonkei.modules.orders.entity.Orders;
 import com.zjy.losonkei.modules.orders.entity.ShoppingCart;
+import com.zjy.losonkei.modules.orders.service.OrdersService;
 import com.zjy.losonkei.modules.orders.service.ShoppingCartService;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,6 +42,10 @@ public class OrderCenterController extends BaseController {
     private ShoppingCartService shoppingCartService;
     @Autowired
     private MemberAddressService memberAddressService;
+    @Autowired
+    private MemberNoteService memberNoteService;
+    @Autowired
+    private OrdersService ordersService;
 
     @RequestMapping("shoppingCart")
     public String shoppingCart(Model model){
@@ -53,6 +61,17 @@ public class OrderCenterController extends BaseController {
             goodsAll.setRemarks(GoodsAllUtils.getAllSpecificationDesc(goodsAll));
 
             cart.setGoodsAll(goodsAll);
+
+            boolean valid = GoodsAllUtils.isValid(goodsAll, goodsAll.getGoods());
+            goodsAll.setValid(valid);
+            if (!valid){
+                shoppingCartService.delete(cart);
+
+                memberNoteService.save(new MemberNote(memberId,"您的购物车商品　" +
+                goodsAll.getGoods().getGoodsName() + " " + goodsAll.getRemarks() +
+                        " 已失效并移除。"
+                ));
+            }
         }
 
         model.addAttribute("shoppingCartList",shoppingCarts);
@@ -62,6 +81,8 @@ public class OrderCenterController extends BaseController {
 
         return "modules/front/orders/shoppingCart";
     }
+
+
 
     @RequestMapping("delCart")
     @ResponseBody
@@ -92,34 +113,38 @@ public class OrderCenterController extends BaseController {
         for (ShoppingCart cart : shoppingCarts){
             String amountStr = request.getParameter("cart-amount-" + cart.getId());
             GoodsAll goodsAll = GoodsAllUtils.getGoodAllById(cart.getGoodsNo());
-            //处理更改过的价格
-            if (StringUtils.isNotBlank(amountStr)){
-                try{
-                    int amount = Integer.valueOf(amountStr);
-                    if (amount > goodsAll.getStock()){
-                        amount = goodsAll.getStock();
-                    }else if (amount < 0){
-                        amount = 0;
+
+            if (GoodsAllUtils.isValid(goodsAll)) {  //商品有效
+
+                //处理更改过的价格
+                if (StringUtils.isNotBlank(amountStr)) {
+                    try {
+                        int amount = Integer.valueOf(amountStr);
+                        if (amount > goodsAll.getStock()) {
+                            amount = goodsAll.getStock();
+                        } else if (amount <= 0) {
+                            amount = 1;
+                        }
+                        //修改过的价格
+                        if (amount != cart.getGoodsAmount()) {
+                            cart.setGoodsAmount(amount);
+                            shoppingCartService.save(cart);
+                        }
+                    } catch (Exception e) {
                     }
-                    //修改过的价格
-                    if(amount != cart.getGoodsAmount()){
-                        cart.setGoodsAmount(amount);
-                        shoppingCartService.save(cart);
-                    }
-                }catch (Exception e){}
+                }
+                //
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("id", cart.getId());
+                map.put("amount", cart.getGoodsAmount());
+                map.put("stock", goodsAll.getStock());
+
+                BigDecimal priceTotal = goodsAll.getPrice().multiply(new BigDecimal(cart.getGoodsAmount()));
+                total = total.add(priceTotal);
+                map.put("total", priceTotal);
+
+                list.add(map);
             }
-            //
-            Map<String,Object> map = new HashMap<String, Object>();
-            map.put("id",cart.getId());
-            map.put("amount",cart.getGoodsAmount());
-            map.put("stock",goodsAll.getStock());
-
-            BigDecimal priceTotal = goodsAll.getPrice().multiply(new BigDecimal(cart.getGoodsAmount()));
-            total = total.add(priceTotal);
-            map.put("total",priceTotal);
-
-            list.add(map);
-
         }
 
         obj[1] = total;
@@ -128,11 +153,87 @@ public class OrderCenterController extends BaseController {
     }
 
 
-    @RequestMapping("quicklyBuy")
-    public String quicklyBuy(){
+    @RequestMapping("quicklyBuy/{id}/{amount}")
+    public String quicklyBuy(Model model,@PathVariable("id")String goodNo,@PathVariable("amount") String amountStr){
+        String memberId = UserUtils.getPrincipal().getId();
 
-        return "";
+        GoodsAll goodsAll = GoodsAllUtils.getGoodAllById(goodNo);
+        if (goodsAll == null){
+            model.addAttribute("error","抱歉，商品不存在");
+        }else{
+            GoodsAllUtils.fillProperty(goodsAll, true);
+            goodsAll.setRemarks(GoodsAllUtils.getAllSpecificationDesc(goodsAll));
+
+            if(!GoodsAllUtils.isValid(goodsAll,goodsAll.getGoods())){
+               model.addAttribute("error","抱歉，该商品不存在");
+            }else if (goodsAll.getStock() <= 0){
+                model.addAttribute("error","抱歉，该商品暂不供货");
+            }else {
+                int amount = 1;
+                try {
+                    amount = Integer.valueOf(amountStr);
+                }catch (Exception e){}
+                if (amount > goodsAll.getStock()){
+                    amount = goodsAll.getStock();
+                }else if(amount < 1){
+                    amount = 1;
+                }
+
+                ShoppingCart shoppingCart = new ShoppingCart();
+                shoppingCart.setGoodsAll(goodsAll);
+                shoppingCart.setGoodsAmount(amount);
+                shoppingCart.setMemberId(memberId);
+                shoppingCart.setGoodsNo(goodsAll.getId());
+
+                model.addAttribute("shoppingCart",shoppingCart);
+            }
+        }
+
+        //收货地址
+        model.addAttribute("memberAddressList",memberAddressService.findListByMemberId(memberId));
+
+        return "modules/front/orders/quicklyBuy";
     }
+
+    @RequestMapping("createOrders")
+    @ResponseBody
+    public Map<String,String> createOrders(String goodsNo,@RequestParam(value = "cart-amount",required = false) String amountStr,String addressId,HttpServletRequest request){
+
+        String memberId = UserUtils.getPrincipal().getId();
+        Map<String,String> map = new HashMap<String,String>();
+
+        MemberAddress memberAddress;
+
+        if(StringUtils.isBlank(addressId)){
+            map.put("error","请先填写收货地址");
+            return map;
+        }else{
+            memberAddress = memberAddressService.get(addressId);
+            if (memberAddress == null || !memberId.equals(memberAddress.getMemberId())) {     //为空或不是自己的地址
+                map.put("error","请先填写收货地址");
+                return map;
+            }
+        }
+
+        if (StringUtils.isNotBlank(goodsNo)){   //马上下单
+            String result = ordersService.createOrders(goodsNo,amountStr, memberAddress);
+            if (result == null){
+                map.put("error","页面已过期");
+            }else{
+                map.put("goodsNo",result);
+            }
+        }else {     //清空购物车
+            String result = ordersService.createOrdersShoppingCart(request, memberAddress);
+            if (result == null){
+                map.put("error","页面已过期");
+            }else{
+                map.put("goodsNo",result);
+            }
+        }
+        return map;
+    }
+
+
 
     @RequestMapping("orders")
     public String ordersList(){
@@ -145,5 +246,6 @@ public class OrderCenterController extends BaseController {
 
         return "";
     }
+
 
 }

@@ -83,4 +83,20 @@ public class GoodsAllUtils {
         }
         return sb.toString();
     }
+
+    //判断商品是否有效
+    public static boolean isValid(GoodsAll goodsAll,Goods goods){
+        return (GoodsAll.DEL_FLAG_NORMAL.equals(goodsAll.getDelFlag()) && Goods.STATE_ON_SALE.equals(goods.getState()));
+    }
+
+    //判断商品是否有效
+    public static boolean isValid(GoodsAll goodsAll){
+        if (goodsAll == null)
+            return false;
+        Goods goods = goodsAll.getGoods();
+        if (goods == null){
+            goods = goodsService.get(goodsAll.getGoodsId());
+        }
+        return (GoodsAll.DEL_FLAG_NORMAL.equals(goodsAll.getDelFlag()) && Goods.STATE_ON_SALE.equals(goods.getState()));
+    }
 }

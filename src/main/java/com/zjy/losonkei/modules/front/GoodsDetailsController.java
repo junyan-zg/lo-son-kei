@@ -153,7 +153,7 @@ public class GoodsDetailsController extends BaseController{
         if (goodsAll == null){
             return "error";
         }
-        if (GoodsAll.DEL_FLAG_NORMAL.equals(goodsAll.getDelFlag()) && Goods.STATE_ON_SALE.equals(goodsService.get(goodsAll.getGoodsId()).getState())){
+        if (GoodsAllUtils.isValid(goodsAll, goodsService.get(goodsAll.getGoodsId()))){
             if (amount > goodsAll.getStock()){
                 return "error";
             }

@@ -26,11 +26,17 @@
 		a.update_date AS "updateDate",
 		a.del_flag AS "delFlag",
 		a.refund AS "refund",
-		a.income AS "income"
+		a.income AS "income",
+
+		a1.name AS "area.name",
+		a2.name AS "city.name",
+		a3.name AS "province.name"
 	</sql>
 	
 	<sql id="ordersJoins">
-		LEFT JOIN sys_area a8 ON a8.id = a.area_id
+		LEFT JOIN sys_dict_area a1 ON a1.id = a.area_id
+		LEFT JOIN sys_dict_area a2 ON a2.id = a.city_id
+		LEFT JOIN sys_dict_area a3 ON a3.id = a.province_id
 	</sql>
     
 	<select id="get" resultType="Orders">
