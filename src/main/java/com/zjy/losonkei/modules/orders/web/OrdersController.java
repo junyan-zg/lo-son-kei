@@ -49,7 +49,17 @@ public class OrdersController extends BaseController {
 	@RequiresPermissions("orders:orders:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(Orders orders, HttpServletRequest request, HttpServletResponse response, Model model) {
+		orders.setFlag(Orders.FLAG_DOING);
 		Page<Orders> page = ordersService.findPage(new Page<Orders>(request, response), orders); 
+		model.addAttribute("page", page);
+		return "modules/orders/ordersList";
+	}
+
+	@RequiresPermissions("orders:orders:view")
+	@RequestMapping("listOld")
+	public String listOld(Orders orders, HttpServletRequest request, HttpServletResponse response, Model model) {
+		orders.setFlag(null);
+		Page<Orders> page = ordersService.findPage(new Page<Orders>(request, response), orders);
 		model.addAttribute("page", page);
 		return "modules/orders/ordersList";
 	}

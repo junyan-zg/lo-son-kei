@@ -4,6 +4,7 @@
 package com.zjy.losonkei.modules.orders.entity;
 
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
+import com.zjy.losonkei.modules.member.entity.Member;
 import org.hibernate.validator.constraints.Length;
 import com.zjy.losonkei.modules.sys.entity.CountryArea;
 
@@ -44,6 +45,7 @@ public class Orders extends DataEntity<Orders> {
 	private BigDecimal endIncome;		// 结束 收益，交易成功时price_all-cost_all-refund
 	private List<OrdersDetails> ordersDetailsList = Lists.newArrayList();		// 子表列表
 
+	private Member member;
 
 	/**
 	 * 有效
@@ -311,5 +313,13 @@ public class Orders extends DataEntity<Orders> {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+	}
+
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
 	}
 }

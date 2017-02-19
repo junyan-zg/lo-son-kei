@@ -53,7 +53,13 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 
 	public Orders get(String id) {
 		Orders orders = super.get(id);
-		orders.setOrdersDetailsList(ordersDetailsDao.findList(new OrdersDetails(orders)));
+
+		List<OrdersDetails> list = ordersDetailsDao.findList(new OrdersDetails(orders));
+		orders.setOrdersDetailsList(list);
+		for (OrdersDetails o : list){
+			o.setGoodsId(GoodsAllUtils.getGoodAllById(o.getGoodsNo()).getGoodsId());
+		}
+
 		return orders;
 	}
 	
@@ -93,6 +99,11 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		ordersDetailsDao.delete(new OrdersDetails(orders));
 	}
 
+	@Transactional(readOnly = false)
+	public void update(Orders orders) {
+		orders.preUpdate();
+		dao.update(orders);
+	}
 
 	@Transactional(readOnly = false)
 	public String createOrders(String goodsNo,String amountStr,MemberAddress memberAddress){
@@ -223,6 +234,10 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		ordersDetails.setGoodsAmount(amount);
 
 		ordersDetails.setPriceAll(price.multiply(new BigDecimal(amount)));
+
+		GoodsAllUtils.fillProperty(goodsAll,true);
+
+		ordersDetails.setRemarks(goodsAll.getGoods().getGoodsName() + " " + GoodsAllUtils.getAllSpecificationDesc(goodsAll));
 
 		return ordersDetails;
 	}

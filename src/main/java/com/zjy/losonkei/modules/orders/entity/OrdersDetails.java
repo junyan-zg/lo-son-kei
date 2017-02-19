@@ -3,6 +3,7 @@
  */
 package com.zjy.losonkei.modules.orders.entity;
 
+import com.zjy.losonkei.modules.goods.entity.Goods;
 import org.hibernate.validator.constraints.Length;
 
 import com.zjy.losonkei.common.persistence.DataEntity;
@@ -23,6 +24,8 @@ public class OrdersDetails extends DataEntity<OrdersDetails> {
 	private BigDecimal cost;		// 单个成本
 	private BigDecimal price;		// 单个售价，直接等于商品售价
 	private BigDecimal priceAll;		// amount个商品的总售价
+
+	private String goodsId;
 	
 	public OrdersDetails() {
 		super();
@@ -85,5 +88,13 @@ public class OrdersDetails extends DataEntity<OrdersDetails> {
 	public void setPriceAll(BigDecimal priceAll) {
 		this.priceAll = priceAll;
 	}
-	
+
+
+	public String getGoodsId() {
+		return goodsId;
+	}
+
+	public void setGoodsId(String goodsId) {
+		this.goodsId = goodsId;
+	}
 }

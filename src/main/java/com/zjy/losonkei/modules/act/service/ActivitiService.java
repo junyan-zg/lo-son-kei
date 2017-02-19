@@ -52,6 +52,9 @@ public class ActivitiService extends BaseService {
 	private ProcessEngineFactoryBean processEngine;
 
 	@Autowired
+	private ManagementService managementService;
+
+	@Autowired
 	private IdentityService identityService;
 
 	/**
@@ -432,5 +435,9 @@ public class ActivitiService extends BaseService {
 		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(ActivitiUtils.PROCESS_KEY_SHOPPING, ordersId, variables);
 		return processInstance;
 	}
+
+	/*public void getTheEndTime(){
+		managementService.createJobQuery().executionId();
+	}*/
 }
 
