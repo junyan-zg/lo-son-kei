@@ -19,7 +19,7 @@
 <content tag="nav">
     <ul>
         <li class="curent" style="margin-right: 30px;"><a href="${ctxFront}/home">个人中心</a></li>
-        <li><a href="catalog_grid.html">订 单</a></li>
+        <li><a href="${ctxFront}/orders">订 单</a></li>
         <li><a href="catalog_grid.html">消 息</a></li>
         <li><a href="javascript:;">购物车</a></li>
     </ul>

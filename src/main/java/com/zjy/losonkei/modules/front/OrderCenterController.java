@@ -1,5 +1,6 @@
 package com.zjy.losonkei.modules.front;
 
+import com.zjy.losonkei.common.config.Global;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
@@ -238,14 +239,26 @@ public class OrderCenterController extends BaseController {
     @RequestMapping("orders")
     public String ordersList(){
 
-        return "";
+        return "modules/front/success";
     }
 
     @RequestMapping("orders/{id}")
-    public String viewOrders(){
+    public String viewOrders(@PathVariable("id") String ordersId,Model model){
+        String memberId = UserUtils.getPrincipal().getId();
 
-        return "";
+        Orders orders = ordersService.get(ordersId);
+
+        if (orders == null || !memberId.equals(orders.getMemberId())){
+
+            return "redirect:" + Global.getFrontPath() + "/orders";
+        }
+
+        model.addAttribute("orders",orders);
+
+        return "modules/front/orders/ordersDetails";
     }
+
+
 
 
 }

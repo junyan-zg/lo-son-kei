@@ -12,6 +12,7 @@ import java.util.Map;
 import com.zjy.losonkei.modules.act.service.ActivitiService;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import com.zjy.losonkei.modules.goods.service.GoodsAllService;
+import com.zjy.losonkei.modules.goods.service.GoodsService;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import com.zjy.losonkei.modules.member.entity.MemberAddress;
 import com.zjy.losonkei.modules.member.entity.MemberNote;
@@ -50,14 +51,23 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	private ShoppingCartService shoppingCartService;
 	@Autowired
 	private MemberNoteService memberNoteService;
+	@Autowired
+	private GoodsService goodsService;
 
 	public Orders get(String id) {
 		Orders orders = super.get(id);
 
-		List<OrdersDetails> list = ordersDetailsDao.findList(new OrdersDetails(orders));
-		orders.setOrdersDetailsList(list);
-		for (OrdersDetails o : list){
-			o.setGoodsId(GoodsAllUtils.getGoodAllById(o.getGoodsNo()).getGoodsId());
+		if (orders != null){
+			List<OrdersDetails> list = ordersDetailsDao.findList(new OrdersDetails(orders));
+			orders.setOrdersDetailsList(list);
+			for (OrdersDetails o : list){
+				GoodsAll goodAll = GoodsAllUtils.getGoodAllById(o.getGoodsNo());
+				goodAll.setGoods(goodsService.get(goodAll.getGoodsId()));
+
+				o.setGoodsId(goodAll.getGoodsId());
+				o.setGoodsAll(goodAll);
+			}
+
 		}
 
 		return orders;
