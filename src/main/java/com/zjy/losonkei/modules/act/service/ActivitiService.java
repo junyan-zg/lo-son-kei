@@ -19,6 +19,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
+import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.IdentityLink;
@@ -77,6 +78,22 @@ public class ActivitiService extends BaseService {
 
 	public Task getCurrentTaskByInstanceId(String processInstanceId){
 		return taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+	}
+
+	public String getCurrentStateByInstanceId(String processInstanceId){
+		List<Task> list = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+		if (list == null || list.isEmpty()){
+			return "";
+		}else{
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0 ;i < list.size();i++){
+				sb.append(list.get(i).getName());
+				if (i < list.size() - 1){
+					sb.append(",");
+				}
+			}
+			return sb.toString();
+		}
 	}
 
 	public ProcessInstance getProcessInstanceById(String processInstanceId) {
@@ -436,8 +453,8 @@ public class ActivitiService extends BaseService {
 		return processInstance;
 	}
 
-	/*public Date getTheEndTime(){
-		managementService.createJobQuery().executionId();
-	}*/
+	public Job getTheEndTime(String executionId){
+		return managementService.createJobQuery().executionId(executionId).singleResult();
+	}
 }
 

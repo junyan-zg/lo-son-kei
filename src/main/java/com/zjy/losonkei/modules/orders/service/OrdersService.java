@@ -10,16 +10,25 @@ import java.util.List;
 import java.util.Map;
 
 import com.zjy.losonkei.modules.act.service.ActivitiService;
+import com.zjy.losonkei.modules.act.utils.ActivitiUtils;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import com.zjy.losonkei.modules.goods.service.GoodsAllService;
 import com.zjy.losonkei.modules.goods.service.GoodsService;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
+import com.zjy.losonkei.modules.member.entity.Member;
+import com.zjy.losonkei.modules.member.entity.MemberAccount;
 import com.zjy.losonkei.modules.member.entity.MemberAddress;
 import com.zjy.losonkei.modules.member.entity.MemberNote;
+import com.zjy.losonkei.modules.member.service.MemberAccountService;
 import com.zjy.losonkei.modules.member.service.MemberNoteService;
+import com.zjy.losonkei.modules.member.service.MemberService;
+import com.zjy.losonkei.modules.member.utils.MemberUtils;
 import com.zjy.losonkei.modules.orders.entity.ShoppingCart;
+import com.zjy.losonkei.modules.sys.service.SystemService;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
+import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +62,13 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	private MemberNoteService memberNoteService;
 	@Autowired
 	private GoodsService goodsService;
+	@Autowired
+	private SystemService systemService;
+	@Autowired
+	private MemberService memberService;
+	@Autowired
+	private MemberAccountService memberAccountService;
+
 
 	public Orders get(String id) {
 		Orders orders = super.get(id);
@@ -72,7 +88,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 
 		return orders;
 	}
-	
+
 	public List<Orders> findList(Orders orders) {
 		return super.findList(orders);
 	}
@@ -274,4 +290,73 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		return orders;
 	}
 
+	//取得支付剩余时间
+	public Job getPayOrdersLastTime(String processInstanceId){
+		Task task = activitiService.getCurrentTaskByInstanceId(processInstanceId);
+		if (task != null){
+			String executionId = task.getExecutionId();
+			if (StringUtils.isNotBlank(executionId)){
+				Job job = activitiService.getTheEndTime(executionId);
+				return job;
+			}
+		}
+		return null;
+	}
+
+	@Transactional(readOnly = false)
+	public String payOrders(String ordersId,String payPwd){
+		String memberId = UserUtils.getPrincipal().getId();
+
+		Member member = memberService.get(UserUtils.getPrincipal().getId());
+		if (MemberUtils.validatePassword(payPwd, member.getMemberPaypwd())){
+
+		}else{
+			return "支付密码错误，请重试！";
+		}
+
+		Orders orders = get(ordersId);
+		if (orders == null || !memberId.equals(orders.getMemberId())){   //订单不存在或非本人
+			return null;
+		}
+
+		if (Orders.FLAG_DOING.equals(orders.getFlag()) && Orders.PAY_STATE1.equals(orders.getPayState())){
+			Task task = activitiService.getCurrentTaskByInstanceId(orders.getProcessInstanceId());
+			if (task != null && memberId.equals(task.getAssignee())){
+				BigDecimal balance = member.getMemberBalance().subtract(orders.getPriceAll());
+				if (balance.compareTo(BigDecimal.ZERO) == -1){	//小于0
+					return "余额不足！请充值后再支付！";
+				}
+
+				//更新积分
+				member.setMemberPoints(member.getMemberPoints() + orders.getPriceAll().intValue());
+				//更新余额
+				member.setMemberBalance(balance);
+				memberService.save(member);
+
+				//更新账户
+				MemberAccount memberAccount = new MemberAccount();
+				memberAccount.setMemberId(memberId);
+				memberAccount.setProcessType(MemberAccount.PROCESS_TYPE_PAY);
+				memberAccount.setAmount(orders.getPriceAll().negate());
+				memberAccountService.save(memberAccount);
+
+
+				//随机设置一个销售员
+				String salerId = systemService.getUserIdListByRoleNameRandom(1);
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put(ActivitiUtils.VAR_SALERS,salerId);
+				activitiService.getTaskService().complete(task.getId(),map);
+
+				orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+				orders.setPayState(Orders.PAY_STATE2);
+				update(orders);
+
+				memberNoteService.save(new MemberNote(memberId,"支付成功，您的订单已被受理，请耐心等待。",ordersId));
+				return "ok";
+			}else{
+				return "页面已过期，请刷新";
+			}
+		}
+		return "页面已过期，请刷新";
+	}
 }

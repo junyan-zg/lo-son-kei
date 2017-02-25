@@ -72,4 +72,11 @@ public interface UserDao extends CrudDao<User> {
 	 */
 	public int updateUserInfo(User user);
 
+	/**
+	 * 按角色获取下面可用的员工
+	 * @param user
+	 * @return
+     */
+	public List<String> getUserIdListByRoleName(User user);
+
 }

@@ -13,11 +13,14 @@ import com.zjy.losonkei.modules.member.entity.MemberAddress;
 import com.zjy.losonkei.modules.member.entity.MemberNote;
 import com.zjy.losonkei.modules.member.service.MemberAddressService;
 import com.zjy.losonkei.modules.member.service.MemberNoteService;
+import com.zjy.losonkei.modules.member.service.MemberService;
+import com.zjy.losonkei.modules.member.utils.MemberUtils;
 import com.zjy.losonkei.modules.orders.entity.Orders;
 import com.zjy.losonkei.modules.orders.entity.ShoppingCart;
 import com.zjy.losonkei.modules.orders.service.OrdersService;
 import com.zjy.losonkei.modules.orders.service.ShoppingCartService;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
+import org.activiti.engine.runtime.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,6 +53,8 @@ public class OrderCenterController extends BaseController {
     private MemberNoteService memberNoteService;
     @Autowired
     private OrdersService ordersService;
+    @Autowired
+    private MemberService memberService;
 
     @RequestMapping("shoppingCart")
     public String shoppingCart(Model model){
@@ -201,9 +206,16 @@ public class OrderCenterController extends BaseController {
 
     @RequestMapping("payOrders")
     @ResponseBody
-    public String payOrders(String ordersId){
-
-        return "";
+    public String payOrders(String ordersId,String payPwd){
+        String result = "参数不合法！";
+        if (StringUtils.isBlank(ordersId)){
+            return result;
+        }
+        String s = ordersService.payOrders(ordersId, payPwd);
+        if (s != null){
+            result = s;
+        }
+        return result;
     }
 
     @RequestMapping("createOrders")
@@ -298,7 +310,8 @@ public class OrderCenterController extends BaseController {
         model.addAttribute("notes",memberNoteService.findList(memberNote));
 
         if (Orders.FLAG_DOING.equals(orders.getFlag()) && Orders.PAY_STATE1.equals(orders.getPayState())){      //获取剩下时间
-
+            Job job = ordersService.getPayOrdersLastTime(orders.getProcessInstanceId());
+            model.addAttribute("job",job);
         }
 
         model.addAttribute("orders",orders);

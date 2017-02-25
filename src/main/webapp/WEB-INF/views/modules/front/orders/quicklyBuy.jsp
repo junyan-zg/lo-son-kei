@@ -156,7 +156,8 @@
                                             if(data.error){
                                                 alert(data.error);
                                             }else{
-                                                alert(data.goodsNo);
+                                                //alert(data.goodsNo);
+                                                window.location.href = '${ctxFront}/orders/' + data.goodsNo;
                                             }
                                         });
                                     };

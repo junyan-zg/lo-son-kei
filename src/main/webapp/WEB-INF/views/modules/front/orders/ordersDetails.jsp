@@ -110,13 +110,27 @@
                                     <c:when test="${PAY_STATE1 eq orders.payState}">
                                     <div class="grid_4" style="border: 4px dashed #eed3d7;padding-left: 8px;padding-top: 15px;">
                                         <form onsubmit="return false;" id="payForm">
+                                        <input type="hidden" name="ordersId" value="${orders.id}"/>
                                         <p>待支付：<span style="color: #EB6447;font-size: 20px;">￥${orders.priceAll}</span></p>
                                         <p><label>支付密码：</label><input type="password" name="payPwd"/></p>
                                         <p><a href="javascript:subPayForm();" class="btn" style="letter-spacing:10px;font-size: 18px;">立刻支付</a></p>
+                                        <p>请在<fmt:formatDate value="${job.duedate}" pattern="yyyy-MM-dd HH:mm:ss"/>前完成支付.</p>
                                         </form>
                                         <script>
+                                            var flag = true;
                                             function subPayForm(){
-
+                                                if (flag){
+                                                    flag = false;
+                                                    $.post("${ctxFront}/payOrders",$("#payForm").serialize(),function(data){
+                                                        if(data == "ok"){
+                                                            alert("支付成功！");
+                                                            window.location.reload();
+                                                        }else{
+                                                            flag = true;
+                                                            alert(data);
+                                                        }
+                                                    });
+                                                }
                                             }
                                         </script>
                                     </div>

@@ -21,7 +21,13 @@ public class MemberAccount extends DataEntity<MemberAccount> {
 	private String processType;		// 流动类型0充值1付款2退款
 	private BigDecimal amount;		// 资金变化数目，正为增，负为减
 	private String payment = "0";		// 支付方式
-	
+
+	public final static String PROCESS_TYPE_ADD = "0";
+
+	public final static String PROCESS_TYPE_PAY = "1";
+
+	public final static String PROCESS_TYPE_BACK = "2";
+
 	public MemberAccount() {
 		super();
 	}

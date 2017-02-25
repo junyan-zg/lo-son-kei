@@ -3,10 +3,7 @@
  */
 package com.zjy.losonkei.modules.sys.service;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import com.zjy.losonkei.common.security.shiro.session.SessionDAO;
 import com.zjy.losonkei.common.service.ServiceException;
@@ -541,5 +538,35 @@ public class SystemService extends BaseService implements InitializingBean {
 	}
 	
 	///////////////// Synchronized to the Activiti end //////////////////
-	
+	/**
+	 * 按角色获取下面可用的员工
+	 * @return
+	 */
+	public String getUserIdListByRoleNameRandom(int type){
+		User user = new User();
+		String roleName;
+		if (type == 1){
+			roleName = "role_sale";
+		}else if (type == 2){
+			roleName = "role_store";
+		}else if (type == 3){
+			roleName = "role_audit";
+		}else{
+			throw new IllegalArgumentException("the possible value is 1 or 2 or 3");
+		}
+		user.setName(roleName);	//借用name字段
+
+		List<String> ids = userDao.getUserIdListByRoleName(user);
+
+		if (ids == null || ids.isEmpty()){
+			throw new RuntimeException("please set your staff: " + roleName);
+		}
+
+		if (ids.size() == 1){
+			return ids.get(0);
+		}
+
+		return ids.get(new Random().nextInt(ids.size()));
+	}
+
 }
