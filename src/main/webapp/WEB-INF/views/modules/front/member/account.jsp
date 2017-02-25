@@ -13,8 +13,8 @@
     <ul>
         <li class="curent" style="margin-right: 30px;"><a href="${ctxFront}/home">个人中心</a></li>
         <li><a href="${ctxFront}/orders">订 单</a></li>
-        <li><a href="catalog_grid.html">消 息</a></li>
-        <li><a href="javascript:;">购物车</a></li>
+        <li><a href="${ctxFront}/notes">消 息</a></li>
+        <li><a href="${ctxFront}/shoppingCart">购物车</a></li>
     </ul>
 </content>
 
@@ -33,6 +33,12 @@
             });
         }
     });
+
+    function page(n){
+        $("#pageNum").val(n);
+        $("#searchForm").submit();
+        return false;
+    }
 </script>
 <section id="main1">
     <div class="container_12">
@@ -50,6 +56,7 @@
                             <div class="clear"></div>
                         </div>
                         <hr style="margin-bottom: 10px;"/>
+                        <form method="get" id="searchForm" action="${ctxFront}/account"><input type="hidden" id="pageNum" name="pageNum" value="${page.pageNo}"></form>
                         <c:forEach var="list" items="${page.list}" varStatus="status">
                             <div style="margin-bottom: 10px;" class="container_12">
                                 <div class="grid_1">${fns:getDictLabel(list.processType, 'account_process_type', '')}</div>

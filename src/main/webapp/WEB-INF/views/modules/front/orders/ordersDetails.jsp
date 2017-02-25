@@ -1,6 +1,18 @@
-<%@ page import="com.zjy.losonkei.modules.goods.entity.Goods" %>
+<%@ page import="com.zjy.losonkei.modules.orders.entity.Orders" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/views/include/taglib-front.jsp" %>
+<c:set var="FLAG_DOING"><%=Orders.FLAG_DOING%></c:set>
+<c:set var="PAY_STATE1"><%=Orders.PAY_STATE1%></c:set>
+<c:set var="GOODS_STATE1"><%=Orders.GOODS_STATE1%></c:set>
+<c:set var="GOODS_STATE6"><%=Orders.GOODS_STATE6%></c:set>
+<c:set var="STATE1"><%=Orders.ORDERS_STATE1%></c:set>
+<%--
+   所有在flag=doing中
+
+   1、PAY_STATE1时支付
+   2、orders_states为空或为1时可取消
+   3、goods_states为空或为1或为6时可取消
+--%>
 <html>
 <content tag="moduleName">orders</content>
 <meta name="decorator" content="front"/>
@@ -18,7 +30,7 @@
     <ul>
         <li style="margin-right: 30px;"><a href="${ctxFront}/home">个人中心</a></li>
         <li class="curent"><a href="${ctxFront}/orders">订 单</a></li>
-        <li><a href="catalog_grid.html">消 息</a></li>
+        <li><a href="${ctxFront}/notes">消 息</a></li>
         <li><a href="${ctxFront}/shoppingCart">购物车</a></li>
     </ul>
 </content>
@@ -32,6 +44,32 @@
                 </div>
 
                 <article>
+
+                    <%--<div style="border: 2px dashed #bdd1e9;margin-bottom: 20px;padding: 10px;" >
+                        <div class="circle-info">
+                            <div class="circle-red"><p>已下单</p></div>
+                            <p>2016-12-22<br>10:22:22</p>
+                        </div>
+                        <div class="direction-left">next</div>
+                        <div class="circle-info">
+                            <div class="circle-red"><p>在线支付</p></div>
+                        </div>
+                        <div class="direction-left">next</div>
+                        <div class="circle-info">
+                            <div class="circle-red"><p>待发货</p></div>
+                        </div>
+                        <div class="direction-left">next</div>
+                        <div class="circle-info">
+                            <div class="circle-gray"><p>待收货</p></div>
+                        </div>
+                        <div class="direction-left">next</div>
+                        <div class="circle-info">
+                            <div class="circle-gray"><p>确认收货</p></div>
+                        </div>
+
+                        <div class="clear"></div>
+                    </div>--%>
+
                     <table class="cart_product">
                         <tr class="bg">
                             <th class="images"></th>
@@ -67,17 +105,52 @@
                                     <p>收货地址：${orders.province.name} ${orders.city.name} ${orders.area.name} ${orders.address}</p>
                                     <p>下单日期：<fmt:formatDate value="${orders.createDate}" pattern="yyyy年MM月dd日 HH:mm:ss"/></p>
                                 </div>
-                                <div class="grid_4" style="border: 4px dashed #eed3d7;padding-left: 8px;padding-top: 15px;">
-                                    <p>待支付：<span style="color: #EB6447;font-size: 20px;">￥${orders.priceAll}</span></p>
-                                    <p><label>支付密码：</label><input type="password"/></p>
-                                    <p><a href="" class="btn" style="letter-spacing:10px;font-size: 18px;">立刻支付</a></p>
-                                </div>
+                                <c:if test="${FLAG_DOING eq orders.flag}">
+                                    <c:choose>
+                                    <c:when test="${PAY_STATE1 eq orders.payState}">
+                                    <div class="grid_4" style="border: 4px dashed #eed3d7;padding-left: 8px;padding-top: 15px;">
+                                        <form onsubmit="return false;" id="payForm">
+                                        <p>待支付：<span style="color: #EB6447;font-size: 20px;">￥${orders.priceAll}</span></p>
+                                        <p><label>支付密码：</label><input type="password" name="payPwd"/></p>
+                                        <p><a href="javascript:subPayForm();" class="btn" style="letter-spacing:10px;font-size: 18px;">立刻支付</a></p>
+                                        </form>
+                                        <script>
+                                            function subPayForm(){
+
+                                            }
+                                        </script>
+                                    </div>
+                                    </c:when>
+                                    <c:when test="${empty orders.ordersState || empty orders.goodsState || STATE1 eq orders.ordersState || GOODS_STATE1 eq orders.goodsState || GOODS_STATE6 eq orders.goodsState}">
+                                        <div class="grid_4" style="border: 4px dashed #eed3d7;padding-left: 8px;padding-top: 15px;">
+                                            <form>
+                                            <p><label>申请理由：</label><br><textarea name="reason"></textarea></p>
+                                            <p><a href="" class="btn" style="letter-spacing:10px;font-size: 18px;">申请退<c:choose><c:when test="${GOODS_STATE6 eq orders.goodsState}">货</c:when><c:otherwise>单</c:otherwise></c:choose></a></p>
+                                            </form>
+                                        </div>
+                                    </c:when>
+                                    </c:choose>
+                                </c:if>
                                 <div class="clear"></div>
                             </div><!-- .estimate -->
                         </div>
 
                         <div class="clear"></div>
                     </div><!-- #cart_forms -->
+
+
+                    <div>
+                        <div class="grid_11">
+                            <h1 class="red" style="margin-top: 10px; padding-bottom: 20px; border-bottom: 2px dashed #bdd1e9;">订单跟踪</h1>
+
+                            <ol style="margin-left: -20px;margin-top: -20px;">
+                                <c:forEach items="${notes}" var="note">
+                                <li style="margin-bottom: 10px;">${note.content}<span style="color: grey;"><fmt:formatDate value="${note.createDate}" pattern="yyyy-MM-dd HH:mm:ss"/> </span></li>
+                                </c:forEach>
+                            </ol>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
                 </article>
 
             </div>

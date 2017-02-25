@@ -1,12 +1,14 @@
 package com.zjy.losonkei.modules.front;
 
 import com.zjy.losonkei.common.config.Global;
+import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import com.zjy.losonkei.modules.goods.entity.GoodsSpecificationValue;
 import com.zjy.losonkei.modules.goods.service.GoodsAllService;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
+import com.zjy.losonkei.modules.member.entity.Member;
 import com.zjy.losonkei.modules.member.entity.MemberAddress;
 import com.zjy.losonkei.modules.member.entity.MemberNote;
 import com.zjy.losonkei.modules.member.service.MemberAddressService;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -196,6 +199,13 @@ public class OrderCenterController extends BaseController {
         return "modules/front/orders/quicklyBuy";
     }
 
+    @RequestMapping("payOrders")
+    @ResponseBody
+    public String payOrders(String ordersId){
+
+        return "";
+    }
+
     @RequestMapping("createOrders")
     @ResponseBody
     public Map<String,String> createOrders(String goodsNo,@RequestParam(value = "cart-amount",required = false) String amountStr,String addressId,HttpServletRequest request){
@@ -237,9 +247,36 @@ public class OrderCenterController extends BaseController {
 
 
     @RequestMapping("orders")
-    public String ordersList(){
+    public String ordersList(HttpServletRequest request, String pageNum){
+        String memberId = UserUtils.getPrincipal().getId();
+        Orders orders = new Orders();
+        orders.setIgnoreFlag(null);
+        orders.setMemberId(memberId);
 
-        return "modules/front/success";
+        int pageNo = 1;
+        try {
+            if(StringUtils.isNotBlank(pageNum)){
+                pageNo = Integer.valueOf(pageNum);
+                if (pageNo < 1){
+                    pageNo = 1;
+                }
+            }
+        }catch (Exception e){}
+        Page<Orders> page = new Page<Orders>();
+        page.setPageSize(20);
+        page.setPageNo(pageNo);
+
+        ordersService.findPage(page,orders);
+        List<Orders> list = page.getList();
+
+        if (list != null){
+            for (Orders o : list){
+                o.setOrdersDetailsList(ordersService.get(o.getId()).getOrdersDetailsList());
+            }
+        }
+
+        request.setAttribute("page",page);
+        return "modules/front/orders/orders";
     }
 
     @RequestMapping("orders/{id}")
@@ -251,6 +288,17 @@ public class OrderCenterController extends BaseController {
         if (orders == null || !memberId.equals(orders.getMemberId())){
 
             return "redirect:" + Global.getFrontPath() + "/orders";
+        }
+
+        MemberNote memberNote = new MemberNote();
+        memberNote.setOrdersId(ordersId);
+        Page page = new Page();
+        page.setOrderBy("create_date asc");
+        memberNote.setPage(page);
+        model.addAttribute("notes",memberNoteService.findList(memberNote));
+
+        if (Orders.FLAG_DOING.equals(orders.getFlag()) && Orders.PAY_STATE1.equals(orders.getPayState())){      //获取剩下时间
+
         }
 
         model.addAttribute("orders",orders);

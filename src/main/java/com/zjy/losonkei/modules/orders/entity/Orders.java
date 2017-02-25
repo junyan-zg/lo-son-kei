@@ -39,6 +39,7 @@ public class Orders extends DataEntity<Orders> {
 	private String flag;		// 0进行中1交易成功2交易失败,待发货前全额退款都是失败
 	private BigDecimal refund;		// 退款
 	private BigDecimal income;		// 收益，交易成功时price_all-cost_all-refund
+	private String reason;
 	private BigDecimal beginPriceAll;		// 开始 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
 	private BigDecimal endPriceAll;		// 结束 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
 	private BigDecimal beginIncome;		// 开始 收益，交易成功时price_all-cost_all-refund
@@ -46,6 +47,8 @@ public class Orders extends DataEntity<Orders> {
 	private List<OrdersDetails> ordersDetailsList = Lists.newArrayList();		// 子表列表
 
 	private Member member;
+
+	private String ignoreFlag = "no";	//当要忽略flag时请将其置于空
 
 	/**
 	 * 有效
@@ -101,6 +104,10 @@ public class Orders extends DataEntity<Orders> {
 	 * 无货
 	 */
 	public static final String GOODS_STATE5 = "5";
+	/**
+	 * 已收货
+	 */
+	public static final String GOODS_STATE6 = "6";
 	/**
 	 * 未付款
 	 */
@@ -321,5 +328,21 @@ public class Orders extends DataEntity<Orders> {
 
 	public void setMember(Member member) {
 		this.member = member;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+	public String getIgnoreFlag() {
+		return ignoreFlag;
+	}
+
+	public void setIgnoreFlag(String ignoreFlag) {
+		this.ignoreFlag = ignoreFlag;
 	}
 }

@@ -27,6 +27,7 @@
 		a.del_flag AS "delFlag",
 		a.refund AS "refund",
 		a.income AS "income",
+		a.reason AS "reason",
 
 		a1.name AS "area.name",
 		a2.name AS "city.name",
@@ -114,6 +115,9 @@
 				AND a.pay_state = #{payState}
 			</if>
 			<choose>
+				<when test="ignoreFlag == null or ignoreFlag == ''">
+
+				</when>
 				<when test="flag != null and flag != ''">
 					AND a.flag = #{flag}
 				</when>
@@ -190,7 +194,8 @@
 			update_date,
 			del_flag,
 			refund,
-			income
+			income,
+			reason
 		) VALUES (
 			#{id},
 			#{memberId},
@@ -215,7 +220,8 @@
 			#{updateDate},
 			#{delFlag},
 			#{refund},
-			#{income}
+			#{income},
+			#{reason}
 		)
 	</insert>
 	
@@ -239,7 +245,8 @@
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},
 			refund = #{refund},
-			income = #{income}
+			income = #{income},
+			reason = #{reason}
 		WHERE id = #{id}
 	</update>
 	

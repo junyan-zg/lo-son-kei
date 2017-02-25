@@ -4,13 +4,12 @@ import com.zjy.losonkei.common.config.Global;
 import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
+import com.zjy.losonkei.modules.goods.entity.Goods;
 import com.zjy.losonkei.modules.member.entity.Member;
 import com.zjy.losonkei.modules.member.entity.MemberAccount;
 import com.zjy.losonkei.modules.member.entity.MemberAddress;
-import com.zjy.losonkei.modules.member.service.MemberAccountService;
-import com.zjy.losonkei.modules.member.service.MemberAddressService;
-import com.zjy.losonkei.modules.member.service.MemberDetailsService;
-import com.zjy.losonkei.modules.member.service.MemberService;
+import com.zjy.losonkei.modules.member.entity.MemberNote;
+import com.zjy.losonkei.modules.member.service.*;
 import com.zjy.losonkei.modules.member.utils.MemberUtils;
 import com.zjy.losonkei.modules.sys.security.Principal;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
@@ -18,10 +17,7 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +37,8 @@ public class MemberCenterController extends BaseController {
     private MemberDetailsService memberDetailsService;
     @Autowired
     private MemberAccountService memberAccountService;
+    @Autowired
+    private MemberNoteService memberNoteService;
 
     @ModelAttribute
     public Member get() {
@@ -94,12 +92,48 @@ public class MemberCenterController extends BaseController {
     }
 
     @RequestMapping("account")
-    public String account(HttpServletRequest request, HttpServletResponse response){
+    public String account(HttpServletRequest request,String pageNum){
         MemberAccount memberAccount = new MemberAccount();
         memberAccount.setMemberId(UserUtils.getPrincipal().getId());
-        Page<MemberAccount> page = memberAccountService.findPage(new Page<MemberAccount>(request, response), memberAccount);
+
+        int pageNo = 1;
+        try {
+            if(StringUtils.isNotBlank(pageNum)){
+                pageNo = Integer.valueOf(pageNum);
+                if (pageNo < 1){
+                    pageNo = 1;
+                }
+            }
+        }catch (Exception e){}
+        Page<MemberAccount> page = new Page<MemberAccount>();
+        page.setPageSize(20);
+        page.setPageNo(pageNo);
+        memberAccountService.findPage(page, memberAccount);
         request.setAttribute("page",page);
         return "modules/front/member/account";
+    }
+
+    @RequestMapping("notes")
+    public String notes(String pageNum,HttpServletRequest request){
+        MemberNote memberNote = new MemberNote();
+        memberNote.setMember(new Member(UserUtils.getPrincipal().getId()));
+
+        int pageNo = 1;
+        try {
+            if(StringUtils.isNotBlank(pageNum)){
+                pageNo = Integer.valueOf(pageNum);
+                if (pageNo < 1){
+                    pageNo = 1;
+                }
+            }
+        }catch (Exception e){}
+        Page<MemberNote> page = new Page<MemberNote>();
+        page.setPageSize(20);
+        page.setPageNo(pageNo);
+
+        memberNoteService.findPage(page, memberNote);
+        request.setAttribute("page",page);
+        return "modules/front/member/notes";
     }
 
 }

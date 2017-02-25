@@ -39,3 +39,35 @@
     -moz-box-shadow: 0px 0px 4px #fa7a5f;
     -webkit-box-shadow: 0px 0px 4px #fa7a5f;
 }
+.circle-info{
+    float: left;text-align: center;
+    width:64px;
+    height: 90px;
+}
+.circle-red{
+    background: #eb6447;
+}
+.red{
+    color: #eb6447;
+}
+.circle-gray{
+    background: gray;
+}
+.circle-info div{
+    font-size: 14px;
+    float: left;
+    font-weight: bolder;
+    text-align: center;
+    display: inline-block;
+    line-height:60px;
+    margin-left: 3px;
+    color:#ffffff;
+    width: 60px;
+    height: 60px;
+    border-radius:30px;
+}
+.direction-left{
+    width: 70px;height:20px;margin-top: 20px;margin-left: 20px;margin-right: 20px; display: inline-block;float: left;border: 1px solid grey; border-top-right-radius: 10px;border-bottom-right-radius: 10px;text-align: center;line-height: 20px;font-size: 14px;
+    font-weight: normal;
+    color: grey;
+}
