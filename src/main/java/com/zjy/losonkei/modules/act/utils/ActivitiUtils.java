@@ -1,5 +1,12 @@
 package com.zjy.losonkei.modules.act.utils;
 
+import com.alibaba.druid.support.spring.stat.annotation.Stat;
+import com.zjy.losonkei.modules.act.entity.Act;
+import com.zjy.losonkei.modules.act.entity.ActFlowInfo;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Administrator on 2016/11/8.
  */
@@ -35,4 +42,29 @@ public class ActivitiUtils {
     public final static String VAR_WAREHOUSE_STAFFS = "warehouseStaff";
 
     //审核员见上面
+
+    private static final Map<String,ActFlowInfo> ordersFlowMap = new HashMap<String, ActFlowInfo>();
+
+    static {
+        ordersFlowMap.put("确认订单",new ActFlowInfo("valid","确认订单",
+               new ActFlowInfo.Detail("1","有效",true),new ActFlowInfo.Detail("0","无效",false)
+        ));
+        ordersFlowMap.put("检查库存",new ActFlowInfo("enough","检查库存",
+                new ActFlowInfo.Detail("1","有货",true),new ActFlowInfo.Detail("0","缺货",false)
+        ));
+        ordersFlowMap.put("待发货",new ActFlowInfo("","马上发货"));
+        ordersFlowMap.put("审核退货",new ActFlowInfo("r","审核退货",
+                new ActFlowInfo.Detail("1","不能退货"),new ActFlowInfo.Detail("2","不需寄回")
+                ,new ActFlowInfo.Detail("3","需要寄回")
+        ));
+        ordersFlowMap.put("退货退款",new ActFlowInfo("","退货退款"));
+        ordersFlowMap.put("确认寄回商品",new ActFlowInfo("","确认寄回商品"));
+        ordersFlowMap.put("寄回退款",new ActFlowInfo("","寄回退款"));
+    }
+
+    public static ActFlowInfo getOrdersFlow(String taskName){
+        return ordersFlowMap.get(taskName);
+    }
+
+
 }

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.zjy.losonkei.modules.act.entity.ActFlowInfo;
 import com.zjy.losonkei.modules.act.service.ActivitiService;
 import com.zjy.losonkei.modules.act.utils.ActivitiUtils;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
@@ -26,6 +27,7 @@ import com.zjy.losonkei.modules.member.utils.MemberUtils;
 import com.zjy.losonkei.modules.orders.entity.ShoppingCart;
 import com.zjy.losonkei.modules.sys.service.SystemService;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
+import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -176,6 +178,12 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 			return orders.getId();
 		}
 		return null;
+	}
+
+	@Transactional(readOnly = false)
+	public void updateRemarks(Orders orders){
+		orders.preUpdate();
+		dao.updateRemarks(orders);
 	}
 
 
@@ -358,5 +366,165 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 			}
 		}
 		return "页面已过期，请刷新";
+	}
+
+
+	/**
+	 * 处理订单流程的dispatch
+	 */
+	@Transactional(readOnly = false)
+	public void compileTask(String ordersId,String taskId,String comment,HttpServletRequest request) {
+		if (activitiService.nextStepBelongsMe(null,taskId)){
+			Task task = activitiService.getTask(taskId);
+			Map<String,Object> map = new HashMap<String,Object>();
+			ActFlowInfo ordersFlow = ActivitiUtils.getOrdersFlow(task.getName());
+			if (StringUtils.isNotBlank(ordersFlow.getFormName())){	//需要设置变量
+				String value = request.getParameter(ordersFlow.getFormName());
+				Object objValue = ordersFlow.getValue(value);
+				map.put(task.getName(),objValue);
+				dispatch(task.getName(),value,ordersId,task,comment,map);
+			}else{
+				dispatch(task.getName(),null,ordersId,task,comment,map);
+			}
+		}
+	}
+
+
+	private void dispatch(String taskName,String value,String ordersId,Task task,String comment,Map<String,Object> map){
+		Orders orders = get(ordersId);
+		if (orders == null || !Orders.FLAG_DOING.equals(orders.getFlag())){
+			throw new IllegalArgumentException();
+		}
+		if ("确认订单".equals(taskName)){
+			confirmOrders(value,orders);
+		}else if ("检查库存".equals(taskName)){
+			checkStock(value,orders,map);
+		}else if ("待发货".equals(taskName)){
+			sendGoods(orders);
+		}else if ("审核退货".equals(taskName)){
+			auditBack(value,orders,map);
+		}
+
+		activitiService.complete(task.getId(),task.getProcessInstanceId(),comment,null,map);
+	}
+
+	/**
+	 * 确认订单
+	 */
+	private void confirmOrders(String value,Orders orders){
+		if ("1".equals(value)){		//有效
+			orders.setOrdersState(Orders.ORDERS_STATE1);
+		}else if ("0".equals(value)){	//无效
+			orders.setOrdersState(Orders.ORDERS_STATE2);
+			memberNoteService.save(new MemberNote(orders.getMemberId(),"抱歉，您的订单被确认为无效，稍后将会退款。",orders.getId()));
+		}else{
+			throw new IllegalArgumentException();
+		}
+		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+		this.update(orders);
+	}
+
+	/**
+	 * 检查库存
+	 */
+	private void checkStock(String value,Orders orders,Map<String,Object> map){
+		if ("1".equals(value)){		//有货
+			orders.setGoodsState(Orders.GOODS_STATE1);
+			//设置库存员
+			map.put(ActivitiUtils.VAR_WAREHOUSE_STAFFS,systemService.getUserIdListByRoleNameRandom(2));
+		}else if ("0".equals(value)){	//缺货
+			orders.setOrdersState(Orders.ORDERS_STATE5);
+			orders.setGoodsState(Orders.GOODS_STATE5);
+			memberNoteService.save(new MemberNote(orders.getMemberId(),"抱歉，您的订单缺货了，稍后将会退款。",orders.getId()));
+		}else{
+			throw new IllegalArgumentException();
+		}
+		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+		this.update(orders);
+	}
+
+	/**
+	 * 待发货
+	 */
+	private void sendGoods(Orders orders){
+		orders.setGoodsState(Orders.GOODS_STATE2);
+		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+		this.update(orders);
+		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单发货啦！请耐心等待。",orders.getId()));
+	}
+
+	/**
+	 * 审核退货
+	 */
+	private void auditBack(String value,Orders orders,Map<String,Object> map){
+		if ("1".equals(value)){		//不能退货
+			orders.setGoodsState(Orders.GOODS_STATE1);
+			memberNoteService.save(new MemberNote(orders.getMemberId(),"抱歉，您的退货请求审核不通过，请联系客服人员。",orders.getId()));
+		}else if ("2".equals(value)){	//不需退回
+			orders.setOrdersState(Orders.ORDERS_STATE4);
+			memberNoteService.save(new MemberNote(orders.getMemberId(),"恭喜！您的退货请求已审核通过，稍后将会退款。",orders.getId()));
+		}else if ("3".equals(value)){	//需要寄回
+			map.put(ActivitiUtils.VAR_TIMEOUT_BACK,ActivitiUtils.TIME_TIMEOUT_BACK);
+			memberNoteService.save(new MemberNote(orders.getMemberId(),"您的退货请求已审核通过，请于7天内寄回，预期作废",orders.getId()));
+		}else{
+			throw new IllegalArgumentException();
+		}
+		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+		this.update(orders);
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	@Transactional(readOnly = false)
+	public void endOrderTask(DelegateExecution execution){
+		String ordersId = execution.getProcessBusinessKey();
+		Orders orders = this.get(ordersId);
+		orders.setFlag(Orders.FLAG_FAILED);
+		orders.setProcessState(execution.getCurrentActivityId());
+
+		if(Orders.PAY_STATE1.equals(orders.getPayState())){      //来自超时未支付
+			memberNoteService.save(new MemberNote(orders.getMemberId(),"您未在15分钟内完成支付，订单已被取消。",ordersId));
+		}
+
+		this.update(orders);
+	}
+
+
+	@Transactional(readOnly = false)
+	public void returnAllMoneyTask(DelegateExecution execution){
+		String ordersId = execution.getProcessBusinessKey();
+		Orders orders = this.get(ordersId);
+		orders.setPayState(Orders.PAY_STATE3);
+		orders.setFlag(Orders.FLAG_FAILED);
+		orders.setProcessState(execution.getCurrentActivityId());
+		this.update(orders);
+
+
+		Member member = memberService.get(orders.getMemberId());
+		member.setMemberBalance(member.getMemberBalance().add(orders.getPriceAll()));
+		member.setMemberPoints(member.getMemberPoints() - member.getMemberBalance().intValue());
+		memberService.save(member);
+
+		//账单
+		MemberAccount memberAccount = new MemberAccount();
+		memberAccount.setMemberId(orders.getMemberId());
+		memberAccount.setProcessType(MemberAccount.PROCESS_TYPE_BACK);
+		memberAccount.setAmount(orders.getPriceAll());
+		memberAccountService.save(memberAccount);
+
+		memberNoteService.save(new MemberNote(orders.getMemberId(),"您退款已到账，请查收！。",ordersId));
+
 	}
 }

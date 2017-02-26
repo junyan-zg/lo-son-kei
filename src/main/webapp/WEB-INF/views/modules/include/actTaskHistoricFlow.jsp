@@ -10,7 +10,16 @@
         <th>任务历时</th>
     </tr>
     <c:forEach items="${histoicFlowList}" var="act">
-        <c:set var="candidateUsers"><c:forEach items="${act.candidateUsers}" var="userId" varStatus="status">${fns:getUserById(userId).name}<c:if test="${status.index < fn:length(act.candidateUsers) - 1}">,</c:if></c:forEach></c:set>
+        <c:set var="candidateUsers"><c:forEach items="${act.candidateUsers}" var="userId" varStatus="status">
+            <c:set var="user">${fns:getUserById(userId).name}</c:set>
+                <c:if test="${empty user}">
+                    ${fns:getMemberById(userId).memberName}(会员)
+                </c:if>
+                <c:if test="${not empty user}">
+                    ${user}
+                </c:if>
+            <c:if test="${status.index < fn:length(act.candidateUsers) - 1}">,</c:if>
+        </c:forEach></c:set>
         <tr>
             <td>${act.histIns.activityName}</td>
             <td title="${candidateUsers}">${candidateUsers}</td>

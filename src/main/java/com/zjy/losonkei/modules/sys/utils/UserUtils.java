@@ -158,6 +158,15 @@ public class UserUtils {
 		return null;
 	}
 
+	/**
+	 * 根据id获取会员
+	 * @return 取不到返回 null
+	 */
+	public static Member getMemberById(String memberId){
+		return memberDao.get(memberId);
+	}
+
+
 
 	/**
 	 * 获取当前用户角色列表

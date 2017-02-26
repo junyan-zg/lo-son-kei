@@ -78,7 +78,7 @@ public class ActProcessController extends BaseController {
 	 * @param response
 	 * @throws Exception
 	 */
-	@RequiresPermissions("act:process:edit")
+	@RequiresPermissions("act:process:view")
 	@RequestMapping(value = "resource/read")
 	public void resourceRead(String procDefId, String proInsId, String resType, HttpServletResponse response) throws Exception {
 		InputStream resourceAsStream = actProcessService.resourceRead(procDefId, proInsId, resType);

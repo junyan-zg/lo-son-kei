@@ -6,6 +6,11 @@ package com.zjy.losonkei.modules.orders.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.zjy.losonkei.modules.act.entity.ActFlowInfo;
+import com.zjy.losonkei.modules.act.service.ActivitiService;
+import com.zjy.losonkei.modules.act.utils.ActivitiUtils;
+import com.zjy.losonkei.modules.sys.utils.UserUtils;
+import org.activiti.engine.task.Task;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zjy.losonkei.common.config.Global;
@@ -21,6 +27,8 @@ import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.modules.orders.entity.Orders;
 import com.zjy.losonkei.modules.orders.service.OrdersService;
+
+import java.util.List;
 
 /**
  * 订单Controller
@@ -33,6 +41,8 @@ public class OrdersController extends BaseController {
 
 	@Autowired
 	private OrdersService ordersService;
+	@Autowired
+	private ActivitiService activitiService;
 	
 	@ModelAttribute
 	public Orders get(@RequestParam(required=false) String id) {
@@ -61,33 +71,58 @@ public class OrdersController extends BaseController {
 		orders.setFlag(null);
 		Page<Orders> page = ordersService.findPage(new Page<Orders>(request, response), orders);
 		model.addAttribute("page", page);
-		return "modules/orders/ordersList";
+		return "modules/orders/ordersListOld";
 	}
 
 	@RequiresPermissions("orders:orders:view")
 	@RequestMapping(value = "form")
 	public String form(Orders orders, Model model) {
 		model.addAttribute("orders", orders);
+
+		if (Orders.FLAG_DOING.equals(orders.getFlag())){
+			String processInstanceId = orders.getProcessInstanceId();
+			Task task = activitiService.getTaskService().createTaskQuery().processInstanceId(processInstanceId).taskCandidateUser(UserUtils.getPrincipal().getId()).singleResult();
+			if (task != null) {
+				ActFlowInfo ordersFlow = ActivitiUtils.getOrdersFlow(task.getName());
+				if (ordersFlow != null) {
+					model.addAttribute("ordersFlow",ordersFlow);
+				}
+				model.addAttribute("task", task);
+			}
+		}
+		model.addAttribute("histoicFlowList",activitiService.histoicFlowList(orders.getProcessInstanceId()));
+
 		return "modules/orders/ordersForm";
 	}
 
 	@RequiresPermissions("orders:orders:edit")
 	@RequestMapping(value = "save")
 	public String save(Orders orders, Model model, RedirectAttributes redirectAttributes) {
-		if (!beanValidator(model, orders)){
+		/*if (!beanValidator(model, orders)){
 			return form(orders, model);
-		}
-		ordersService.save(orders);
+		}*/
+		ordersService.updateRemarks(orders);
 		addMessage(redirectAttributes, "保存订单成功");
-		return "redirect:"+Global.getAdminPath()+"/orders/orders/?repage";
+		return "redirect:"+Global.getAdminPath()+"/orders/orders/"+(Orders.FLAG_DOING.equals(orders.getFlag()) ? "" : "listOld")+"?repage";
 	}
 	
-	@RequiresPermissions("orders:orders:edit")
+	/*@RequiresPermissions("orders:orders:edit")
 	@RequestMapping(value = "delete")
 	public String delete(Orders orders, RedirectAttributes redirectAttributes) {
 		ordersService.delete(orders);
 		addMessage(redirectAttributes, "删除订单成功");
 		return "redirect:"+Global.getAdminPath()+"/orders/orders/?repage";
-	}
+	}*/
 
+
+	@RequiresPermissions("orders:orders:edit")
+	@RequestMapping(value = "compileTask")
+	public String compileTask(String ordersId,String taskId, Model model,String comment,HttpServletRequest request) {
+		/*if (!beanValidator(model, orders)){
+			return form(orders, model);
+		}*/
+
+
+		return "redirect:"+Global.getAdminPath()+"/orders/orders/form?id=" + ordersId;
+	}
 }

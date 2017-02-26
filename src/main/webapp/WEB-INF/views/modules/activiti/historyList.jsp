@@ -90,19 +90,21 @@
 						<td>生产</td>
 						<td>${productOrder.id}</td>
 						<td>${productOrder.orderName}</td>
+						<td><a href="javascript:;" onclick="tracePhoto('${ctx}/act/process/resource/read?procDefId=${act.procDef.id}&resType=image');">已完成</a></td>
+						<td>${fns:getUserById(act.startUserId).name}</td>
 					</c:if>
 					<c:if test="${act.procDef.key != PROCESS_KEY_PRODUCT}">
 						<td>销售</td>
+						<td>${act.businessId}</td>
 						<td></td>
-						<td></td>
+						<td><a target="_blank" href="${ctx}/act/process/resource/read?procDefId=${act.procDef.id}&resType=image">已完成</a></td>
+						<td>${fns:getMemberById(act.startUserId).memberAccount}</td>
 					</c:if>
-					<td>
-					<%--
+
+					<%-- <td>
 						<a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${act.procDef.id}&processInstanceId=${act.procInsId}">已完成</a>
-					--%>
-						<a href="javascript:;" onclick="tracePhoto('${ctx}/act/process/resource/read?procDefId=${act.procDef.id}&resType=image');">已完成</a>
-					</td>
-					<td>${fns:getUserById(act.startUserId).name}</td>
+					</td> --%>
+
 					<td>
 						<c:forEach items="${act.candidateUsers}" var="candidateUser" varStatus="status">
 							${fns:getUserById(candidateUser).name}<c:if test="${status.index < fn:length(act.candidateUsers)-1}">,</c:if>

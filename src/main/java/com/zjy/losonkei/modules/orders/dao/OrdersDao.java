@@ -14,5 +14,6 @@ import com.zjy.losonkei.modules.orders.entity.Orders;
  */
 @MyBatisDao
 public interface OrdersDao extends CrudDao<Orders> {
-	
+
+    public void updateRemarks(Orders orders);
 }

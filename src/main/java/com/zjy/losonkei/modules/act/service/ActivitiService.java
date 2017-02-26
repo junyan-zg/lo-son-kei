@@ -255,19 +255,33 @@ public class ActivitiService extends BaseService {
 			HistoricActivityInstance histIns = list.get(i);
 
 			// 不显示开始节点和结束节点
-			if (!"startEvent".equals(histIns.getActivityType()) &&
+			if (!"startEvent".equals(histIns.getActivityType()) && ! "subProcess".equals(histIns.getActivityType())
+					&& !"parallelGateway".equals(histIns.getActivityType()) &&
 					 ! "endEvent".equals(histIns.getActivityType())){
 				Act e = new Act();
 				e.setHistIns(histIns);
 				// 获取流程发起人名称
 				e.setStartUserId(getStartUserIdByProcessInstanceId(procInsId));
 				// 获取任务参与者名称
-				List<HistoricIdentityLink> historicIdentityLinks = historyService.getHistoricIdentityLinksForTask(histIns.getTaskId());
-				List<String> candidateUsers = Lists.newArrayList();
-				for (HistoricIdentityLink identityLink:historicIdentityLinks){
-					candidateUsers.add(identityLink.getUserId());
+				if (StringUtils.isNotBlank(histIns.getTaskId())){
+					List<HistoricIdentityLink> historicIdentityLinks = historyService.getHistoricIdentityLinksForTask(histIns.getTaskId());
+					List<String> candidateUsers = Lists.newArrayList();
+					if (!historicIdentityLinks.isEmpty()){
+						for (HistoricIdentityLink identityLink:historicIdentityLinks){
+							candidateUsers.add(identityLink.getUserId());
+						}
+					}else{
+						HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(histIns.getTaskId()).singleResult();
+						if (historicTaskInstance != null){
+							String assignee = historicTaskInstance.getAssignee();
+							if (StringUtils.isNotBlank(assignee)){
+								candidateUsers.add(assignee);
+							}
+						}
+					}
+					e.setCandidateUsers(candidateUsers);
 				}
-				e.setCandidateUsers(candidateUsers);
+
 				// 获取意见评论内容
 				if (StringUtils.isNotBlank(histIns.getTaskId())){
 					List<Comment> commentList = taskService.getTaskComments(histIns.getTaskId());
@@ -377,7 +391,11 @@ public class ActivitiService extends BaseService {
 		}
 		
 		// 提交任务
-		taskService.complete(taskId, vars);
+		if (vars.isEmpty()){
+			taskService.complete(taskId);
+		}else {
+			taskService.complete(taskId, vars);
+		}
 	}
 
 	/**

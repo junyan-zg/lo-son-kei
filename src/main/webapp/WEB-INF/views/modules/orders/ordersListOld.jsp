@@ -19,10 +19,10 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/orders/orders">订单列表</a></li>
+		<li class="active"><a href="${ctx}/orders/orders/listOld">订单列表</a></li>
 		<%--<shiro:hasPermission name="orders:orders:edit"><li><a href="${ctx}/orders/orders/form">订单添加</a></li></shiro:hasPermission>--%>
 	</ul>
-	<form:form id="searchForm" modelAttribute="orders" action="${ctx}/orders/orders/" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="orders" action="${ctx}/orders/orders/listOld" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
@@ -132,7 +132,7 @@
 					${orders.income}
 				</td>
 				<shiro:hasPermission name="orders:orders:edit"><td>
-					<a href="${ctx}/orders/orders/form?id=${orders.id}">处理</a>
+    				<a href="${ctx}/orders/orders/form?id=${orders.id}">查看</a>
 					<%--<a href="${ctx}/orders/orders/delete?id=${orders.id}" onclick="return confirmx('确认要删除该订单吗？', this.href)">删除</a>--%>
 				</td></shiro:hasPermission>
 			</tr>

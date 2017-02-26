@@ -64,6 +64,14 @@
     <function-signature>com.zjy.losonkei.modules.member.entity.Member getMember()</function-signature>
     <example>${fns:getMember()}</example>
   </function>
+
+  <function>
+    <description>获取会员对象</description>
+    <name>getMemberById</name>
+    <function-class>com.zjy.losonkei.modules.sys.utils.UserUtils</function-class>
+    <function-signature>com.zjy.losonkei.modules.member.entity.Member getMemberById(java.lang.String)</function-signature>
+    <example>${fns:getMemberById(id)}</example>
+  </function>
   
   <function>
     <description>根据编码获取用户对象</description>

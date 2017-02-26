@@ -249,6 +249,14 @@
 			reason = #{reason}
 		WHERE id = #{id}
 	</update>
+
+	<update id="updateRemarks">
+		UPDATE orders SET
+		remarks = #{remarks},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
 	
 	<update id="delete">
 		UPDATE orders SET 

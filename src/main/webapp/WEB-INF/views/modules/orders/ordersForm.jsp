@@ -1,5 +1,8 @@
+<%@ page import="com.zjy.losonkei.modules.orders.entity.Orders" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<c:set var="FLAG_DOING"><%=Orders.FLAG_DOING%></c:set>
+
 <html>
 <head>
 	<title>订单管理</title>
@@ -43,16 +46,18 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li><a href="${ctx}/orders/orders/">订单列表</a></li>
+		<li><a href="${ctx}/orders/orders/<c:if test="${FLAG_DOING ne orders.flag}">listOld</c:if>">订单列表</a></li>
 		<li class="active"><a href="${ctx}/orders/orders/form?id=${orders.id}">订单<shiro:hasPermission name="orders:orders:edit">${not empty orders.id?'处理':'添加'}</shiro:hasPermission><shiro:lacksPermission name="orders:orders:edit">查看</shiro:lacksPermission></a></li>
 	</ul><br/>
+	<div class="form-actions" style="margin-top: -28px;">
+		<h3>基本信息</h3>
+	</div>
 	<form:form id="inputForm" modelAttribute="orders" action="${ctx}/orders/orders/save" method="post" class="form-horizontal">
-		<form:hidden path="id"/>
 		<sys:message content="${message}"/>
 		<div class="control-group">
 			<label class="control-label">订单号：</label>
 			<div class="controls">
-				<form:input path="id" htmlEscape="false" maxlength="64" class="input-xlarge " disabled="true"/>
+				<form:input path="id" htmlEscape="false" maxlength="64" class="input-xlarge " readonly="true"/>
 			</div>
 		</div>
 		<div class="control-group">
@@ -149,56 +154,108 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">备注：</label>
-			<div class="controls">
-				<form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge "/>
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">退款：</label>
-			<div class="controls">
-				<form:input path="refund" htmlEscape="false" class="input-xlarge  number"/>
-			</div>
-		</div>
-		<div class="control-group">
 			<label class="control-label">收益：<br>（总售价 - 成本价 - 退款）</label>
 			<div class="controls">
 				<form:input path="income" htmlEscape="false" class="input-xlarge  number" disabled="true"/>
 			</div>
 		</div>
-
-		<div class="form-actions">
-			<shiro:hasPermission name="orders:orders:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
-			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+		<c:if test="${not empty orders.reason}">
+			<div class="control-group">
+				<label class="control-label">退款：</label>
+				<div class="controls">
+					<form:input path="refund" htmlEscape="false" class="input-xlarge  number" disabled="true"/>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">退款原因：</label>
+				<div class="controls">
+					<form:textarea path="reason" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge " disabled="true"/>
+				</div>
+			</div>
+		</c:if>
+		<div class="control-group">
+			<label class="control-label">流转信息：</label>
+			<div class="controls">
+				<div class="row-fluid">
+					<div class="span11">
+						<%@include file="/WEB-INF/views/modules/include/actTaskHistoricFlow.jsp"%>
+					</div>
+				</div>
+			</div>
 		</div>
-	</form:form>
-			<table id="contentTable" class="table table-striped table-bordered table-condensed">
-				<thead>
-				<tr>
-					<th>商品号</th>
-					<th>商品名</th>
-					<th>购买数量</th>
-					<th>成本价（个）</th>
-					<th>单价</th>
-					<th>总价</th>
-					<%--<th>备注</th>--%>
-					<th>查看</th>
-				</tr>
-				</thead>
-				<tbody id="ordersDetailsList">
-					<c:forEach items="${orders.ordersDetailsList}" var="details">
-                        <tr>
-						<td>${details.goodsNo}</td>
-						<td>${details.remarks}</td>
-						<td>${details.goodsAmount}</td>
-						<td>${details.cost}</td>
-						<td>${details.price}</td>
-						<td>${details.priceAll}</td>
-						<td><a href="${pageContext.request.contextPath}/goodsDetails/${details.goodsId}" target="_blank">访问</a></td>
-                        </tr>
-					</c:forEach>
-				</tbody>
-			</table>
+		<div class="control-group">
+			<label class="control-label">备注：</label>
+			<div class="controls">
+				<form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge "/>
+				<shiro:hasPermission name="orders:orders:edit">
+					<input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
+				<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+			</div>
+		</div>
 
+		<%--<div class="form-actions">
+			<shiro:hasPermission name="orders:orders:edit">
+				<input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
+			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+		</div>--%>
+	</form:form>
+	<div class="form-actions">
+		<h3>购买情况</h3>
+	</div>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+		<thead>
+		<tr>
+			<th>商品号</th>
+			<th>商品名</th>
+			<th>购买数量</th>
+			<th>成本价（个）</th>
+			<th>单价</th>
+			<th>总价</th>
+			<%--<th>备注</th>--%>
+			<th>查看</th>
+		</tr>
+		</thead>
+		<tbody id="ordersDetailsList">
+		<c:forEach items="${orders.ordersDetailsList}" var="details">
+			<tr>
+				<td>${details.goodsNo}</td>
+				<td>${details.remarks}</td>
+				<td>${details.goodsAmount}</td>
+				<td>${details.cost}</td>
+				<td>${details.price}</td>
+				<td>${details.priceAll}</td>
+				<td><a href="${pageContext.request.contextPath}/goodsDetails/${details.goodsId}" target="_blank">访问</a></td>
+			</tr>
+		</c:forEach>
+		</tbody>
+	</table>
+	<c:if test="${not empty task}">
+		<div class="form-actions">
+			<h3>处理订单（${task.name}）</h3>
+		</div>
+		<form class="form-horizontal" method="post" action="" id="act-form">
+			<input type="hidden" name="taskId" value="${task.id}">
+			<input type="hidden" name="ordersId" value="${orders.id}">
+			<div class="control-group">
+				<label class="control-label">提交意见：</label>
+				<div class="controls">
+					<textarea id="comment" name="comment" rows="4" class="input-xxlarge"></textarea>
+				</div>
+			</div>
+			<div class="form-actions">
+				<shiro:hasPermission name="orders:orders:edit">
+					<c:if test="${not empty ordersFlow.formName}">
+						<input type="hidden" name="${ordersFlow.formName}" id="flow-parm"/>
+						<c:forEach var="d" items="${ordersFlow.details}">
+							<input onclick="$('#comment').val('${d.formValue}');$('#act-form').submit();" class="btn btn-primary" type="button" value="${d.formLabel}"/>&nbsp;&nbsp;&nbsp;
+						</c:forEach>
+					</c:if>
+					<c:if test="${empty ordersFlow.formName}">
+						<input id="btnSubmit" class="btn btn-primary" type="submit" value="${ordersFlow.taskName}"/>&nbsp;&nbsp;
+					</c:if></shiro:hasPermission>
+				<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+			</div>
+		</form>
+	</c:if>
 </body>
 </html>
