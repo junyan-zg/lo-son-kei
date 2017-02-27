@@ -25,10 +25,25 @@
 
             $("#inputForm").validate({
                 submitHandler: function (form) {
-                    loading('正在提交，请稍等...');
-               //     console.log($("#inputForm").serialize());
+                    var sort = "";
+                    var repeat = false;
+                    $(".spGroup").each(function(){
+                        var v = $(this).val();
+                        if(v.indexOf(sort) != -1){
+                            repeat = true;
+                            return;
+                        }else{
+                            sort += v;
+                        }
+                    });
+                    if (repeat){
+                        alertx("排序请不要重复！");
+                        return false;
+                    }
 
-                    form.submit();
+                    loading('正在提交，请稍等...');
+                //  console.log($("#inputForm").serialize());
+                   form.submit();
                 },
                 errorContainer: "#messageBox",
                 errorPlacement: function (error, element) {
@@ -270,7 +285,7 @@
                     <td><input name="stock" class="digits l-width" value="${goodsAll.stock}">
                     </td>
                     <td><input name="srcSpecificationGroup" type="hidden" value="${goodsAll.specificationGroup}">
-                        <input name="specificationGroup" class="digits required l-width"
+                        <input name="specificationGroup" class="digits required l-width spGroup"
                                value="${goodsAll.specificationGroup}" id="specificationGroup${status.index}"></td>
                     <td>
                         <input name="goodsAllId" value="${goodsAll.id}" type="hidden"/>
@@ -321,7 +336,7 @@
         <td><input name="stock" class="digits l-width">
         </td>
         <td><input name="srcSpecificationGroup" type="hidden" value="">
-            <input name="specificationGroup" id="specificationGroup{{index}}"  class="digits required l-width">
+            <input name="specificationGroup" id="specificationGroup{{index}}"  class="digits required l-width spGroup">
         </td>
         <td>
             <input name="goodsAllId" value="" type="hidden"/>

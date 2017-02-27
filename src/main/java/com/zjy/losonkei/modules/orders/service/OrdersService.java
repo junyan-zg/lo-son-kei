@@ -377,15 +377,14 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		if (activitiService.nextStepBelongsMe(null,taskId)){
 			Task task = activitiService.getTask(taskId);
 			Map<String,Object> map = new HashMap<String,Object>();
+			String value = null;
 			ActFlowInfo ordersFlow = ActivitiUtils.getOrdersFlow(task.getName());
 			if (StringUtils.isNotBlank(ordersFlow.getFormName())){	//需要设置变量
-				String value = request.getParameter(ordersFlow.getFormName());
+				value = request.getParameter(ordersFlow.getFormName());
 				Object objValue = ordersFlow.getValue(value);
 				map.put(task.getName(),objValue);
-				dispatch(task.getName(),value,ordersId,task,comment,map);
-			}else{
-				dispatch(task.getName(),null,ordersId,task,comment,map);
 			}
+			dispatch(task.getName(),value,ordersId,task,comment,map);
 		}
 	}
 
@@ -400,7 +399,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		}else if ("检查库存".equals(taskName)){
 			checkStock(value,orders,map);
 		}else if ("待发货".equals(taskName)){
-			sendGoods(orders);
+			sendGoods(orders,map);
 		}else if ("审核退货".equals(taskName)){
 			auditBack(value,orders,map);
 		}
@@ -446,10 +445,11 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	/**
 	 * 待发货
 	 */
-	private void sendGoods(Orders orders){
+	private void sendGoods(Orders orders,Map<String,Object> map){
 		orders.setGoodsState(Orders.GOODS_STATE2);
 		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
 		this.update(orders);
+		map.put(ActivitiUtils.VAR_TIMEOUT_GET,ActivitiUtils.TIME_TIMEOUT_GET);
 		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单发货啦！请耐心等待。",orders.getId()));
 	}
 

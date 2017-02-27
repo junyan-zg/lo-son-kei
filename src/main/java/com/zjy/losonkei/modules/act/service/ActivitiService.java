@@ -16,6 +16,7 @@ import org.activiti.engine.*;
 import org.activiti.engine.history.*;
 import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
 import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.persistence.entity.CommentEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
@@ -187,6 +188,7 @@ public class ActivitiService extends BaseService {
 		if (act.getEndDate() != null){
 			taskInstanceQuery.taskCreatedBefore(act.getEndDate());
 		}
+		taskInstanceQuery.finished();
 		act.getPage().setCount(taskInstanceQuery.count());
 		// 查询列表
 		List<HistoricTaskInstance> historicTaskInstances = taskInstanceQuery.listPage(act.getPage().getFirstResult(), act.getPage().getPageSize());
@@ -286,7 +288,7 @@ public class ActivitiService extends BaseService {
 				if (StringUtils.isNotBlank(histIns.getTaskId())){
 					List<Comment> commentList = taskService.getTaskComments(histIns.getTaskId());
 					if (commentList.size() > 0){
-						e.setComment(commentList.get(0).getFullMessage());
+						e.setComment(((CommentEntity)commentList.get(0)).getMessage());
 					}
 				}
 				actList.add(e);

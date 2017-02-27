@@ -25,7 +25,7 @@ public class ActivitiUtils {
     //超时支付 15分钟
     public final static String VAR_TIMEOUT_PAY = "payTimeOut";
     public final static String TIME_TIMEOUT_PAY = "PT15M";
-    //确认收货 15天
+    //确认收货 10天
     public final static String VAR_TIMEOUT_GET = "confirmGetGoodsTimeOut";
     public final static String TIME_TIMEOUT_GET = "P10D";
     //申请退货 7天
