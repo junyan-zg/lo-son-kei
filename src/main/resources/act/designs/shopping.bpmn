@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
-  <process id="shopping" name="shopping" isExecutable="true">
+  <process id="shopping" name="下单流程" isExecutable="true">
     <startEvent id="startevent1" name="Start"></startEvent>
     <userTask id="在线支付" name="在线支付" activiti:assignee="${member}"></userTask>
     <boundaryEvent id="boundarytimer1" name="Timer" attachedToRef="在线支付" cancelActivity="true">
@@ -32,25 +32,25 @@
         <timeDuration>${returnGoodsTimeOut}</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
-    <userTask id="usertask8" name="审核退货" activiti:candidateUsers="${auditors}"></userTask>
+    <userTask id="审核退货" name="审核退货" activiti:candidateUsers="${auditors}"></userTask>
     <endEvent id="endevent2" name="End"></endEvent>
-    <sequenceFlow id="flow20" sourceRef="申请退货" targetRef="usertask8"></sequenceFlow>
-    <userTask id="寄回商品" name="确认寄回商品" activiti:candidateUsers="${warehouseStaff}"></userTask>
+    <sequenceFlow id="flow20" sourceRef="申请退货" targetRef="审核退货"></sequenceFlow>
+    <userTask id="确认寄回商品" name="确认寄回商品" activiti:candidateUsers="${warehouseStaff}"></userTask>
     <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
-    <sequenceFlow id="flow21" sourceRef="usertask8" targetRef="exclusivegateway3"></sequenceFlow>
-    <sequenceFlow id="flow23" name="需要寄回" sourceRef="exclusivegateway3" targetRef="寄回商品">
+    <sequenceFlow id="flow21" sourceRef="审核退货" targetRef="exclusivegateway3"></sequenceFlow>
+    <sequenceFlow id="flow23" name="需要寄回" sourceRef="exclusivegateway3" targetRef="确认寄回商品">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${r==3}]]></conditionExpression>
     </sequenceFlow>
     <serviceTask id="完成订单" name="完成订单" activiti:class="com.zjy.losonkei.modules.act.servicetask.FinishOrderTask"></serviceTask>
     <userTask id="退货入库" name="退货入库" activiti:candidateUsers="${warehouseStaff}"></userTask>
     <parallelGateway id="parallelgateway1" name="Parallel Gateway"></parallelGateway>
-    <boundaryEvent id="boundarytimer4" name="Timer" attachedToRef="寄回商品" cancelActivity="true">
+    <boundaryEvent id="boundarytimer4" name="Timer" attachedToRef="确认寄回商品" cancelActivity="true">
       <timerEventDefinition>
         <timeDuration>${backGoodsTimeOut}</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flow29" name="超时寄回" sourceRef="boundarytimer4" targetRef="完成订单"></sequenceFlow>
-    <sequenceFlow id="flow30" sourceRef="寄回商品" targetRef="parallelgateway1"></sequenceFlow>
+    <sequenceFlow id="flow30" sourceRef="确认寄回商品" targetRef="parallelgateway1"></sequenceFlow>
     <parallelGateway id="parallelgateway2" name="Parallel Gateway"></parallelGateway>
     <userTask id="退货退款" name="退货退款" activiti:candidateUsers="${auditors}"></userTask>
     <sequenceFlow id="flow38" name="不需寄回" sourceRef="exclusivegateway3" targetRef="退货退款">
@@ -72,21 +72,23 @@
       </endEvent>
       <sequenceFlow id="flow43" sourceRef="取消订单" targetRef="errorendevent2"></sequenceFlow>
       <sequenceFlow id="flow44" sourceRef="确认订单" targetRef="exclusivegateway4"></sequenceFlow>
-      <userTask id="usertask15" name="检查库存" activiti:candidateUsers="${salers}"></userTask>
-      <sequenceFlow id="flow45" name="有效" sourceRef="exclusivegateway4" targetRef="usertask15">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${valid==true}]]></conditionExpression>
+      <userTask id="检查库存" name="检查库存" activiti:candidateUsers="${salers}"></userTask>
+      <sequenceFlow id="flow45" name="有效" sourceRef="exclusivegateway4" targetRef="检查库存">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${valid==1}]]></conditionExpression>
       </sequenceFlow>
       <userTask id="待发货" name="待发货" activiti:candidateUsers="${warehouseStaff}"></userTask>
       <endEvent id="endevent3" name="End"></endEvent>
       <sequenceFlow id="flow48" sourceRef="待发货" targetRef="endevent3"></sequenceFlow>
       <sequenceFlow id="flow49" name="无效" sourceRef="exclusivegateway4" targetRef="errorendevent2">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${valid==false}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${valid==0}]]></conditionExpression>
       </sequenceFlow>
       <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway"></exclusiveGateway>
-      <sequenceFlow id="flow50" sourceRef="usertask15" targetRef="exclusivegateway5"></sequenceFlow>
-      <sequenceFlow id="flow51" name="有货" sourceRef="exclusivegateway5" targetRef="待发货"></sequenceFlow>
+      <sequenceFlow id="flow50" sourceRef="检查库存" targetRef="exclusivegateway5"></sequenceFlow>
+      <sequenceFlow id="flow51" name="有货" sourceRef="exclusivegateway5" targetRef="待发货">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${enough==1}]]></conditionExpression>
+      </sequenceFlow>
       <sequenceFlow id="flow52" name="缺货" sourceRef="exclusivegateway5" targetRef="errorendevent2">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${enough==false}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${enough==0}]]></conditionExpression>
       </sequenceFlow>
     </subProcess>
     <boundaryEvent id="boundaryerror1" name="Error" attachedToRef="subprocess1">
@@ -142,13 +144,13 @@
       <bpmndi:BPMNShape bpmnElement="boundarytimer3" id="BPMNShape_boundarytimer3">
         <omgdc:Bounds height="30.0" width="30.0" x="836.0" y="530.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask8" id="BPMNShape_usertask8">
+      <bpmndi:BPMNShape bpmnElement="审核退货" id="BPMNShape_审核退货">
         <omgdc:Bounds height="55.0" width="105.0" x="655.0" y="403.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
         <omgdc:Bounds height="35.0" width="35.0" x="954.0" y="601.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="寄回商品" id="BPMNShape_寄回商品">
+      <bpmndi:BPMNShape bpmnElement="确认寄回商品" id="BPMNShape_确认寄回商品">
         <omgdc:Bounds height="55.0" width="105.0" x="655.0" y="226.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="boundarytimer4" id="BPMNShape_boundarytimer4">
@@ -196,7 +198,7 @@
       <bpmndi:BPMNShape bpmnElement="errorendevent2" id="BPMNShape_errorendevent2">
         <omgdc:Bounds height="35.0" width="35.0" x="211.0" y="424.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask15" id="BPMNShape_usertask15">
+      <bpmndi:BPMNShape bpmnElement="检查库存" id="BPMNShape_检查库存">
         <omgdc:Bounds height="55.0" width="105.0" x="400.0" y="414.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="待发货" id="BPMNShape_待发货">
@@ -218,7 +220,7 @@
         <omgdi:waypoint x="292.0" y="166.0"></omgdi:waypoint>
         <omgdi:waypoint x="155.0" y="165.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="48.0" x="175.0" y="152.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="48.0" x="130.0" y="107.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
@@ -245,7 +247,7 @@
         <omgdi:waypoint x="680.0" y="627.0"></omgdi:waypoint>
         <omgdi:waypoint x="745.0" y="625.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="60.0" x="696.0" y="598.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="60.0" x="678.0" y="602.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
@@ -272,7 +274,7 @@
         <omgdi:waypoint x="971.0" y="253.0"></omgdi:waypoint>
         <omgdi:waypoint x="971.0" y="458.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="48.0" x="863.0" y="241.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="48.0" x="888.0" y="225.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
@@ -283,7 +285,7 @@
         <omgdi:waypoint x="727.0" y="344.0"></omgdi:waypoint>
         <omgdi:waypoint x="817.0" y="344.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="744.0" y="328.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="48.0" x="744.0" y="328.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
@@ -314,7 +316,7 @@
         <omgdi:waypoint x="452.0" y="347.0"></omgdi:waypoint>
         <omgdi:waypoint x="452.0" y="414.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="24.0" x="446.0" y="370.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="446.0" y="370.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow48" id="BPMNEdge_flow48">
@@ -325,7 +327,7 @@
         <omgdi:waypoint x="452.0" y="347.0"></omgdi:waypoint>
         <omgdi:waypoint x="228.0" y="424.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="24.0" x="362.0" y="375.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="362.0" y="375.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow50" id="BPMNEdge_flow50">
@@ -336,14 +338,14 @@
         <omgdi:waypoint x="322.0" y="461.0"></omgdi:waypoint>
         <omgdi:waypoint x="322.0" y="517.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="24.0" x="348.0" y="445.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="318.0" y="480.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow52" id="BPMNEdge_flow52">
         <omgdi:waypoint x="302.0" y="441.0"></omgdi:waypoint>
         <omgdi:waypoint x="246.0" y="441.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="24.0" x="241.0" y="428.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="241.0" y="428.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow53" id="BPMNEdge_flow53">

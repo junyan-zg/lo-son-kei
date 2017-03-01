@@ -258,8 +258,10 @@ public class ActivitiService extends BaseService {
 
 			// 不显示开始节点和结束节点
 			if (!"startEvent".equals(histIns.getActivityType()) && ! "subProcess".equals(histIns.getActivityType())
-					&& !"parallelGateway".equals(histIns.getActivityType()) &&
-					 ! "endEvent".equals(histIns.getActivityType())){
+					&& !"parallelGateway".equals(histIns.getActivityType())
+					&& !"exclusiveGateway".equals(histIns.getActivityType())
+					&& !"boundaryError".equals(histIns.getActivityType())
+					&& ! "endEvent".equals(histIns.getActivityType())){
 				Act e = new Act();
 				e.setHistIns(histIns);
 				// 获取流程发起人名称

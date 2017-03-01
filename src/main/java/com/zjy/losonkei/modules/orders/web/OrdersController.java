@@ -5,6 +5,7 @@ package com.zjy.losonkei.modules.orders.web;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.zjy.losonkei.modules.act.entity.ActFlowInfo;
 import com.zjy.losonkei.modules.act.service.ActivitiService;
@@ -13,6 +14,7 @@ import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.activiti.engine.task.Task;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -28,6 +30,7 @@ import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.modules.orders.entity.Orders;
 import com.zjy.losonkei.modules.orders.service.OrdersService;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -76,8 +79,13 @@ public class OrdersController extends BaseController {
 
 	@RequiresPermissions("orders:orders:view")
 	@RequestMapping(value = "form")
-	public String form(Orders orders, Model model) {
+	public String form(Orders orders, Model model, HttpSession session) {
 		model.addAttribute("orders", orders);
+
+		if (session.getAttribute("message") != null){
+			model.addAttribute("message",session.getAttribute("message"));
+			session.removeAttribute("message");
+		}
 
 		if (Orders.FLAG_DOING.equals(orders.getFlag())){
 			String processInstanceId = orders.getProcessInstanceId();
@@ -116,13 +124,19 @@ public class OrdersController extends BaseController {
 
 
 	@RequiresPermissions("orders:orders:edit")
-	@RequestMapping(value = "compileTask")
-	public String compileTask(String ordersId,String taskId, Model model,String comment,HttpServletRequest request) {
+	@RequestMapping(value = "doTask")
+	public String doTask(String ordersId,String taskId,String comment,HttpServletRequest request) {
 		/*if (!beanValidator(model, orders)){
 			return form(orders, model);
 		}*/
+		try{
+			ordersService.compileTask(ordersId, taskId, comment, request);
+			request.getSession().setAttribute("message","操作成功！");
+		}catch (Exception e){
+			e.printStackTrace();
+			request.getSession().setAttribute("message","操作失败，请稍后重试！");
+		}
 
-
-		return "redirect:"+Global.getAdminPath()+"/orders/orders/form?id=" + ordersId;
+		return "redirect:"+Global.getAdminPath()+"/orders/orders/form?id=" + ordersId + "&time=" + new Date().getTime();
 	}
 }

@@ -36,7 +36,7 @@ public class Orders extends DataEntity<Orders> {
 	private String ordersState;		// 1有效，2无效，3用户于待发货时取消，4用户收货后退单，5商家缺货退单
 	private String goodsState;		// 1待发货，2已发货，3已取消，4已退回，5无货
 	private String payState;		// 1未付款，2已付款，3已退款
-	private String flag;		// 0进行中1交易成功2交易失败,待发货前全额退款都是失败
+	private String flag;		// 0进行中1交易成功2交易失败,没有盈利都是失败
 	private BigDecimal refund;		// 退款
 	private BigDecimal income;		// 收益，交易成功时price_all-cost_all-refund
 	private String reason;

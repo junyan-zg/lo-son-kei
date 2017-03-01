@@ -32,13 +32,6 @@ public class ActFlowInfo implements Serializable {
 
     }
 
-    public Object getValue(String value){
-        if (valueMap == null){
-            return null;
-        }
-        return valueMap.get(value).getValue();
-    }
-
     public ActFlowInfo(String formName,String taskName,Detail ... details){
         this.formName = formName;
         this.taskName = taskName;
@@ -46,14 +39,13 @@ public class ActFlowInfo implements Serializable {
         this.valueMap = new HashMap<String, Detail>();
         for (Detail d : details){
             this.details.add(d);
-            valueMap.put("formValue",d);
+            valueMap.put(d.getFormValue(),d);
         }
     }
 
     public static class Detail{
         private String formValue;
         private String formLabel;
-        private Boolean trueValue;  //该字段针对把true改成1,false改成0
 
         public Detail() {}
 
@@ -62,15 +54,6 @@ public class ActFlowInfo implements Serializable {
             this.formLabel = formLabel;
         }
 
-        public Object getValue(){
-            return trueValue == null ? formValue : trueValue;
-        }
-
-        public Detail(String formValue, String formLabel,Boolean trueValue) {
-            this.formValue = formValue;
-            this.formLabel = formLabel;
-            this.trueValue = trueValue;
-        }
 
         public String getFormValue() {
             return formValue;
@@ -88,13 +71,6 @@ public class ActFlowInfo implements Serializable {
             this.formLabel = formLabel;
         }
 
-        public Boolean getTrueValue() {
-            return trueValue;
-        }
-
-        public void setTrueValue(Boolean trueValue) {
-            this.trueValue = trueValue;
-        }
     }
 
 

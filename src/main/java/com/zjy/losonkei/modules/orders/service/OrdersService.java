@@ -31,6 +31,7 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.activiti.rest.common.api.ActivitiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -381,15 +382,14 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 			ActFlowInfo ordersFlow = ActivitiUtils.getOrdersFlow(task.getName());
 			if (StringUtils.isNotBlank(ordersFlow.getFormName())){	//需要设置变量
 				value = request.getParameter(ordersFlow.getFormName());
-				Object objValue = ordersFlow.getValue(value);
-				map.put(task.getName(),objValue);
+				map.put(ordersFlow.getFormName(),value);
 			}
-			dispatch(task.getName(),value,ordersId,task,comment,map);
+			dispatch(task.getName(),value,ordersId,task,comment,map,request);
 		}
 	}
 
 
-	private void dispatch(String taskName,String value,String ordersId,Task task,String comment,Map<String,Object> map){
+	private void dispatch(String taskName,String value,String ordersId,Task task,String comment,Map<String,Object> map,HttpServletRequest request){
 		Orders orders = get(ordersId);
 		if (orders == null || !Orders.FLAG_DOING.equals(orders.getFlag())){
 			throw new IllegalArgumentException();
@@ -402,6 +402,14 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 			sendGoods(orders,map);
 		}else if ("审核退货".equals(taskName)){
 			auditBack(value,orders,map);
+		}else if ("确认寄回商品".equals(taskName)){
+			confirmBack(orders);
+		}else if ("退货退款".equals(taskName)){
+
+		}else if ("寄回退款".equals(taskName)){
+
+		}else if ("退货入库".equals(taskName)){
+
 		}
 
 		activitiService.complete(task.getId(),task.getProcessInstanceId(),comment,null,map);
@@ -474,7 +482,14 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	}
 
 
-
+	/**
+	 * 确认寄回商品
+	 */
+	private void confirmBack(Orders orders){
+		orders.setGoodsState(Orders.GOODS_STATE4);
+		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+		this.update(orders);
+	}
 
 
 
@@ -514,7 +529,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 
 		Member member = memberService.get(orders.getMemberId());
 		member.setMemberBalance(member.getMemberBalance().add(orders.getPriceAll()));
-		member.setMemberPoints(member.getMemberPoints() - member.getMemberBalance().intValue());
+		member.setMemberPoints(member.getMemberPoints() - orders.getPriceAll().intValue());
 		memberService.save(member);
 
 		//账单
@@ -526,5 +541,40 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 
 		memberNoteService.save(new MemberNote(orders.getMemberId(),"您退款已到账，请查收！。",ordersId));
 
+	}
+
+
+	@Transactional(readOnly = false)
+	public void getGoodsTask(DelegateExecution execution){
+		String ordersId = execution.getProcessBusinessKey();
+		Orders orders = this.get(ordersId);
+		orders.setGoodsState(Orders.GOODS_STATE6);
+		orders.setProcessState(execution.getCurrentActivityId());
+		this.update(orders);
+
+		//设置退货超时
+		Map<String,Object> map = new HashMap<String, Object>();
+		map.put(ActivitiUtils.VAR_TIMEOUT_BACK,ActivitiUtils.TIME_TIMEOUT_BACK);
+		execution.setVariables(map);
+
+		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单长时间未处理，系统自动确认收货。",ordersId));
+
+	}
+
+	@Transactional(readOnly = false)
+	public void finishOrderTask(DelegateExecution execution){
+		String ordersId = execution.getProcessBusinessKey();
+		Orders orders = this.get(ordersId);
+
+		BigDecimal income = orders.getPriceAll().subtract(orders.getCostAll());
+		if (orders.getRefund() != null){
+			income = income.subtract(orders.getRefund());
+		}
+		orders.setIncome(income);
+
+		orders.setFlag(income.compareTo(BigDecimal.ZERO) == 1 ? Orders.FLAG_SUCCESS : Orders.FLAG_FAILED);
+
+		orders.setProcessState(execution.getCurrentActivityId());
+		this.update(orders);
 	}
 }

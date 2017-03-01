@@ -25,15 +25,15 @@
 
             $("#inputForm").validate({
                 submitHandler: function (form) {
-                    var sort = "";
+                    var sort = ",";
                     var repeat = false;
                     $(".spGroup").each(function(){
                         var v = $(this).val();
-                        if(v.indexOf(sort) != -1){
+                        if(sort.indexOf("," + v + ",") != -1){
                             repeat = true;
                             return;
                         }else{
-                            sort += v;
+                            sort += v + ",";
                         }
                     });
                     if (repeat){
