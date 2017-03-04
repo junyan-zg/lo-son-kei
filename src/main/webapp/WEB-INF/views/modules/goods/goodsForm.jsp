@@ -236,6 +236,27 @@
             }
         </style>
     </div>
+    <shiro:hasPermission name="goods:goodsArticle:view">
+    <div class="control-group">
+        <label class="control-label">商品描述：</label>
+        <div class="controls">
+            <a class="btn btn-primary btn-mini" onclick="openArticle('${ctx}/goods/goodsArticle/form?goodsId=${goods.id}');">查看</a>
+        </div>
+        <script>
+            function openArticle(url){
+                top.$.jBox("iframe:" + url, {
+                    title: "商品描述",
+                    width: 900,
+                    height: 550,
+                    buttons: {"关闭": true},
+                    loaded: function (h) {
+                        $(".jbox-content", top.document).css("overflow-y", "hidden");
+                    }
+                });
+            }
+        </script>
+    </div>
+    </shiro:hasPermission>
     </c:if>
     <div class="control-group">
         <label class="control-label">描述：</label>

@@ -28,6 +28,9 @@ public class OrdersDetails extends DataEntity<OrdersDetails> {
 
 	private String goodsId;
 
+	private Integer backAmount;		// 退货数量
+	private Integer backQualifiedAmount;		// 退货合格数量，直接保存到库存
+
 	private GoodsAll goodsAll;
 	
 	public OrdersDetails() {
@@ -107,5 +110,21 @@ public class OrdersDetails extends DataEntity<OrdersDetails> {
 
 	public void setGoodsAll(GoodsAll goodsAll) {
 		this.goodsAll = goodsAll;
+	}
+
+	public Integer getBackAmount() {
+		return backAmount;
+	}
+
+	public void setBackAmount(Integer backAmount) {
+		this.backAmount = backAmount;
+	}
+
+	public Integer getBackQualifiedAmount() {
+		return backQualifiedAmount;
+	}
+
+	public void setBackQualifiedAmount(Integer backQualifiedAmount) {
+		this.backQualifiedAmount = backQualifiedAmount;
 	}
 }

@@ -3,10 +3,7 @@ package com.zjy.losonkei.modules.front;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.goods.entity.*;
-import com.zjy.losonkei.modules.goods.service.GoodsAllService;
-import com.zjy.losonkei.modules.goods.service.GoodsAttrValueService;
-import com.zjy.losonkei.modules.goods.service.GoodsService;
-import com.zjy.losonkei.modules.goods.service.GoodsSpecificationValueService;
+import com.zjy.losonkei.modules.goods.service.*;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import com.zjy.losonkei.modules.orders.entity.ShoppingCart;
 import com.zjy.losonkei.modules.orders.service.ShoppingCartService;
@@ -40,6 +37,8 @@ public class GoodsDetailsController extends BaseController{
     private GoodsAllService goodsAllService;
     @Autowired
     private ShoppingCartService shoppingCartService;
+    @Autowired
+    private GoodsArticleService goodsArticleService;
 
     @RequestMapping("/goodsDetails/{id}")
     public String goodsDetails(@PathVariable("id")String goodsId, Model model){
@@ -69,6 +68,9 @@ public class GoodsDetailsController extends BaseController{
         goodsAttrValue.setGoodsId(goodsId);
         List<GoodsAttrValue> goodsAttrValueList = goodsAttrValueService.findList(goodsAttrValue);
         model.addAttribute("goodsAttrValueList",goodsAttrValueList);
+
+        GoodsArticle goodsArticle = goodsArticleService.getByGoodsId(goodsId);
+        model.addAttribute("goodsArticle",goodsArticle);
 
         return "modules/front/goodsDetails";
     }

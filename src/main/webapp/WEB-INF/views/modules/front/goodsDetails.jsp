@@ -223,40 +223,8 @@
                         <div class="clear"></div>
 
                         <div class="tab1 tab_body">
-                            <h4>About This Item</h4>
-
-                            <p>Suspendisse at placerat turpis. Duis luctus erat vel magna pharetra aliquet. Maecenas
-                                tincidunt feugiat ultricies. Phasellus et dui risus. Vestibulum adipiscing, eros quis
-                                lobortis dictum. Etiam mollis volutpat odio, id euismod justo gravida a. Aliquam erat
-                                volutpat. Phasellus faucibus venenatis lorem, vitae commodo elit pretium et. Duis
-                                rhoncus lobortis congue. Vestibulum et purus dui, vel porta lectus. Sed vulputate
-                                pulvinar adipiscing.</p>
-                            <ul>
-                                <li>She was walking to the mall.</li>
-                                <li>Ted might eat the cake.</li>
-                                <li>You must go right now.</li>
-                                <li>Words were spoken.</li>
-                                <li>The teacher is writing a report.</li>
-                            </ul>
-
-                            <p>Here are some verb phrase examples where the verb phrase is the predicate of a sentence.
-                                In this case, the verb phrase consists of the main verb plus any auxiliary, or helping,
-                                verbs. Nulla nec velit. Mauris pulvinar erat non massa. Suspendisse tortor turpis, porta
-                                nec, tempus vitae, iaculis semper, pede.</p>
-                            <ol>
-                                <li>Shipping & Delivery.</li>
-                                <li>Privacy & Security.</li>
-                                <li>Returns & Replacements.</li>
-                                <li>Payment, Pricing & Promotions.</li>
-                                <li>Viewing Orders.</li>
-                            </ol>
-                            <p>Next are some verb phrase examples of verb phrases where the phrase has a single function
-                                which means it can act like an adverb or an adjective. The phrase would include the verb
-                                and any modifiers, complements, or objects. Lorem ipsum dolor sit amet, consectetuer
-                                adipiscing elit. Morbi luctus. Duis lobortis. Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit. Curabitur nec posuere odio. Proin vel ultrices erat.</p>
-
-                            <div class="clear"></div>
+                           ${fns:unescapeHtml(goodsArticle.content)}
+                           <div class="clear"></div>
                         </div><!-- .tab1 .tab_body -->
 
                         <div class="tab2 tab_body">
