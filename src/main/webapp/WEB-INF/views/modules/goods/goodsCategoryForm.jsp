@@ -63,6 +63,21 @@
             <form:input path="sort" htmlEscape="false" maxlength="11" class="input-xlarge  digits"/>
         </div>
     </div>
+    <c:if test="${not empty goodsCategory.id}">
+    <div class="control-group" id="ol-thumb-img">
+        <label class="control-label">缩略图：<br>(首页展示)</label>
+        <div class="controls">
+            <form:hidden path="thumbImgUrl" htmlEscape="false" maxlength="255" class="input-xlarge"/>
+            <sys:ckfinder input="thumbImgUrl" type="images" uploadPath="/goodsCategory/${goodsCategory.id}" selectMultiple="false" maxWidth="100" maxHeight="100"/>
+        </div>
+        <style>
+            #ol-thumb-img li{
+                list-style: none;
+            }
+        </style>
+    </div>
+    </c:if>
+
     <div class="control-group">
         <label class="control-label">备注：</label>
 

@@ -6,8 +6,10 @@ import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.goods.entity.Goods;
 import com.zjy.losonkei.modules.goods.entity.GoodsCategory;
 import com.zjy.losonkei.modules.goods.entity.GoodsSearch;
+import com.zjy.losonkei.modules.goods.entity.SearchRecord;
 import com.zjy.losonkei.modules.goods.service.GoodsCategoryService;
 import com.zjy.losonkei.modules.goods.service.GoodsService;
+import com.zjy.losonkei.modules.goods.service.SearchRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
@@ -32,6 +34,8 @@ public class GoodsController extends BaseController{
     private GoodsCategoryService goodsCategoryService;
     @Autowired
     private GoodsService goodsService;
+    @Autowired
+    private SearchRecordService searchRecordService;
 
     @RequestMapping("/goods")
     public String list(Model model, GoodsSearch goodsSearch, HttpServletRequest request) throws UnsupportedEncodingException {
@@ -79,6 +83,7 @@ public class GoodsController extends BaseController{
             }
 
         }else{
+            searchRecordService.saveRecord(goodsSearch.getKeywords());
             //关键字不为空，搜商品，group by 得到我想要。
             goodsSearch.setFirstLevelCategoryId(null);
             goodsSearch.setCategories(goodsCategoryService.getCategoryListBySearchKey(goodsSearch.getKeywords()));
@@ -136,8 +141,4 @@ public class GoodsController extends BaseController{
         return "modules/front/goods";
     }
 
-    @RequestMapping("/goods/details")
-    public String goodsDetails(){
-        return "modules/front/goods";
-    }
 }

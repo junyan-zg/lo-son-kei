@@ -3,7 +3,7 @@ $(document).ready(function() {
     $('select').selectBox();
        
     // Cart
-    $(function() {
+/*    $(function() {
 	$('#cart_nav').hover(
             function(){
                 var self = this;
@@ -21,7 +21,7 @@ $(document).ready(function() {
                 $(this).find('.checkout').transition({ left: '147px', delay: 400 });
 	});
     });
-    
+*/
     // Menu
     $('.parent').hover(function(){
         var self = this;
@@ -84,7 +84,7 @@ $(document).ready(function() {
         return false;
     });
     
-    // Animations product
+/*    // Animations product
     $(function() {
 	$(".article").hover(
             function(){
@@ -103,6 +103,6 @@ $(document).ready(function() {
                 $(this).find(".price").transition({ left: '60px', textAlign:'center' });
 	});
     });
-    
+*/
 
 });

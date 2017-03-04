@@ -209,7 +209,6 @@
     <c:if test="${not empty goods.id}">
     <div class="control-group" id="ol-thumb-img">
         <label class="control-label">缩略图：</label>
-
         <div class="controls">
             <form:hidden path="thumbImgUrl" htmlEscape="false" maxlength="255" class="input-xlarge"/>
             <sys:ckfinder input="thumbImgUrl" type="images" uploadPath="/goods/${goods.id}" selectMultiple="false" maxWidth="100" maxHeight="100"/>
@@ -248,6 +247,7 @@
     <table id="contentTable" class="table table-striped table-bordered table-condensed">
         <thead>
         <tr>
+            <th>商品号</th>
             <c:forEach var="list" items="${goodsSpecificationList}">
                 <th>${list.specificationName}
                     <c:if test="${list.required eq requiredYes}">
@@ -269,6 +269,7 @@
         <c:if test="${not empty goods.goodsAlls}">
             <c:forEach varStatus="status" var="goodsAll" items="${goods.goodsAlls}">
                 <tr id="no-tag-${status.index}">
+                    <td>${goodsAll.id}</td>
                     <c:forEach var="list" items="${goodsSpecificationList}">
                         <td>
                             <input id="${list.id}${status.index}" name="goodsSpecification${list.id}"
@@ -317,6 +318,7 @@
 
 <script type="text/html" id="row-tmp">
     <tr id="no-tag-{{index}}">
+        <td>（待生成）</td>
         <c:forEach var="list" items="${goodsSpecificationList}">
             <td>
                 <c:if test="${list.required eq requiredYes}">

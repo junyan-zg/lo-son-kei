@@ -49,5 +49,21 @@ public class GoodsService extends CrudService<GoodsDao, Goods> {
 	public void delete(Goods goods) {
 		super.delete(goods);
 	}
+
+	@Transactional(readOnly = false)
+	public void updateVisit(String goodsId){
+		dao.updateVisit(goodsId);
+	}
+
+
+	public List<Goods> findListForIndex() {
+		Goods goods = new Goods();
+		goods.setState(Goods.STATE_ON_SALE);
+		Page<Goods> page = new Page<>();
+		page.setPageNo(1);
+		page.setPageSize(8);
+		goods.setPage(page);
+		return dao.findListFront(goods);
+	}
 	
 }

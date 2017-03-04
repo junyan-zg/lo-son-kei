@@ -190,6 +190,7 @@
         <c:if test="${not empty goods.goodsAlls}">
             <c:forEach varStatus="status" var="goodsAll" items="${goods.goodsAlls}">
                 <tr>
+                    <td>${goodsAll.id}</td>
                     <c:forEach var="list" items="${goodsSpecificationList}">
                         <td>
                           <c:forEach items="${goodsAll.goodsSpecificationValues}" var="val"><c:if test="${val.goodsSpecification.id eq list.id}">${val.specificationValue}</c:if></c:forEach>

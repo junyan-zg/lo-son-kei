@@ -47,6 +47,7 @@ public class GoodsDetailsController extends BaseController{
         if(goods == null){
             return "redirect:/goods";
         }
+        goodsService.updateVisit(goodsId);
         model.addAttribute("goods",goods);
 
         //url

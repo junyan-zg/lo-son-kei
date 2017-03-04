@@ -22,6 +22,7 @@ public class GoodsCategory extends TreeEntity<GoodsCategory> {
 	private GoodsCategory parent;		// 商品分类id上级
 	private String parentIds;		// 商品分类id所有上级
 	private Integer sort;		// 排序，根据分级排序
+	private String thumbImgUrl;
 	
 	public GoodsCategory() {
 		super();
@@ -78,5 +79,13 @@ public class GoodsCategory extends TreeEntity<GoodsCategory> {
 	
 	public String getParentId() {
 		return parent != null && parent.getId() != null ? parent.getId() : "0";
+	}
+
+	public String getThumbImgUrl() {
+		return thumbImgUrl;
+	}
+
+	public void setThumbImgUrl(String thumbImgUrl) {
+		this.thumbImgUrl = thumbImgUrl;
 	}
 }

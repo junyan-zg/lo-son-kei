@@ -40,6 +40,7 @@ public class Goods extends DataEntity<Goods> {
 	private Integer sort;		// 排序
 	private Long salesAmount;	//销售总量,由定时任务更新
 	private String flag;		//1新品2热销3优惠
+	private Long visitAmount;	//访问量
 
 	private List<GoodsAll> goodsAlls;
 
@@ -233,5 +234,13 @@ public class Goods extends DataEntity<Goods> {
 
 	public void setCategoryIds(String[] categoryIds) {
 		this.categoryIds = categoryIds;
+	}
+
+	public Long getVisitAmount() {
+		return visitAmount;
+	}
+
+	public void setVisitAmount(Long visitAmount) {
+		this.visitAmount = visitAmount;
 	}
 }

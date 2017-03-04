@@ -23,6 +23,7 @@
 		a.sales_amount AS "salesAmount",
 		a.sort AS "sort",
 		a.flag AS "flag",
+		a.visit_amount AS "visitAmount",
 
 		b.category_name AS "goodsCategory.categoryName"
 	</sql>
@@ -253,6 +254,12 @@
 			update_date = #{updateDate},
 			flag = #{flag},
 			sort = #{sort}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateVisit">
+		UPDATE goods SET
+		visit_amount = visit_amount + 1
 		WHERE id = #{id}
 	</update>
 	

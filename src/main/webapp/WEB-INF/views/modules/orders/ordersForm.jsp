@@ -207,6 +207,7 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 		<tr>
+			<th class="sort-column">库存</th>
 			<th>商品号</th>
 			<th>商品名</th>
 			<th>购买数量</th>
@@ -220,6 +221,7 @@
 		<tbody id="ordersDetailsList">
 		<c:forEach items="${orders.ordersDetailsList}" var="details">
 			<tr>
+				<td class="data-stock" data-id="${details.goodsAll.id}">${details.goodsAll.stock}</td>
 				<td>${details.goodsNo}</td>
 				<td>${details.remarks}</td>
 				<td>${details.goodsAmount}</td>
@@ -246,6 +248,21 @@
 			</div>
 			<div class="form-actions">
 				<shiro:hasPermission name="orders:orders:edit">
+					<c:if test="${'检查库存' eq task.name}">
+						<input value="刷新库存" type="button" onclick="reFreshStock();" class=" btn-warning btn" style="margin-right: 50px;">
+						<script>
+							function reFreshStock(){
+								$(".data-stock").each(function(){
+									var id = $(this).attr("data-id");
+									$(this).html("");
+									var $tmp = $(this);
+									$.get("${ctx}/orders/orders/getStock?goodsNo="+id,function(data){
+										$tmp.append(data);
+									});
+								});
+							}
+						</script>
+					</c:if>
 					<c:if test="${not empty ordersFlow.formName}">
 						<input type="hidden" name="${ordersFlow.formName}" id="flow-parm"/>
 						<c:forEach var="d" items="${ordersFlow.details}">

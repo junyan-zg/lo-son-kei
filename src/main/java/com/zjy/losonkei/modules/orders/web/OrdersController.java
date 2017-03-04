@@ -10,6 +10,8 @@ import javax.servlet.http.HttpSession;
 import com.zjy.losonkei.modules.act.entity.ActFlowInfo;
 import com.zjy.losonkei.modules.act.service.ActivitiService;
 import com.zjy.losonkei.modules.act.utils.ActivitiUtils;
+import com.zjy.losonkei.modules.goods.entity.GoodsAll;
+import com.zjy.losonkei.modules.goods.service.GoodsAllService;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.activiti.engine.task.Task;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -46,6 +48,8 @@ public class OrdersController extends BaseController {
 	private OrdersService ordersService;
 	@Autowired
 	private ActivitiService activitiService;
+	@Autowired
+	private GoodsAllService goodsAllService;
 	
 	@ModelAttribute
 	public Orders get(@RequestParam(required=false) String id) {
@@ -57,6 +61,18 @@ public class OrdersController extends BaseController {
 			entity = new Orders();
 		}
 		return entity;
+	}
+
+	@RequiresPermissions("orders:orders:view")
+	@RequestMapping("getStock")
+	@ResponseBody
+	public Integer getStock(String goodsNo){
+		GoodsAll goodsAll = goodsAllService.get(goodsNo);
+		if (goodsAll != null){
+			return goodsAll.getStock();
+		}else{
+			return 0;
+		}
 	}
 	
 	@RequiresPermissions("orders:orders:view")

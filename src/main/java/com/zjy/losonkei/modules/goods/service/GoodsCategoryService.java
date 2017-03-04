@@ -5,6 +5,7 @@ package com.zjy.losonkei.modules.goods.service;
 
 import java.util.List;
 
+import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.modules.goods.entity.Goods;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,11 @@ public class GoodsCategoryService extends TreeService<GoodsCategoryDao, GoodsCat
 		if (StringUtils.isNotBlank(goodsCategory.getParentIds())){
 			goodsCategory.setParentIds(","+goodsCategory.getParentIds()+",");
 		}
+		return super.findList(goodsCategory);
+	}
+
+	public List<GoodsCategory> findListForIndex() {
+		GoodsCategory goodsCategory = new GoodsCategory("0",null);
 		return super.findList(goodsCategory);
 	}
 	

@@ -5,18 +5,14 @@ package com.zjy.losonkei.modules.goods.dao;
 
 import com.zjy.losonkei.common.persistence.CrudDao;
 import com.zjy.losonkei.common.persistence.annotation.MyBatisDao;
-import com.zjy.losonkei.modules.goods.entity.Goods;
-
-import java.util.List;
+import com.zjy.losonkei.modules.goods.entity.SearchRecord;
 
 /**
- * 商品DAO接口
+ * 搜索记录DAO接口
  * @author zjy
- * @version 2016-10-03
+ * @version 2017-03-02
  */
 @MyBatisDao
-public interface GoodsDao extends CrudDao<Goods> {
-    public List<Goods> findListFront(Goods entity);
-
-    public void updateVisit(String id);
+public interface SearchRecordDao extends CrudDao<SearchRecord> {
+	
 }
