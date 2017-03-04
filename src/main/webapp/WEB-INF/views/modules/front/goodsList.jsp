@@ -5,7 +5,7 @@
 <content tag="moduleName">goods</content>
 <meta name="decorator" content="front"/>
 <head>
-    <title>商品</title>
+    <title><c:if test="${'hot' eq key}">热销</c:if><c:if test="${'discount' eq key}">优惠</c:if><c:if test="${'new' eq key}">新品</c:if></title>
     <script>
         function page(n){
             $("#pageNo").val(n);
@@ -46,10 +46,10 @@
 <content tag="nav">
     <ul>
         <li><a href="${ctx}/index">首 页</a></li>
-        <li><a href="${ctx}/goods/hot">热 销</a></li>
-        <li><a href="${ctx}/goods/new">新 品</a></li>
-        <li><a href="${ctx}/goods/discount">优惠</a></li>
-        <li class="curent"><a href="${ctx}/goods">更 多</a></li>
+        <li<c:if test="${'hot' eq key}"> class="curent"</c:if>><a href="${ctx}/goods/hot">热 销</a></li>
+        <li<c:if test="${'new' eq key}"> class="curent"</c:if>><a href="${ctx}/goods/new">新 品</a></li>
+        <li<c:if test="${'discount' eq key}"> class="curent"</c:if>><a href="${ctx}/goods/discount">优惠</a></li>
+        <li><a href="${ctx}/goods">更 多</a></li>
     </ul>
 </content>
 
@@ -74,7 +74,7 @@
         <div id="content" class="grid_10">
             <h1 class="page_title">&nbsp;</h1>
 
-            <form:form modelAttribute="goodsSearch" action="${ctx}/goods" method="get" id="searchForm" onsubmit="$('#keywordsHidden').val($('#keywords').val());">
+            <form:form modelAttribute="goodsSearch" action="${ctx}/goods/${key}" method="get" id="searchForm" onsubmit="$('#keywordsHidden').val($('#keywords').val());">
                 <input type="hidden" name="keywords" id="keywordsHidden" value="${goodsSearch.keywords}">
                 <form:hidden path="firstLevelCategoryId" />
                 <form:hidden path="pageNo" />
@@ -119,46 +119,55 @@
             </form:form>
             <div class="clear"></div>
 
-            <div class="products catalog">
+            <div class="products_list catalog">
                 <c:set var="FLAG_NEW" value="<%=Goods.FLAG_NEW%>"/>
                 <c:set var="FLAG_HOT" value="<%=Goods.FLAG_HOT%>"/>
                 <c:set var="FLAG_DISCOUNT" value="<%=Goods.FLAG_DISCOUNT%>"/>
                 <c:forEach items="${page.list}" var="goods">
-                    <article class="grid_3 article">
-                        <c:if test="${FLAG_NEW eq goods.flag}">
-                            <img class="sale" src="${ctxStaticFront}/common/img/new.png" alt="Sale">
-                        </c:if>
-                        <c:if test="${FLAG_HOT eq goods.flag}">
-                            <img class="sale" src="${ctxStaticFront}/common/img/sale.png" alt="Sale">
-                        </c:if>
-                        <c:if test="${FLAG_DISCOUNT eq goods.flag}">
-                            <img class="sale" src="${ctxStaticFront}/common/img/top.png" alt="Sale">
-                        </c:if>
-                        <div class="prev">
-                            <a href="${ctx}/goodsDetails/${goods.id}"><img src="${goods.thumbImgUrl}"></a>
-                        </div><!-- .prev -->
+                    <article>
+                        <div class="grid_3">
+                            <c:if test="${FLAG_NEW eq goods.flag}">
+                                <img class="sale" src="${ctxStaticFront}/common/img/new.png" alt="Sale">
+                            </c:if>
+                            <c:if test="${FLAG_HOT eq goods.flag}">
+                                <img class="sale" src="${ctxStaticFront}/common/img/sale.png" alt="Sale">
+                            </c:if>
+                            <c:if test="${FLAG_DISCOUNT eq goods.flag}">
+                                <img class="sale" src="${ctxStaticFront}/common/img/top.png" alt="Sale">
+                            </c:if>
+                            <div class="prev">
+                                <a href="${ctx}/goodsDetails/${goods.id}"><img src="${goods.thumbImgUrl}"></a>
+                            </div><!-- .prev -->
+                        </div><!-- .grid_3 -->
 
-                        <h3 class="title">${goods.goodsName}</h3>
-                        <div class="cart">
-                            <div class="price">
-                                <div class="vert">
-                                    <c:if test="${not empty goods.price}">
-                                        ￥${goods.price}
-                                    </c:if>
-                                    <div class="price_old">
-                                        <div style="position: absolute;font-size: 13px;color: #eb6447; margin-left: -60px;">销量 ${goods.salesAmount}</div>
-                                        <c:if test="${not empty goods.srcPrice}">
-                                            ￥${goods.srcPrice}
-                                        </c:if>
-                                    </div>
-                                </div>
+                        <div class="grid_6">
+                            <div class="entry_content">
+                                <a href="${ctx}/goodsDetails/${goods.id}"><h3 class="title" style="width:500px;">${goods.goodsName}</h3></a>
+                                <p>${goods.remarks}<a class="more" href="${ctx}/goodsDetails/${goods.id}">更多》</a></p>
+                            </div><!-- .entry_content -->
 
+                            <div class="price" style="font-size: 20px;">
+                                <c:if test="${not empty goods.srcPrice}"><div class="price_old" style="text-decoration: line-through;">￥${goods.srcPrice}</div></c:if>
+                                ￥${goods.price}
                             </div>
-                            <%--<a href="#" class="obn"></a>
-                            <a href="#" class="like"></a>--%>
-                            <a href="#" class="bay"><img src="${ctxStaticFront}/common/img/bg_cart.png" alt="Buy" title=""></a>
-                        </div><!-- .cart -->
-                    </article><!-- .grid_3.article -->
+
+                            <%--<div class="review">
+                                <a class="plus" href="#"></a>
+                                <a class="plus" href="#"></a>
+                                <a class="plus" href="#"></a>
+                                <a href="#"></a>
+                                <a href="#"></a>
+                                <span><strong>3</strong> REVIEW(S)</span>
+                            </div>--%>
+
+                            <div class="cart">
+                                <a href="${ctx}/goodsDetails/${goods.id}" class="bay"><img src="${ctxStaticFront}/common/img/bg_cart.png" alt="Buy" title="">马 上 购 买</a>
+                                <%--<a href="#" class="like"><img src="img/like.png" alt="" title=""> Add to Compare</a>
+                                <a href="#" class="obn"><img src="img/obl.png" alt="" title="">Add to Compare</a>--%>
+                            </div><!-- .cart -->
+                        </div><!-- .grid_6 -->
+                        <div class="clear"></div>
+                    </article>
                 </c:forEach>
 
 
@@ -196,7 +205,7 @@
                 <nav class="right_menu">
                     <ul>
                         <c:forEach items="${firstLevelCategoryList}" var="gcl">
-                            <li<c:if test="${gcl.id eq goodsSearch.firstLevelCategoryId}"> class="current"</c:if>><a href="${ctx}/goods?firstLevelCategoryId=${gcl.id}">${gcl.categoryName}</a></li>
+                            <li<c:if test="${gcl.id eq goodsSearch.firstLevelCategoryId}"> class="current"</c:if>><a href="${ctx}/goods/${key}?firstLevelCategoryId=${gcl.id}">${gcl.categoryName}</a></li>
                         </c:forEach>
                         <%--<li><a href="#">Home</a></li>
                         <li><a href="#">Wedding</a></li>

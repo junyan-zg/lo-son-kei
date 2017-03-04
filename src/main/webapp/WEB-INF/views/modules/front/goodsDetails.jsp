@@ -56,9 +56,9 @@
 <content tag="nav">
     <ul>
         <li><a href="${ctx}/index">首 页</a></li>
-        <li><a href="catalog_grid.html">热 销</a></li>
-        <li><a href="catalog_grid.html">新 品</a></li>
-        <li><a href="javascript:;">优惠</a></li>
+        <li><a href="${ctx}/goods/hot">热 销</a></li>
+        <li><a href="${ctx}/goods/new">新 品</a></li>
+        <li><a href="${ctx}/goods/discount">优惠</a></li>
         <li class="curent"><a href="${ctx}/goods">更 多</a></li>
     </ul>
 </content>

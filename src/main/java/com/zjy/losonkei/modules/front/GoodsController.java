@@ -141,4 +141,102 @@ public class GoodsController extends BaseController{
         return "modules/front/goods";
     }
 
+
+    @RequestMapping(value = {"/goods/hot","/goods/new","/goods/discount"})
+    public String hot(Model model, GoodsSearch goodsSearch, HttpServletRequest request) throws UnsupportedEncodingException {
+        String key;
+        String flag;
+        if(request.getRequestURI().contains("hot")){
+            key = "hot";
+            flag = Goods.FLAG_HOT;
+        }else if (request.getRequestURI().contains("new")){
+            key = "new";
+            flag = Goods.FLAG_NEW;
+        }else{
+            key = "discount";
+            flag = Goods.FLAG_DISCOUNT;
+        }
+        model.addAttribute("key",key);
+        //右侧分类UI
+        GoodsCategory firstLevelCategory = new GoodsCategory("0",null);  //设上级为root
+        List<GoodsCategory> firstLevelCategoryList = goodsCategoryService.findList(firstLevelCategory);
+        model.addAttribute("firstLevelCategoryList",firstLevelCategoryList);
+
+        GoodsCategory firstGC = null;
+        GoodsCategory secondGC = null;
+
+        if (StringUtils.isNotBlank(goodsSearch.getFirstLevelCategoryId())){ //第一分类不为空    情况是直接从超链接进入
+            if((firstGC = goodsCategoryService.get(goodsSearch.getFirstLevelCategoryId())) != null){    //未篡改url
+                goodsSearch.setCategories(goodsCategoryService.findList(new GoodsCategory(firstGC)));
+            }else{
+                goodsSearch.setFirstLevelCategoryId(null);  //错误的url等于null，交给下一步
+            }
+        }
+
+        if (StringUtils.isBlank(goodsSearch.getFirstLevelCategoryId())){    //第一分类为空    情况是第一次是关键字，去掉，然后选我想要，或者接上篡改了url
+            //firstGC = firstLevelCategoryList.isEmpty() ? null : firstLevelCategoryList.get(0);
+            if (StringUtils.isNotBlank(goodsSearch.getCategoryId())){   //第二分类不为空
+                if((secondGC = goodsCategoryService.get(goodsSearch.getCategoryId()))==null){   //找不到第二分类   篡改了url
+                    goodsSearch.setCategoryId("");//设为空，下次界面回显全部
+                    if(firstGC != null)
+                        goodsSearch.setCategories(goodsCategoryService.findList(new GoodsCategory(firstGC)));
+                }else{
+                    firstGC = goodsCategoryService.get(secondGC.getParent());   //找到第二分类后直接给第一分类
+                    goodsSearch.setCategories(goodsCategoryService.findList(new GoodsCategory(firstGC)));
+                }
+            }else{  //第二分类是空，情况是第一次关键字，去掉关键字，选了我想要的全部
+                if(firstGC != null)
+                    goodsSearch.setCategories(goodsCategoryService.findList(new GoodsCategory(firstGC)));
+            }
+        }
+
+        if (firstGC != null){
+            goodsSearch.setFirstLevelCategoryId(firstGC.getId());
+        }
+
+        model.addAttribute("goodsSearch",goodsSearch);
+
+
+        //search goods start
+        Goods goods;
+        if (StringUtils.isNotBlank(goodsSearch.getCategoryId())){
+            goods = new Goods(new GoodsCategory(goodsSearch.getCategoryId()));
+        }else{
+            goods = new Goods();
+            List<GoodsCategory> categories = goodsSearch.getCategories();
+            if (categories != null && !categories.isEmpty()){
+                if (categories.size() == 1){
+                    goods.setGoodsCategory(new GoodsCategory(categories.get(0).getId()));
+                }else{
+                    String[] cIds = new String[categories.size()];
+                    for (int i = 0; i < cIds.length; i++){
+                        cIds[i] = categories.get(i).getId();
+                    }
+                    goods.setCategoryIds(cIds);
+                }
+            }
+        }
+        goods.setState(Goods.STATE_ON_SALE);
+        goods.setFlag(flag);
+
+        int pageNo = 1;
+        try {
+            String pageNoStr = goodsSearch.getPageNo();
+            if(StringUtils.isNotBlank(pageNoStr)){
+                pageNo = Integer.valueOf(pageNoStr);
+                if (pageNo < 1){
+                    pageNo = 1;
+                }
+            }
+        }catch (Exception e){goodsSearch.setPageNo(1+"");}
+        Page<Goods> page = new Page<Goods>();
+        page.setPageSize(10);
+        page.setPageNo(pageNo);
+        page.setOrderBy(goodsSearch.getOrderBy());
+        goodsService.findPageFront(page,goods);
+        model.addAttribute("page",page);
+        //search goods end
+        System.out.println(page.getCount());
+        return "modules/front/goodsList";
+    }
 }
