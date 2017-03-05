@@ -3,15 +3,13 @@
  */
 package com.zjy.losonkei.modules.orders.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.zjy.losonkei.common.persistence.Page;
+import com.zjy.losonkei.common.service.CrudService;
+import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.modules.act.entity.ActFlowInfo;
 import com.zjy.losonkei.modules.act.service.ActivitiService;
 import com.zjy.losonkei.modules.act.utils.ActivitiUtils;
+import com.zjy.losonkei.modules.goods.entity.Goods;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import com.zjy.losonkei.modules.goods.service.GoodsAllService;
 import com.zjy.losonkei.modules.goods.service.GoodsService;
@@ -24,6 +22,10 @@ import com.zjy.losonkei.modules.member.service.MemberAccountService;
 import com.zjy.losonkei.modules.member.service.MemberNoteService;
 import com.zjy.losonkei.modules.member.service.MemberService;
 import com.zjy.losonkei.modules.member.utils.MemberUtils;
+import com.zjy.losonkei.modules.orders.dao.OrdersDao;
+import com.zjy.losonkei.modules.orders.dao.OrdersDetailsDao;
+import com.zjy.losonkei.modules.orders.entity.Orders;
+import com.zjy.losonkei.modules.orders.entity.OrdersDetails;
 import com.zjy.losonkei.modules.orders.entity.ShoppingCart;
 import com.zjy.losonkei.modules.sys.service.SystemService;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
@@ -31,20 +33,15 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
-import org.activiti.rest.common.api.ActivitiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.zjy.losonkei.common.persistence.Page;
-import com.zjy.losonkei.common.service.CrudService;
-import com.zjy.losonkei.common.utils.StringUtils;
-import com.zjy.losonkei.modules.orders.entity.Orders;
-import com.zjy.losonkei.modules.orders.dao.OrdersDao;
-import com.zjy.losonkei.modules.orders.entity.OrdersDetails;
-import com.zjy.losonkei.modules.orders.dao.OrdersDetailsDao;
-
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 订单Service
@@ -71,6 +68,8 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	private MemberService memberService;
 	@Autowired
 	private MemberAccountService memberAccountService;
+    @Autowired
+    private GoodsAllService goodsAllService;
 
 
 	public Orders get(String id) {
@@ -185,6 +184,42 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	public void updateRemarks(Orders orders){
 		orders.preUpdate();
 		dao.updateRemarks(orders);
+	}
+
+	/**
+	 * 本方法实用于会员
+	 */
+	@Transactional(readOnly = false)
+	public void dealOrder(String ordersId,String reason){
+		Orders orders = this.get(ordersId);
+		String memberId = UserUtils.getPrincipal().getId();
+		if (!memberId.equals(orders.getMemberId())){
+			return;
+		}
+
+		if(Orders.FLAG_DOING.equals(orders.getFlag())){
+			Task task = activitiService.getTaskService().createTaskQuery().processInstanceId(orders.getProcessInstanceId()).taskAssignee(memberId).singleResult();
+			if (task != null){
+				Map<String,Object> map = new HashMap<String,Object>();
+				if ("取消订单".equals(task.getName())){
+					orders.setReason(reason);
+					orders.setOrdersState(Orders.ORDERS_STATE3);
+					orders.setGoodsState(Orders.GOODS_STATE3);
+					memberNoteService.save(new MemberNote(memberId,"您已取消订单成功！稍后将进行退款。",ordersId));
+				}else if ("确认收货".equals(task.getName())){
+					map.put(ActivitiUtils.VAR_TIMEOUT_BACK,ActivitiUtils.TIME_TIMEOUT_BACK);
+					orders.setGoodsState(Orders.GOODS_STATE6);
+					memberNoteService.save(new MemberNote(memberId,"您已确认收货！如需退货，请在7个工作日内进行申请。",ordersId));
+				}else if ("申请退货".equals(task.getName())){
+					orders.setReason(reason);
+					orders.setOrdersState(Orders.ORDERS_STATE4);
+					map.put(ActivitiUtils.VAR_AUDITORS,systemService.getUserIdListByRoleNameRandom(3));
+					memberNoteService.save(new MemberNote(memberId,"您的退货请求已提交，请耐心等待。",ordersId));
+				}
+				this.updateRemarks(orders);
+				activitiService.complete(task.getId(),orders.getProcessInstanceId(),reason,map);
+			}
+		}
 	}
 
 
@@ -455,7 +490,14 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	 */
 	private void sendGoods(Orders orders,Map<String,Object> map){
 		orders.setGoodsState(Orders.GOODS_STATE2);
-		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+        List<OrdersDetails> ordersDetailsList = orders.getOrdersDetailsList();
+        for (OrdersDetails o: ordersDetailsList) {
+            GoodsAll goodsAll = o.getGoodsAll();
+            goodsAll.setStock(goodsAll.getStock() - o.getGoodsAmount());
+            goodsAllService.save(goodsAll);
+        }
+
+        orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
 		this.update(orders);
 		map.put(ActivitiUtils.VAR_TIMEOUT_GET,ActivitiUtils.TIME_TIMEOUT_GET);
 		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单发货啦！请耐心等待。",orders.getId()));
@@ -473,6 +515,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 			memberNoteService.save(new MemberNote(orders.getMemberId(),"恭喜！您的退货请求已审核通过，稍后将会退款。",orders.getId()));
 		}else if ("3".equals(value)){	//需要寄回
 			map.put(ActivitiUtils.VAR_TIMEOUT_BACK,ActivitiUtils.TIME_TIMEOUT_BACK);
+            orders.setGoodsState(Orders.GOODS_STATE7);
 			memberNoteService.save(new MemberNote(orders.getMemberId(),"您的退货请求已审核通过，请于7天内寄回，预期作废",orders.getId()));
 		}else{
 			throw new IllegalArgumentException();
@@ -557,7 +600,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		map.put(ActivitiUtils.VAR_TIMEOUT_BACK,ActivitiUtils.TIME_TIMEOUT_BACK);
 		execution.setVariables(map);
 
-		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单长时间未处理，系统自动确认收货。",ordersId));
+		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单长时间未处理，系统自动确认收货。如需退货，请在7个工作日内进行申请。",ordersId));
 
 	}
 
@@ -573,6 +616,22 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		orders.setIncome(income);
 
 		orders.setFlag(income.compareTo(BigDecimal.ZERO) == 1 ? Orders.FLAG_SUCCESS : Orders.FLAG_FAILED);
+
+        if(Orders.GOODS_STATE7.equals(orders.getOrdersState())) { //退回中设为逾期退回
+            orders.setGoodsState(Orders.GOODS_STATE8);
+        }
+
+        List<OrdersDetails> ordersDetailsList = orders.getOrdersDetailsList();
+
+        //更新交易成功量
+        for (OrdersDetails o: ordersDetailsList) {
+            int count = o.getGoodsAmount() - (o.getBackAmount() == null ? 0 : o.getBackAmount());
+            if (count > 0){
+                Goods goods = o.getGoodsAll().getGoods();
+                goods.setSalesAmount(goods.getSalesAmount() + count);
+                goodsService.save(goods);
+            }
+        }
 
 		orders.setProcessState(execution.getCurrentActivityId());
 		this.update(orders);

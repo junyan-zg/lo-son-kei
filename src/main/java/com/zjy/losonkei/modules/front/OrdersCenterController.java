@@ -4,6 +4,7 @@ import com.zjy.losonkei.common.config.Global;
 import com.zjy.losonkei.common.persistence.Page;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.common.web.BaseController;
+import com.zjy.losonkei.modules.act.service.ActivitiService;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import com.zjy.losonkei.modules.goods.entity.GoodsSpecificationValue;
 import com.zjy.losonkei.modules.goods.service.GoodsAllService;
@@ -21,6 +22,7 @@ import com.zjy.losonkei.modules.orders.service.OrdersService;
 import com.zjy.losonkei.modules.orders.service.ShoppingCartService;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.activiti.engine.runtime.Job;
+import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,7 +45,7 @@ import java.util.Map;
  */
 @Controller
 @RequestMapping(value="${frontPath}/")
-public class OrderCenterController extends BaseController {
+public class OrdersCenterController extends BaseController {
 
     @Autowired
     private ShoppingCartService shoppingCartService;
@@ -54,7 +56,7 @@ public class OrderCenterController extends BaseController {
     @Autowired
     private OrdersService ordersService;
     @Autowired
-    private MemberService memberService;
+    private ActivitiService activitiService;
 
     @RequestMapping("shoppingCart")
     public String shoppingCart(Model model){
@@ -312,6 +314,9 @@ public class OrderCenterController extends BaseController {
         if (Orders.FLAG_DOING.equals(orders.getFlag()) && Orders.PAY_STATE1.equals(orders.getPayState())){      //获取剩下时间
             Job job = ordersService.getPayOrdersLastTime(orders.getProcessInstanceId());
             model.addAttribute("job",job);
+        }else{
+            Task task = activitiService.getTaskService().createTaskQuery().processInstanceId(orders.getProcessInstanceId()).taskAssignee(memberId).singleResult();
+            model.addAttribute("task",task);
         }
 
         model.addAttribute("orders",orders);
@@ -319,7 +324,11 @@ public class OrderCenterController extends BaseController {
         return "modules/front/orders/ordersDetails";
     }
 
-
-
+    @RequestMapping("dealOrders")
+    @ResponseBody
+    public String dealOrder(@RequestParam("id") String ordersId, String reason){
+        ordersService.dealOrder(ordersId,reason);
+        return "ok";
+    }
 
 }

@@ -59,7 +59,7 @@ public class Orders extends DataEntity<Orders> {
 	 */
 	public static final String ORDERS_STATE2 = "2";
 	/**
-	 * 用户于待发货时取消
+	 * 用户于待收货前取消
 	 */
 	public static final String ORDERS_STATE3 = "3";
 	/**
@@ -108,6 +108,16 @@ public class Orders extends DataEntity<Orders> {
 	 * 已收货
 	 */
 	public static final String GOODS_STATE6 = "6";
+	/**
+	 * 退回中，当需要退回flow，置为7
+	 */
+	public static final String GOODS_STATE7 = "7";
+	/**
+	 * 逾期退回，在完成订单service中，如果原是退回中，则需要置为逾期退回
+	 * 历史退回包括4,8
+	 */
+	public static final String GOODS_STATE8 = "8";
+
 	/**
 	 * 未付款
 	 */

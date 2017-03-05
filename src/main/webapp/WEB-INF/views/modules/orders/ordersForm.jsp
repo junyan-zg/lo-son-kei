@@ -214,6 +214,8 @@
 			<th>成本价（个）</th>
 			<th>单价</th>
 			<th>总价</th>
+			<th>退回数量</th>
+			<th>退回合格数量</th>
 			<%--<th>备注</th>--%>
 			<th>查看</th>
 		</tr>
@@ -228,6 +230,8 @@
 				<td>${details.cost}</td>
 				<td>${details.price}</td>
 				<td>${details.priceAll}</td>
+				<td>${details.backAmount}</td>
+				<td>${details.backQualifiedAmount}</td>
 				<td><a href="${pageContext.request.contextPath}/goodsDetails/${details.goodsId}" target="_blank">访问</a></td>
 			</tr>
 		</c:forEach>
@@ -248,7 +252,7 @@
 			</div>
 			<div class="form-actions">
 				<shiro:hasPermission name="orders:orders:edit">
-					<c:if test="${'检查库存' eq task.name}">
+					<c:if test="${'检查库存' eq task.name || '待发货' eq task.name}">
 						<input value="刷新库存" type="button" onclick="reFreshStock();" class=" btn-warning btn" style="margin-right: 50px;">
 						<script>
 							function reFreshStock(){

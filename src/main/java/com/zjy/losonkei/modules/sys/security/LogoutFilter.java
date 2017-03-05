@@ -1,5 +1,6 @@
 package com.zjy.losonkei.modules.sys.security;
 
+import com.zjy.losonkei.common.config.Global;
 import com.zjy.losonkei.modules.sys.entity.User;
 import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.apache.shiro.session.SessionException;
@@ -19,9 +20,12 @@ public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter
         Subject subject = getSubject(request, response);
         String redirectUrl = getRedirectUrl(request, response, subject);
 
-        try{
-            UserUtils.clearCache(UserUtils.getUser());
-        }catch (Exception e){
+        try {
+            if (UserUtils.getPrincipal() != null && UserUtils.getPrincipal().isCompanyUser()) {
+                redirectUrl = Global.getAdminPath() + "/login";
+                UserUtils.clearCache(UserUtils.getUser());
+            }
+        } catch (Exception e) {
 
         }
 

@@ -3,9 +3,6 @@
 <%@ include file="/WEB-INF/views/include/taglib-front.jsp" %>
 <c:set var="FLAG_DOING"><%=Orders.FLAG_DOING%></c:set>
 <c:set var="PAY_STATE1"><%=Orders.PAY_STATE1%></c:set>
-<c:set var="GOODS_STATE1"><%=Orders.GOODS_STATE1%></c:set>
-<c:set var="GOODS_STATE6"><%=Orders.GOODS_STATE6%></c:set>
-<c:set var="STATE1"><%=Orders.ORDERS_STATE1%></c:set>
 <%--
    所有在flag=doing中
 
@@ -135,12 +132,42 @@
                                         </script>
                                     </div>
                                     </c:when>
-                                    <c:when test="${empty orders.ordersState || empty orders.goodsState || STATE1 eq orders.ordersState || GOODS_STATE1 eq orders.goodsState || GOODS_STATE6 eq orders.goodsState}">
+                                    <c:when test="${not empty task}">
                                         <div class="grid_4" style="border: 4px dashed #eed3d7;padding-left: 8px;padding-top: 15px;">
-                                            <form>
-                                            <p><label>申请理由：</label><br><textarea name="reason"></textarea></p>
-                                            <p><a href="" class="btn" style="letter-spacing:10px;font-size: 18px;">申请退<c:choose><c:when test="${GOODS_STATE6 eq orders.goodsState}">货</c:when><c:otherwise>单</c:otherwise></c:choose></a></p>
+                                            <form onsubmit="return false;" id="ordersForm">
+                                                <input type="hidden" name="id" value="${orders.id}"/>
+                                                <c:if test="${'待收货' ne task.name}">
+                                                    <p><label>申请理由：</label><br><textarea name="reason" id="reason"></textarea></p>
+                                                    <p><a onclick="dealOrders();" class="btn" style="cursor:pointer;letter-spacing:10px;font-size: 18px;">${task.name}</a></p>
+                                                </c:if>
+                                                <c:if test="${'待收货' eq task.name}">
+                                                    <p><a onclick="dealOrders();" class="btn" style="cursor: pointer; letter-spacing:10px;font-size: 18px;">确认收货</a></p>
+                                                </c:if>
                                             </form>
+                                            <script>
+                                                var flag = true;
+                                                function dealOrders(){
+                                                    if (flag){
+                                                        flag = false;
+                                                        <c:if test="${'待收货' ne task.name}">
+                                                            if ($("#reason").val().trim() == ''){
+                                                                alert('请填写申请理由');
+                                                                $("#reason").focus();
+                                                                return false;
+                                                            }
+                                                        </c:if>
+                                                        $.post("${ctxFront}/dealOrders",$("#ordersForm").serialize(),function(data){
+                                                            if(data == "ok"){
+                                                                alert("操作成功！");
+                                                                window.location.reload();
+                                                            }else{
+                                                                alert("操作失败！");
+                                                                window.location.reload();
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            </script>
                                         </div>
                                     </c:when>
                                     </c:choose>

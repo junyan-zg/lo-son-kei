@@ -23,6 +23,7 @@ public class ReturnAllMoneyTask implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
+        Thread.sleep(10 * 1000);
         ordersService.returnAllMoneyTask(execution);
     }
 }
