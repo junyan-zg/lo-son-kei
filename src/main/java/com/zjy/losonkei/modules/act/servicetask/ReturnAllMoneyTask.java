@@ -22,8 +22,15 @@ public class ReturnAllMoneyTask implements JavaDelegate {
     private static OrdersService ordersService = SpringContextHolder.getBean(OrdersService.class);
 
     @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        Thread.sleep(10 * 1000);
-        ordersService.returnAllMoneyTask(execution);
+    public void execute(final DelegateExecution execution) throws Exception {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(10 * 1000);
+                } catch (InterruptedException e) {}
+                ordersService.returnAllMoneyTask(execution);
+            }
+        }).start();
     }
 }

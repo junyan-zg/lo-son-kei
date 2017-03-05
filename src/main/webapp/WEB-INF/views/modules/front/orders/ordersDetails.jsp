@@ -136,20 +136,17 @@
                                         <div class="grid_4" style="border: 4px dashed #eed3d7;padding-left: 8px;padding-top: 15px;">
                                             <form onsubmit="return false;" id="ordersForm">
                                                 <input type="hidden" name="id" value="${orders.id}"/>
-                                                <c:if test="${'待收货' ne task.name}">
+                                                <c:if test="${'确认收货' ne task.name}">
                                                     <p><label>申请理由：</label><br><textarea name="reason" id="reason"></textarea></p>
-                                                    <p><a onclick="dealOrders();" class="btn" style="cursor:pointer;letter-spacing:10px;font-size: 18px;">${task.name}</a></p>
                                                 </c:if>
-                                                <c:if test="${'待收货' eq task.name}">
-                                                    <p><a onclick="dealOrders();" class="btn" style="cursor: pointer; letter-spacing:10px;font-size: 18px;">确认收货</a></p>
-                                                </c:if>
+                                                <p><a onclick="dealOrders();" class="btn" style="cursor:pointer;letter-spacing:10px;font-size: 18px;">${task.name}</a></p>
                                             </form>
                                             <script>
                                                 var flag = true;
                                                 function dealOrders(){
                                                     if (flag){
                                                         flag = false;
-                                                        <c:if test="${'待收货' ne task.name}">
+                                                        <c:if test="${'确认收货' ne task.name}">
                                                             if ($("#reason").val().trim() == ''){
                                                                 alert('请填写申请理由');
                                                                 $("#reason").focus();
