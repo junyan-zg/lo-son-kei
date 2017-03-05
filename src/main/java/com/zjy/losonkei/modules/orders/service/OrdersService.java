@@ -444,7 +444,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		}else if ("寄回退款".equals(taskName)){
 
 		}else if ("退货入库".equals(taskName)){
-
+            backInStock(orders,request);
 		}
 
 		activitiService.complete(task.getId(),task.getProcessInstanceId(),comment,null,map);
@@ -516,7 +516,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		}else if ("3".equals(value)){	//需要寄回
 			map.put(ActivitiUtils.VAR_TIMEOUT_BACK,ActivitiUtils.TIME_TIMEOUT_BACK);
             orders.setGoodsState(Orders.GOODS_STATE7);
-			memberNoteService.save(new MemberNote(orders.getMemberId(),"您的退货请求已审核通过，请于7天内寄回，预期作废",orders.getId()));
+			memberNoteService.save(new MemberNote(orders.getMemberId(),"您的退货请求已审核通过，请于7天内寄回，预期作废。",orders.getId()));
 		}else{
 			throw new IllegalArgumentException();
 		}
@@ -531,10 +531,30 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	private void confirmBack(Orders orders){
 		orders.setGoodsState(Orders.GOODS_STATE4);
 		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+        memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单已收到，确认后将退款。",orders.getId()));
 		this.update(orders);
 	}
 
+    /**
+     * 退货入库
+     * @param orders
+     */
+    private void backInStock(Orders orders,HttpServletRequest request){
+        List<OrdersDetails> ordersDetailsList = orders.getOrdersDetailsList();
+        for (OrdersDetails o : ordersDetailsList){
+            o.setBackAmount(Integer.valueOf(request.getParameter("back-"+o.getId())));
+            o.setBackQualifiedAmount(Integer.valueOf(request.getParameter("back-q-"+o.getId())));
 
+            o.preUpdate();
+            ordersDetailsDao.update(o);
+
+            GoodsAll goodsAll = o.getGoodsAll();
+            goodsAll.setStock(goodsAll.getStock() + o.getBackQualifiedAmount());
+            goodsAllService.save(goodsAll);
+        }
+        orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+        this.update(orders);
+    }
 
 
 

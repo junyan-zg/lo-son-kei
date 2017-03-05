@@ -98,11 +98,6 @@ public class OrdersController extends BaseController {
 	public String form(Orders orders, Model model, HttpSession session) {
 		model.addAttribute("orders", orders);
 
-		if (session.getAttribute("message") != null){
-			model.addAttribute("message",session.getAttribute("message"));
-			session.removeAttribute("message");
-		}
-
 		if (Orders.FLAG_DOING.equals(orders.getFlag())){
 			String processInstanceId = orders.getProcessInstanceId();
 			Task task = activitiService.getTaskService().createTaskQuery().processInstanceId(processInstanceId).taskCandidateUser(UserUtils.getPrincipal().getId()).singleResult();
@@ -141,16 +136,15 @@ public class OrdersController extends BaseController {
 
 	@RequiresPermissions("orders:orders:edit")
 	@RequestMapping(value = "doTask")
-	public String doTask(String ordersId,String taskId,String comment,HttpServletRequest request) {
+	public String doTask(String ordersId,String taskId,String comment,HttpServletRequest request,RedirectAttributes redirectAttributes) {
 		/*if (!beanValidator(model, orders)){
 			return form(orders, model);
 		}*/
 		try{
 			ordersService.compileTask(ordersId, taskId, comment, request);
-			request.getSession().setAttribute("message","操作成功！");
 		}catch (Exception e){
 			e.printStackTrace();
-			request.getSession().setAttribute("message","操作失败，请稍后重试！");
+			addMessage(redirectAttributes,"操作失败，请稍后重试！");
 		}
 
 		return "redirect:"+Global.getAdminPath()+"/orders/orders/form?id=" + ordersId + "&time=" + new Date().getTime();

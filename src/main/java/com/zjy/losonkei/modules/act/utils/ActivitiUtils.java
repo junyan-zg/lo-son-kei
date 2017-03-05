@@ -29,7 +29,7 @@ public class ActivitiUtils {
     public final static String VAR_TIMEOUT_GET = "confirmGetGoodsTimeOut";
     public final static String TIME_TIMEOUT_GET = "P10D";
     //申请退货 7天
-    public final static String VAR_TIMEOUT_BACK = "returnGoodsTimeOut";
+    public final static String VAR_TIMEOUT_BACK = "backGoodsTimeOut";
     public final static String TIME_TIMEOUT_BACK = "P7D";
 
     //memberId
@@ -60,6 +60,7 @@ public class ActivitiUtils {
         ordersFlowMap.put("退货退款",new ActFlowInfo("","退货退款"));
         ordersFlowMap.put("确认寄回商品",new ActFlowInfo("","确认寄回商品"));
         ordersFlowMap.put("寄回退款",new ActFlowInfo("","寄回退款"));
+        ordersFlowMap.put("退货入库",new ActFlowInfo("","马上入库"));
     }
 
     public static ActFlowInfo getOrdersFlow(String taskName){

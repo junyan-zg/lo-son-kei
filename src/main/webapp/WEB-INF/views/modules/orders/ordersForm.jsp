@@ -25,6 +25,21 @@
 					}
 				}
 			});
+			$("#act-form").validate({
+				submitHandler: function(form){
+					loading('正在提交，请稍等...');
+					form.submit();
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
 		});
 		function addRow(list, idx, tpl, row){
 			$(list).append(Mustache.render(tpl, {
@@ -53,7 +68,7 @@
 	<div class="form-actions" style="margin-top: -28px;">
 		<h3>基本信息</h3>
 	</div>
-	<sys:message content="${requestScope.message}"/>
+	<sys:message content="${message}"/>
 	<form:form id="inputForm" modelAttribute="orders" action="${ctx}/orders/orders/save" method="post" class="form-horizontal">
 		<sys:message content="${message}"/>
 		<div class="control-group">
@@ -207,6 +222,7 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 		<tr>
+			<th>序号</th>
 			<th class="sort-column">库存</th>
 			<th>商品号</th>
 			<th>商品名</th>
@@ -221,8 +237,9 @@
 		</tr>
 		</thead>
 		<tbody id="ordersDetailsList">
-		<c:forEach items="${orders.ordersDetailsList}" var="details">
+		<c:forEach items="${orders.ordersDetailsList}" var="details" varStatus="status">
 			<tr>
+				<td data-id="${details.goodsAll.id}">${status.index + 1}</td>
 				<td class="data-stock" data-id="${details.goodsAll.id}">${details.goodsAll.stock}</td>
 				<td>${details.goodsNo}</td>
 				<td>${details.remarks}</td>
@@ -250,6 +267,35 @@
 					<textarea id="comment" name="comment" rows="4" class="input-xxlarge"></textarea>
 				</div>
 			</div>
+			<c:if test="${'退货入库' eq task.name}">
+				<div class="control-group">
+					<label class="control-label">入库信息：</label>
+					<div class="controls">
+						<div class="row-fluid">
+							<div class="span5">
+								<table class="table table-striped table-bordered table-condensed">
+									<thead>
+										<tr>
+											<th>序号</th>
+											<th>寄回数量</th>
+											<th>可重用数量</th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach items="${orders.ordersDetailsList}" var="details" varStatus="status">
+											<tr>
+												<td>${status.index + 1}</td>
+												<td><input type="text" name="back-${details.id}" class="input-medium digits required"></td>
+												<td><input type="text" name="back-q-${details.id}" class="input-medium digits required"></td>
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</c:if>
 			<div class="form-actions">
 				<shiro:hasPermission name="orders:orders:edit">
 					<c:if test="${'检查库存' eq task.name || '待发货' eq task.name}">
