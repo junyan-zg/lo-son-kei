@@ -137,7 +137,7 @@ public class GoodsController extends BaseController{
         goodsService.findPageFront(page,goods);
         model.addAttribute("page",page);
         //search goods end
-        System.out.println(page.getCount());
+//        System.out.println(page.getCount());
         return "modules/front/goods";
     }
 
@@ -236,7 +236,7 @@ public class GoodsController extends BaseController{
         goodsService.findPageFront(page,goods);
         model.addAttribute("page",page);
         //search goods end
-        System.out.println(page.getCount());
+//        System.out.println(page.getCount());
         return "modules/front/goodsList";
     }
 }

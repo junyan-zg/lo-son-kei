@@ -9,6 +9,7 @@ import com.zjy.losonkei.common.utils.CacheUtils;
 import com.zjy.losonkei.common.utils.StringUtils;
 import com.zjy.losonkei.modules.member.dao.MemberDao;
 import com.zjy.losonkei.modules.member.entity.Member;
+import com.zjy.losonkei.modules.member.service.MemberService;
 import com.zjy.losonkei.modules.sys.dao.AreaDao;
 import com.zjy.losonkei.modules.sys.dao.RoleDao;
 import com.zjy.losonkei.modules.sys.dao.UserDao;
@@ -42,7 +43,7 @@ public class UserUtils {
 	private static AreaDao areaDao = SpringContextHolder.getBean(AreaDao.class);
 	private static OfficeDao officeDao = SpringContextHolder.getBean(OfficeDao.class);
 
-	private static MemberDao memberDao = SpringContextHolder.getBean(MemberDao.class);
+	private static MemberService memberService = SpringContextHolder.getBean(MemberService.class);
 
 	public static final String USER_CACHE = "userCache";
 	public static final String USER_CACHE_ID_ = "id_";
@@ -152,7 +153,7 @@ public class UserUtils {
 	public static Member getMember(){
 		Principal principal = getPrincipal();
 		if (principal != null && StringUtils.isNotBlank(principal.getId())){
-			return memberDao.get(principal.getId());
+			return memberService.get(principal.getId());
 		}
 		// 如果没有登录，则返回实例化空的User对象。
 		return null;
@@ -163,7 +164,7 @@ public class UserUtils {
 	 * @return 取不到返回 null
 	 */
 	public static Member getMemberById(String memberId){
-		return memberDao.get(memberId);
+		return memberService.get(memberId);
 	}
 
 

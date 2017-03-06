@@ -176,7 +176,7 @@
 				<form:input path="income" htmlEscape="false" class="input-xlarge  number" disabled="true"/>
 			</div>
 		</div>
-		<c:if test="${not empty orders.reason}">
+		<c:if test="${not empty orders.refund}">
 			<div class="control-group">
 				<label class="control-label">退款：</label>
 				<div class="controls">
@@ -293,6 +293,14 @@
 								</table>
 							</div>
 						</div>
+					</div>
+				</div>
+			</c:if>
+			<c:if test="${'寄回退款' eq task.name || '退货退款' eq task.name}">
+				<div class="control-group">
+					<label class="control-label">退款金额：</label>
+					<div class="controls">
+						<input type="text" name="back-money" class="input-medium number required">
 					</div>
 				</div>
 			</c:if>

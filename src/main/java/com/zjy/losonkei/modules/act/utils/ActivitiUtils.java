@@ -57,9 +57,9 @@ public class ActivitiUtils {
                 new ActFlowInfo.Detail("1","不能退货"),new ActFlowInfo.Detail("2","不需寄回")
                 ,new ActFlowInfo.Detail("3","需要寄回")
         ));
-        ordersFlowMap.put("退货退款",new ActFlowInfo("","退货退款"));
+        ordersFlowMap.put("退货退款",new ActFlowInfo("","马上退款"));
         ordersFlowMap.put("确认寄回商品",new ActFlowInfo("","确认寄回商品"));
-        ordersFlowMap.put("寄回退款",new ActFlowInfo("","寄回退款"));
+        ordersFlowMap.put("寄回退款",new ActFlowInfo("","马上退款"));
         ordersFlowMap.put("退货入库",new ActFlowInfo("","马上入库"));
     }
 

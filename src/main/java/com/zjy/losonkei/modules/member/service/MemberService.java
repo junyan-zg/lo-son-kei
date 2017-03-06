@@ -12,6 +12,9 @@ import com.zjy.losonkei.modules.member.dao.MemberDetailsDao;
 import com.zjy.losonkei.modules.member.entity.MemberDetails;
 import com.zjy.losonkei.modules.member.utils.MemberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,7 @@ public class MemberService extends CrudService<MemberDao, Member> {
 	@Autowired
 	private MemberDetailsDao memberDetailsDao;
 
+	@Cacheable(key = "'MEMBER_' + #id",value = "userCache")
 	public Member get(String id) {
 		return super.get(id);
 	}
@@ -47,12 +51,14 @@ public class MemberService extends CrudService<MemberDao, Member> {
 	public Page<Member> findPage(Page<Member> page, Member member) {
 		return super.findPage(page, member);
 	}
-	
+
+	@CacheEvict(key = "'MEMBER_' + #member.id",value = "userCache")
 	@Transactional(readOnly = false)
 	public void save(Member member) {
 		super.save(member);
 	}
-	
+
+	@CacheEvict(key = "'MEMBER_' + #member.id",value = "userCache")
 	@Transactional(readOnly = false)
 	public void delete(Member member) {
 		super.delete(member);
@@ -88,17 +94,20 @@ public class MemberService extends CrudService<MemberDao, Member> {
 		return "OK";
 	}
 
+	@CacheEvict(key = "'MEMBER_' + #memberId",value = "userCache")
 	@Transactional(readOnly = false)
 	public void updateLoginNum(String memberId){
 		dao.updateLoginNum(memberId);
 	}
 
+	@CacheEvict(key = "'MEMBER_' + #member.id",value = "userCache")
 	@Transactional(readOnly = false)
 	public void updatePwd(Member member){
 		member.preUpdate();
 		dao.updatePwd(member);
 	}
 
+	@CacheEvict(key = "'MEMBER_' + #member.id",value = "userCache")
 	@Transactional(readOnly = false)
 	public void updatePayPwd(Member member){
 		member.preUpdate();

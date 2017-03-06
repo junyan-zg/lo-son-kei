@@ -209,14 +209,14 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 				}else if ("确认收货".equals(task.getName())){
 					map.put(ActivitiUtils.VAR_TIMEOUT_BACK,ActivitiUtils.TIME_TIMEOUT_BACK);
 					orders.setGoodsState(Orders.GOODS_STATE6);
-					memberNoteService.save(new MemberNote(memberId,"您已确认收货！如需退货，请在7个工作日内进行申请。",ordersId));
+					memberNoteService.save(new MemberNote(memberId,"您已确认收货！如需退货，请在7个自然日内进行申请。",ordersId));
 				}else if ("申请退货".equals(task.getName())){
 					orders.setReason(reason);
 					orders.setOrdersState(Orders.ORDERS_STATE4);
 					map.put(ActivitiUtils.VAR_AUDITORS,systemService.getUserIdListByRoleNameRandom(3));
 					memberNoteService.save(new MemberNote(memberId,"您的退货请求已提交，请耐心等待。",ordersId));
 				}
-				this.updateRemarks(orders);
+				this.update(orders);
 				activitiService.complete(task.getId(),orders.getProcessInstanceId(),reason,map);
 			}
 		}
@@ -440,9 +440,9 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		}else if ("确认寄回商品".equals(taskName)){
 			confirmBack(orders);
 		}else if ("退货退款".equals(taskName)){
-
+			backMoney(orders,request);
 		}else if ("寄回退款".equals(taskName)){
-
+			backMoney(orders,request);
 		}else if ("退货入库".equals(taskName)){
             backInStock(orders,request);
 		}
@@ -556,7 +556,31 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
         this.update(orders);
     }
 
+	/**
+	 * 寄回退款 || 退货退款
+	 * @param orders
+	 */
+	private void backMoney(Orders orders,HttpServletRequest request){
+		BigDecimal backMoney = new BigDecimal(request.getParameter("back-money")).abs();
 
+		orders.setRefund(backMoney);//设置退款
+		orders.setPayState(Orders.PAY_STATE3);//已退回
+
+		Member member = memberService.get(orders.getMemberId());
+		member.setMemberBalance(member.getMemberBalance().add(backMoney));//增加余额
+		member.setMemberPoints(member.getMemberPoints() - backMoney.intValue());//减少积分
+
+		MemberAccount memberAccount = new MemberAccount();
+		memberAccount.setAmount(backMoney);
+		memberAccount.setMemberId(orders.getMemberId());
+		memberAccount.setProcessType(MemberAccount.PROCESS_TYPE_BACK);
+		memberAccountService.save(memberAccount);//保存账户流动
+
+		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+
+		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的退款已到账，请查收！",orders.getId()));
+		this.update(orders);
+	}
 
 
 
@@ -602,7 +626,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		memberAccount.setAmount(orders.getPriceAll());
 		memberAccountService.save(memberAccount);
 
-		memberNoteService.save(new MemberNote(orders.getMemberId(),"您退款已到账，请查收！。",ordersId));
+		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的退款已到账，请查收！。",ordersId));
 
 	}
 
@@ -620,7 +644,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		map.put(ActivitiUtils.VAR_TIMEOUT_BACK,ActivitiUtils.TIME_TIMEOUT_BACK);
 		execution.setVariables(map);
 
-		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单长时间未处理，系统自动确认收货。如需退货，请在7个工作日内进行申请。",ordersId));
+		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单长时间未处理，系统自动确认收货。如需退货，请在7个自然日内进行申请。",ordersId));
 
 	}
 
@@ -633,6 +657,26 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		if (orders.getRefund() != null){
 			income = income.subtract(orders.getRefund());
 		}
+
+		List<OrdersDetails> ordersDetailsList = orders.getOrdersDetailsList();
+
+		//更新交易成功量
+		for (OrdersDetails o: ordersDetailsList) {
+			int backAmount = o.getBackAmount() == null ? 0 : o.getBackAmount();
+			int count = o.getGoodsAmount() - backAmount;
+			if (count > 0){
+				Goods goods = o.getGoodsAll().getGoods();
+				goods.setSalesAmount(goods.getSalesAmount() + count);
+				goodsService.save(goods);
+			}
+			//如果有退回，计算合格数量。乘以成本价，加到income
+			int backQuaAmount = o.getBackQualifiedAmount() == null ? 0 : o.getBackQualifiedAmount();
+			if (backQuaAmount > 0){
+				BigDecimal multiply = o.getCost().multiply(new BigDecimal(backQuaAmount));
+				income = income.add(multiply);
+			}
+		}
+
 		orders.setIncome(income);
 
 		orders.setFlag(income.compareTo(BigDecimal.ZERO) == 1 ? Orders.FLAG_SUCCESS : Orders.FLAG_FAILED);
@@ -641,17 +685,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
             orders.setGoodsState(Orders.GOODS_STATE8);
         }
 
-        List<OrdersDetails> ordersDetailsList = orders.getOrdersDetailsList();
 
-        //更新交易成功量
-        for (OrdersDetails o: ordersDetailsList) {
-            int count = o.getGoodsAmount() - (o.getBackAmount() == null ? 0 : o.getBackAmount());
-            if (count > 0){
-                Goods goods = o.getGoodsAll().getGoods();
-                goods.setSalesAmount(goods.getSalesAmount() + count);
-                goodsService.save(goods);
-            }
-        }
 
 		orders.setProcessState(execution.getCurrentActivityId());
 		this.update(orders);

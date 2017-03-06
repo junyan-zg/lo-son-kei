@@ -50,7 +50,7 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
 	 */
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
-		System.out.println("认证");
+//		System.out.println("认证");
 
 		org.apache.shiro.authc.UsernamePasswordToken token = (org.apache.shiro.authc.UsernamePasswordToken) authcToken;
 
@@ -76,7 +76,7 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
 	 */
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		System.out.println("授权");
+//		System.out.println("授权");
 
 		Principal principal = (Principal) getAvailablePrincipal(principals);
 
@@ -89,7 +89,7 @@ public class MemberAuthorizingRealm extends AuthorizingRealm {
 		if(member != null){
 			SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 			info.addRole("member");
-			System.out.println("添加角色member");
+//			System.out.println("添加角色member");
 			return info;
 		}else{
 			return null;
