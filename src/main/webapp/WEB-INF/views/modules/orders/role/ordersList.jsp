@@ -19,10 +19,10 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/orders/orders">订单列表</a></li>
+		<li class="active"><a href="${ctx}/orders/orders/${role}/list">订单列表</a></li>
 		<%--<shiro:hasPermission name="orders:orders:edit"><li><a href="${ctx}/orders/orders/form">订单添加</a></li></shiro:hasPermission>--%>
 	</ul>
-	<form:form id="searchForm" modelAttribute="orders" action="${ctx}/orders/orders/" method="post" class="breadcrumb form-search">
+	<form:form id="searchForm" modelAttribute="orders" action="${ctx}/orders/orders/${role}/list" method="post" class="breadcrumb form-search">
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
@@ -53,29 +53,28 @@
 			</li>--%>
 			<li><label>订单状态</label>
 				<form:select path="ordersState" class="input-small">
-					<form:option value="" label=""/>
+					<form:option value="" label="全部"/>
 					<form:options items="${fns:getDictList('orders_state')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</li>
 			<li><label>商品状态</label>
 				<form:select path="goodsState" class="input-small">
-					<form:option value="" label=""/>
+					<form:option value="" label="全部"/>
 					<form:options items="${fns:getDictList('goods_send_state')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</li>
 			<li><label>支付状态</label>
 				<form:select path="payState" class="input-small">
-					<form:option value="" label=""/>
+					<form:option value="" label="全部"/>
 					<form:options items="${fns:getDictList('pay_state')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
 			</li>
-			<form:hidden path="flag" value="<%=Orders.FLAG_DOING%>"/>
-			<%--<li><label>标记</label>
+			<li><label>完成情况</label>
 				<form:select path="flag" class="input-medium">
-					<form:option value="" label=""/>
+					<form:option value="" label="全部"/>
 					<form:options items="${fns:getDictList('orders_flag')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>
-			</li>--%>
+			</li>
 			<%--<li><label>收益</label>
 				<form:input path="income" htmlEscape="false" class="input-medium"/>
 			</li>--%>
@@ -103,7 +102,7 @@
 		<tbody>
 		<c:forEach items="${page.list}" var="orders">
 			<tr>
-				<td><a href="${ctx}/orders/orders/form?id=${orders.id}">
+				<td><a href="${ctx}/orders/orders/${role}/form?id=${orders.id}">
 					${orders.id}
 				</a></td>
 				<td>
@@ -132,8 +131,12 @@
 					${orders.income}
 				</td>
 				<shiro:hasPermission name="orders:orders:edit"><td>
-					<a href="${ctx}/orders/orders/form?id=${orders.id}">处理</a>
-					<%--<a href="${ctx}/orders/orders/delete?id=${orders.id}" onclick="return confirmx('确认要删除该订单吗？', this.href)">删除</a>--%>
+					<a href="${ctx}/orders/orders/${role}/form?id=${orders.id}">
+						<c:choose>
+							<c:when test="${fn:indexOf(role, 'Old')!=-1}">查看</c:when>
+							<c:otherwise>处理</c:otherwise>
+						</c:choose>
+					</a>
 				</td></shiro:hasPermission>
 			</tr>
 		</c:forEach>

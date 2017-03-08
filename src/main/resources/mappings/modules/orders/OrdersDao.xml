@@ -263,5 +263,220 @@
 			del_flag = #{DEL_FLAG_DELETE}
 		WHERE id = #{id}
 	</update>
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<select id="auditList" resultType="Orders">
+		SELECT
+		<include refid="ordersColumns"/>
+		FROM orders a
+		<include refid="ordersJoins"/>
+		<if test="member != null and member.memberAccount != null and member.memberAccount !=''">
+			LEFT JOIN member m ON m.id = a.member_id
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND (
+			  a.process_state = '审核退货'
+			  OR a.process_state = '退货退款'
+			  OR a.process_state = '寄回退款'
+			)
+			<include refid="common-condition1"/>
+		</where>
+			<include refid="common-condition2"/>
+	</select>
+
+	<select id="auditOldList" resultType="Orders">
+		SELECT
+		<include refid="ordersColumns"/>
+		FROM orders a
+		<include refid="ordersJoins"/>
+		<if test="member != null and member.memberAccount != null and member.memberAccount !=''">
+			LEFT JOIN member m ON m.id = a.member_id
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND (
+			( a.process_state = '完成订单' AND a.pay_state = #{PAY_STATE3} )
+			OR a.process_state IN ('确认寄回商品','退货入库')
+			)
+			<include refid="common-condition1"/>
+		</where>
+		<include refid="common-condition2"/>
+	</select>
+
+	<select id="sendList" resultType="Orders">
+		SELECT
+		<include refid="ordersColumns"/>
+		FROM orders a
+		<include refid="ordersJoins"/>
+		<if test="member != null and member.memberAccount != null and member.memberAccount !=''">
+			LEFT JOIN member m ON m.id = a.member_id
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND (
+			a.process_state = '待发货'
+			)
+			<include refid="common-condition1"/>
+		</where>
+		<include refid="common-condition2"/>
+	</select>
+
+	<select id="sendOldList" resultType="Orders">
+		SELECT
+		<include refid="ordersColumns"/>
+		FROM orders a
+		<include refid="ordersJoins"/>
+		<if test="member != null and member.memberAccount != null and member.memberAccount !=''">
+			LEFT JOIN member m ON m.id = a.member_id
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND (
+			 a.goods_state IS NOT NULL AND
+			 a.goods_state NOT IN ('',#{GOODS_STATE1},#{GOODS_STATE5} )
+			)
+			<include refid="common-condition1"/>
+		</where>
+		<include refid="common-condition2"/>
+	</select>
+
+	<select id="backList" resultType="Orders">
+		SELECT
+		<include refid="ordersColumns"/>
+		FROM orders a
+		<include refid="ordersJoins"/>
+		<if test="member != null and member.memberAccount != null and member.memberAccount !=''">
+			LEFT JOIN member m ON m.id = a.member_id
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND (
+			 a.process_state IN ('确认寄回商品','退货入库')
+			)
+			<include refid="common-condition1"/>
+		</where>
+		<include refid="common-condition2"/>
+	</select>
+
+	<select id="backOldList" resultType="Orders">
+		SELECT
+		<include refid="ordersColumns"/>
+		FROM orders a
+		<include refid="ordersJoins"/>
+		<if test="member != null and member.memberAccount != null and member.memberAccount !=''">
+			LEFT JOIN member m ON m.id = a.member_id
+		</if>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND (
+			( a.process_state = '寄回退款' )
+			OR ( a.process_state = '完成订单' AND a.pay_state = #{PAY_STATE3} )
+			)
+			<include refid="common-condition1"/>
+		</where>
+		<include refid="common-condition2"/>
+	</select>
+
+	<sql id="common-condition1">
+		<if test="memberId != null and memberId != ''">
+			AND a.member_id = #{memberId}
+		</if>
+		<if test="member != null and member.memberAccount != null and member.memberAccount !=''">
+			AND m.member_account = #{member.memberAccount}
+		</if>
+		<if test="trueName != null and trueName != ''">
+			AND a.true_name = #{trueName}
+		</if>
+		<if test="processState != null and processState != ''">
+			AND a.process_state = #{processState}
+		</if>
+		<if test="processInstanceId != null and processInstanceId != ''">
+			AND a.process_instance_id = #{processInstanceId}
+		</if>
+		<choose>
+			<when test="priceAll != null and priceAll != ''">
+				AND a.price_all = #{priceAll}
+			</when>
+			<when test="beginPriceAll != null and endPriceAll != null and beginPriceAll != '' and endPriceAll != ''">
+				AND a.price_all BETWEEN #{beginPriceAll} AND #{endPriceAll}
+			</when>
+			<when test="beginPriceAll != null and beginPriceAll != ''">
+				AND a.price_all &gt; #{beginPriceAll}
+			</when>
+			<when test="endPriceAll != null and endPriceAll != ''">
+				AND a.price_all &lt; #{endPriceAll}
+			</when>
+		</choose>
+
+		<if test="address != null and address != ''">
+			AND a.address LIKE
+			<if test="dbName == 'oracle'">'%'||#{address}||'%'</if>
+			<if test="dbName == 'mssql'">'%'+#{address}+'%'</if>
+			<if test="dbName == 'mysql'">concat('%',#{address},'%')</if>
+		</if>
+
+		<if test="area != null and area.id != null and area.id != ''">
+			AND a.area_id = #{area.id}
+		</if>
+		<if test="city != null and city.id != null and city.id != ''">
+			AND a.city_id = #{city.id}
+		</if>
+		<if test="province != null and province.id != null and province.id != ''">
+			AND a.province_id = #{province.id}
+		</if>
+		<if test="ordersState != null and ordersState != ''">
+			AND a.orders_state = #{ordersState}
+		</if>
+		<if test="goodsState != null and goodsState != ''">
+			AND a.goods_state = #{goodsState}
+		</if>
+		<if test="payState != null and payState != ''">
+			AND a.pay_state = #{payState}
+		</if>
+		<if test="flag != null and flag != ''">
+			AND a.flag = #{flag}
+		</if>
+		<choose>
+			<when test="income != null and income != ''">
+				AND a.income = #{income}
+			</when>
+			<when test="beginIncome != null and endIncome != null and beginIncome != '' and endIncome != ''">
+				AND a.income BETWEEN #{beginIncome} AND #{endIncome}
+			</when>
+			<when test="beginPriceAll != null and beginPriceAll != ''">
+				AND a.income &gt; #{beginPriceAll}
+			</when>
+			<when test="endIncome != null and endIncome != ''">
+				AND a.income &lt; #{endIncome}
+			</when>
+		</choose>
+	</sql>
+
+	<sql id="common-condition2">
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</sql>
 </mapper>

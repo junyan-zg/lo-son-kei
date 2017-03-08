@@ -98,7 +98,41 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	public Page<Orders> findPage(Page<Orders> page, Orders orders) {
 		return super.findPage(page, orders);
 	}
-	
+
+//////////////////////////////////////////////////////////////////////////////////////
+	public Page<Orders> auditList(Page<Orders> page,Orders orders){
+		orders.setPage(page);
+		page.setList(dao.auditList(orders));
+		return page;
+	}
+	public Page<Orders> auditOldList(Page<Orders> page,Orders orders){
+		orders.setPage(page);
+		page.setList(dao.auditOldList(orders));
+		return page;
+	}
+	public Page<Orders> sendList(Page<Orders> page,Orders orders){
+		orders.setPage(page);
+		page.setList(dao.sendList(orders));
+		return page;
+	}
+	public Page<Orders> sendOldList(Page<Orders> page,Orders orders){
+		orders.setPage(page);
+		page.setList(dao.sendOldList(orders));
+		return page;
+	}
+	public Page<Orders> backList(Page<Orders> page,Orders orders){
+		orders.setPage(page);
+		page.setList(dao.backList(orders));
+		return page;
+	}
+	public Page<Orders> backOldList(Page<Orders> page,Orders orders){
+		orders.setPage(page);
+		page.setList(dao.backOldList(orders));
+		return page;
+	}
+//////////////////////////////////////////////////////////////////////////////////////
+
+
 	@Transactional(readOnly = false)
 	public void save(Orders orders) {
 		super.save(orders);
@@ -207,7 +241,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 					orders.setGoodsState(Orders.GOODS_STATE3);
 					memberNoteService.save(new MemberNote(memberId,"您已取消订单成功！稍后将进行退款。",ordersId));
 				}else if ("确认收货".equals(task.getName())){
-					map.put(ActivitiUtils.VAR_TIMEOUT_BACK,ActivitiUtils.TIME_TIMEOUT_BACK);
+					map.put(ActivitiUtils.VAR_TIMEOUT_RETURN,ActivitiUtils.TIME_TIMEOUT_RETURN);
 					orders.setGoodsState(Orders.GOODS_STATE6);
 					memberNoteService.save(new MemberNote(memberId,"您已确认收货！如需退货，请在7个自然日内进行申请。",ordersId));
 				}else if ("申请退货".equals(task.getName())){
@@ -216,8 +250,9 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 					map.put(ActivitiUtils.VAR_AUDITORS,systemService.getUserIdListByRoleNameRandom(3));
 					memberNoteService.save(new MemberNote(memberId,"您的退货请求已提交，请耐心等待。",ordersId));
 				}
-				this.update(orders);
 				activitiService.complete(task.getId(),orders.getProcessInstanceId(),reason,map);
+				orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+				this.update(orders);
 			}
 		}
 	}
@@ -448,6 +483,9 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		}
 
 		activitiService.complete(task.getId(),task.getProcessInstanceId(),comment,null,map);
+
+		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
+		this.update(orders);
 	}
 
 	/**
@@ -462,8 +500,6 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		}else{
 			throw new IllegalArgumentException();
 		}
-		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
-		this.update(orders);
 	}
 
 	/**
@@ -481,8 +517,6 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		}else{
 			throw new IllegalArgumentException();
 		}
-		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
-		this.update(orders);
 	}
 
 	/**
@@ -497,8 +531,6 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
             goodsAllService.save(goodsAll);
         }
 
-        orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
-		this.update(orders);
 		map.put(ActivitiUtils.VAR_TIMEOUT_GET,ActivitiUtils.TIME_TIMEOUT_GET);
 		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单发货啦！请耐心等待。",orders.getId()));
 	}
@@ -520,8 +552,6 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		}else{
 			throw new IllegalArgumentException();
 		}
-		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
-		this.update(orders);
 	}
 
 
@@ -530,9 +560,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	 */
 	private void confirmBack(Orders orders){
 		orders.setGoodsState(Orders.GOODS_STATE4);
-		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
         memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单已收到，确认后将退款。",orders.getId()));
-		this.update(orders);
 	}
 
     /**
@@ -552,8 +580,6 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
             goodsAll.setStock(goodsAll.getStock() + o.getBackQualifiedAmount());
             goodsAllService.save(goodsAll);
         }
-        orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
-        this.update(orders);
     }
 
 	/**
@@ -576,10 +602,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		memberAccount.setProcessType(MemberAccount.PROCESS_TYPE_BACK);
 		memberAccountService.save(memberAccount);//保存账户流动
 
-		orders.setProcessState(activitiService.getCurrentStateByInstanceId(orders.getProcessInstanceId()));
-
 		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的退款已到账，请查收！",orders.getId()));
-		this.update(orders);
 	}
 
 
@@ -641,7 +664,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 
 		//设置退货超时
 		Map<String,Object> map = new HashMap<String, Object>();
-		map.put(ActivitiUtils.VAR_TIMEOUT_BACK,ActivitiUtils.TIME_TIMEOUT_BACK);
+		map.put(ActivitiUtils.VAR_TIMEOUT_RETURN,ActivitiUtils.TIME_TIMEOUT_RETURN);
 		execution.setVariables(map);
 
 		memberNoteService.save(new MemberNote(orders.getMemberId(),"您的订单长时间未处理，系统自动确认收货。如需退货，请在7个自然日内进行申请。",ordersId));
@@ -691,3 +714,17 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 		this.update(orders);
 	}
 }
+
+/**
+ * 当前审核：state审核审核or退货退款or寄回退款
+
+ 历史审核：state（完成订单，pay-flag已退回）、确认寄回商品、退货入库
+
+
+ 发货：待发货
+
+ 历史：之后的都是。goods_flag != null != 1 !=5
+
+ 退货入库：确认寄回商品，退货入库。
+ 历史：寄回退款。（完成订单，逾期退回）
+ */

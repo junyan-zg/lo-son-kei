@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.zjy.losonkei.common.config.Global;
@@ -95,7 +92,7 @@ public class OrdersController extends BaseController {
 
 	@RequiresPermissions("orders:orders:view")
 	@RequestMapping(value = "form")
-	public String form(Orders orders, Model model, HttpSession session) {
+	public String form(Orders orders, Model model) {
 		model.addAttribute("orders", orders);
 
 		if (Orders.FLAG_DOING.equals(orders.getFlag())){
@@ -122,7 +119,7 @@ public class OrdersController extends BaseController {
 		}*/
 		ordersService.updateRemarks(orders);
 		addMessage(redirectAttributes, "保存订单成功");
-		return "redirect:"+Global.getAdminPath()+"/orders/orders/"+(Orders.FLAG_DOING.equals(orders.getFlag()) ? "" : "listOld")+"?repage";
+		return "redirect:"+Global.getAdminPath()+"/orders/orders/form?id="+orders.getId() + "&time=" + new Date().getTime();
 	}
 	
 	/*@RequiresPermissions("orders:orders:edit")
@@ -142,11 +139,118 @@ public class OrdersController extends BaseController {
 		}*/
 		try{
 			ordersService.compileTask(ordersId, taskId, comment, request);
+			addMessage(redirectAttributes,"操作成功！");
 		}catch (Exception e){
 			e.printStackTrace();
 			addMessage(redirectAttributes,"操作失败，请稍后重试！");
 		}
 
 		return "redirect:"+Global.getAdminPath()+"/orders/orders/form?id=" + ordersId + "&time=" + new Date().getTime();
+	}
+
+
+    /**
+	 *
+	 * audit 审核
+	 * send	退货
+	 * back 入库
+	 *
+     */
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+	@RequiresPermissions("orders:orders:view")
+	@RequestMapping("audit/list")
+	public String auditList(Orders orders, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<Orders> page = ordersService.auditList(new Page<Orders>(request, response), orders);
+		model.addAttribute("page", page);
+		getRole(request);
+		return "modules/orders/role/ordersList";
+	}
+	@RequiresPermissions("orders:orders:view")
+	@RequestMapping("auditOld/list")
+	public String auditOldList(Orders orders, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<Orders> page = ordersService.auditOldList(new Page<Orders>(request, response), orders);
+		model.addAttribute("page", page);
+		getRole(request);
+		return "modules/orders/role/ordersList";
+	}
+/////////////////////////////////////////////////////////////////////////////////////////////////
+	@RequiresPermissions("orders:orders:view")
+	@RequestMapping("send/list")
+	public String sendList(Orders orders, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<Orders> page = ordersService.sendList(new Page<Orders>(request, response), orders);
+		model.addAttribute("page", page);
+		getRole(request);
+		return "modules/orders/role/ordersList";
+	}
+	@RequiresPermissions("orders:orders:view")
+	@RequestMapping("sendOld/list")
+	public String sendOldList(Orders orders, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<Orders> page = ordersService.sendOldList(new Page<Orders>(request, response), orders);
+		model.addAttribute("page", page);
+		getRole(request);
+		return "modules/orders/role/ordersList";
+	}
+/////////////////////////////////////////////////////////////////////////////////////////////////
+	@RequiresPermissions("orders:orders:view")
+	@RequestMapping("back/list")
+	public String backList(Orders orders, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<Orders> page = ordersService.backList(new Page<Orders>(request, response), orders);
+		model.addAttribute("page", page);
+		getRole(request);
+		return "modules/orders/role/ordersList";
+	}
+	@RequiresPermissions("orders:orders:view")
+	@RequestMapping("backOld/list")
+	public String backOldList(Orders orders, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<Orders> page = ordersService.backOldList(new Page<Orders>(request, response), orders);
+		model.addAttribute("page", page);
+		getRole(request);
+		return "modules/orders/role/ordersList";
+	}
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+	@RequiresPermissions("orders:orders:edit")
+	@RequestMapping(value = {"audit/doTask","send/doTask","back/doTask"})
+	public String roleDoTask(String ordersId,String taskId,String comment,HttpServletRequest request,RedirectAttributes redirectAttributes) {
+		doTask(ordersId,taskId,comment,request,redirectAttributes);
+		return "redirect:"+Global.getAdminPath()+"/orders/orders/" + getRole(request) + "/form?id=" + ordersId + "&time=" + new Date().getTime();
+	}
+
+
+	@RequiresPermissions("orders:orders:view")
+	@RequestMapping(value = {"audit{old}/form","send{old}/form","back{old}/form"})
+	public String roleForm(Orders orders, Model model, HttpServletRequest request) {
+		form(orders,model);
+		getRole(request);
+		return "modules/orders/role/ordersForm";
+	}
+
+	@RequiresPermissions("orders:orders:edit")
+	@RequestMapping(value = {"audit{old}/save","send{old}/save","back{old}/save"})
+	public String save(Orders orders, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		ordersService.updateRemarks(orders);
+		addMessage(redirectAttributes, "保存订单成功");
+		return "redirect:"+Global.getAdminPath()+"/orders/orders/"+ getRole(request) + "/ordersForm?id=" + orders.getId() + "&time=" + new Date().getTime();
+	}
+
+	private String getRole(HttpServletRequest request){
+		String uri = request.getRequestURI();
+		String role = "back";
+		if (uri.indexOf("auditOld") != -1){
+			role = "auditOld";
+		}else if (uri.indexOf("sendOld") != -1){
+			role = "sendOld";
+		}else if (uri.indexOf("backOld") != -1){
+			role = "backOld";
+		}else if (uri.indexOf("audit") != -1){
+			role = "audit";
+		}else if (uri.indexOf("send") != -1){
+			role = "send";
+		}
+		request.setAttribute("role",role);
+		return role;
 	}
 }

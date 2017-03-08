@@ -49,8 +49,8 @@
 				<form:input path="city.id" htmlEscape="false" maxlength="32" class="input-medium"/>
 			</li>
 			<li><label>所在省份id：</label>
-				<form:input path="province.id" htmlEscape="false" maxlength="32" class="input-medium"/>--%>
-			</li>
+				<form:input path="province.id" htmlEscape="false" maxlength="32" class="input-medium"/>
+			</li>--%>
 			<li><label>订单状态</label>
 				<form:select path="ordersState" class="input-small">
 					<form:option value="" label=""/>

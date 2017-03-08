@@ -28,7 +28,12 @@ public class ActivitiUtils {
     //确认收货 10天
     public final static String VAR_TIMEOUT_GET = "confirmGetGoodsTimeOut";
     public final static String TIME_TIMEOUT_GET = "P10D";
+
     //申请退货 7天
+    public final static String VAR_TIMEOUT_RETURN = "returnGoodsTimeOut";
+    public final static String TIME_TIMEOUT_RETURN = "P7D";
+
+    //确认寄回 7天
     public final static String VAR_TIMEOUT_BACK = "backGoodsTimeOut";
     public final static String TIME_TIMEOUT_BACK = "P7D";
 

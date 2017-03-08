@@ -145,8 +145,11 @@
                                     <c:if test="${not empty goods.price}">
                                         ￥${goods.price}
                                     </c:if>
+                                    <c:if test="${empty goods.price}">
+                                        &nbsp;
+                                    </c:if>
                                     <div class="price_old">
-                                        <div style="position: absolute;font-size: 13px;color: #eb6447; margin-left: -60px;">销量 ${goods.salesAmount}</div>
+                                        <div style="position: absolute;font-size: 13px;color: #eb6447; margin-left: -60px;">销量 ${goods.salesAmount}</div>&nbsp;
                                         <c:if test="${not empty goods.srcPrice}">
                                             ￥${goods.srcPrice}
                                         </c:if>
