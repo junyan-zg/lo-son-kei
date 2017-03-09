@@ -5,9 +5,8 @@ import com.zjy.losonkei.common.web.BaseController;
 import com.zjy.losonkei.modules.member.entity.Member;
 import com.zjy.losonkei.modules.member.service.MemberService;
 import com.zjy.losonkei.modules.sys.security.Principal;
+import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
@@ -33,6 +32,10 @@ public class LoginController extends BaseController{
 
     @RequestMapping(value="/login",method = RequestMethod.GET)
     public String login(Model model,Member member,HttpSession session){
+        if(UserUtils.getPrincipal() != null){
+            return "redirect:/";
+        }
+
         model.addAttribute("isLogin","yes");
 
         CommonUtils.sessionToRequset(session,model,"message");
@@ -42,10 +45,13 @@ public class LoginController extends BaseController{
 
     @RequestMapping(value="/register")
     public String register(Member member){
+        if(UserUtils.getPrincipal() != null){
+            return "redirect:/";
+        }
         return "modules/front/login";
     }
 
-    @RequestMapping(value="/doRegister")
+    @RequestMapping(value="/doRegister",method = RequestMethod.POST)
     public String doRegister(Member member, HttpSession session,Model model){
 
         String result = memberService.doRegister(member);
@@ -77,12 +83,6 @@ public class LoginController extends BaseController{
             System.out.println("loginSuccess");
             return "redirect:/";
         }
-    }
-
-    @RequestMapping(value="${frontPath}/success")
-    public String success(HttpServletResponse response) throws IOException {
-        System.out.println("page success");
-        return "modules/front/success";
     }
 
 }
