@@ -45,7 +45,7 @@ public class GoodsController extends BaseController {
 	@Autowired
 	private GoodsSpecificationService goodsSpecificationService;
 	@Autowired
-	private GoodsSpecificationValueService goodsSpecificationValueService;
+	private GoodsAllService goodsAllService;
 
 	@Autowired
 	private GoodsCoreService goodsCoreService;
@@ -131,6 +131,23 @@ public class GoodsController extends BaseController {
 		}
 		list(goods,request,response,model);
 		return "modules/product/goodsSetting/goodsIframeList";
+	}
+
+	@RequiresPermissions("goods:goods:stock")
+	@RequestMapping(value = "stock")
+	public String getStock(HttpServletRequest request,HttpServletResponse response, GoodsAll goodsAll){
+		if (goodsAll.getGoods() == null){
+			goodsAll.setGoods(new Goods());
+		}
+		if (StringUtils.isNotBlank(goodsAll.getId()) && goodsAll.getId().startsWith("GD")){
+			goodsAll.setGoodsId(goodsAll.getId());
+			goodsAll.setId(null);
+		}
+
+		Page<GoodsAll> page = new Page<GoodsAll>(request, response);
+		goodsAllService.findListForStock(page,goodsAll);
+		request.setAttribute("page",page);
+		return "modules/goods/goodsStockList";
 	}
 
 }

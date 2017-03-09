@@ -58,6 +58,79 @@
 			</otherwise>
 		</choose>
 	</select>
+
+	<select id="findListForStock" resultType="GoodsAll">
+		SELECT
+		<include refid="goodsAllColumns"/> ,
+		g.id AS "goods.id",
+		g.goods_name AS "goods.goodsName",
+		g.state AS "goods.state",
+		g.flag AS "goods.flag",
+
+		b.category_name AS "goods.goodsCategory.categoryName"
+		FROM goods_all a
+		LEFT JOIN goods g ON a.goods_id = g.id
+		LEFT JOIN goods_category b ON b.id = g.goods_category_id
+		<where>
+			1 = 1
+			AND g.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="delFlag != null and delFlag != ''">
+				AND a.del_flag = #{delFlag}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<choose>
+				<when test="beginStock != null and endStock != null">
+					AND a.stock BETWEEN #{beginStock} AND #{endStock}
+				</when>
+				<when test="beginStock != null">
+					AND a.stock &gt;= #{beginStock}
+				</when>
+				<when test="endStock != null">
+					AND a.stock &lt;= #{endStock}
+				</when>
+			</choose>
+			<if test="goods.goodsName != null and goods.goodsName != ''">
+				AND g.goods_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{goods.goodsName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{goods.goodsName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{goods.goodsName},'%')</if>
+			</if>
+			<if test="goodsId != null and goodsId != ''">
+				AND a.goods_id = #{goodsId}
+			</if>
+			<if test="goods.flag != null and goods.flag != ''">
+				AND g.flag = #{goods.flag}
+			</if>
+			<choose>
+				<when test="goods.state != null and goods.state != ''">
+					AND g.state = #{goods.state}
+				</when>
+			</choose>
+				AND g.state != #{goods.STATE_INVENTING}
+			<if test="goods.keywords != null and goods.keywords != ''">
+				AND g.keywords LIKE
+				<if test="dbName == 'oracle'">'%'||#{goods.keywords}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{goods.keywords}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{goods.keywords},'%')</if>
+			</if>
+			<if test="goods.goodsCategory != null and goods.goodsCategory.id != null and goods.goodsCategory.id != ''">
+				AND b.id = #{goods.goodsCategory.id} OR b.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%'||#{goods.goodsCategory.id}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{goods.goodsCategory.id}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{goods.goodsCategory.id},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY g.update_date DESC, a.specification_group ASC
+			</otherwise>
+		</choose>
+	</select>
 	
 	<select id="findAllList" resultType="GoodsAll">
 		SELECT 

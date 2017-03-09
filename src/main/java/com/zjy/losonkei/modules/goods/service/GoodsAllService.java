@@ -5,6 +5,7 @@ package com.zjy.losonkei.modules.goods.service;
 
 import java.util.List;
 
+import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,4 +50,14 @@ public class GoodsAllService extends CrudService<GoodsAllDao, GoodsAll> {
 		dao.trueDelete(id);
 	}
 
+	public Page<GoodsAll> findListForStock(Page<GoodsAll> page,GoodsAll goodsAll){
+		goodsAll.setPage(page);
+		List<GoodsAll> list = dao.findListForStock(goodsAll);
+		for (GoodsAll ga : list){
+			GoodsAllUtils.fillProperty(ga,false);
+			ga.setRemarks(GoodsAllUtils.getAllSpecificationDesc(ga));
+		}
+		page.setList(list);
+		return page;
+	}
 }

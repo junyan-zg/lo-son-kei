@@ -7,6 +7,8 @@ import com.zjy.losonkei.common.persistence.CrudDao;
 import com.zjy.losonkei.common.persistence.annotation.MyBatisDao;
 import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 
+import java.util.List;
+
 /**
  * 所有商品DAO接口
  * @author zjy
@@ -15,4 +17,6 @@ import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 @MyBatisDao
 public interface GoodsAllDao extends CrudDao<GoodsAll> {
 	public void trueDelete(String id);
+
+	public List<GoodsAll> findListForStock(GoodsAll goodsAll);
 }

@@ -32,6 +32,10 @@ public class GoodsAll extends DataEntity<GoodsAll> {
 
 	private List<GoodsSpecificationValue> goodsSpecificationValues;
 
+	private Integer beginStock;
+
+	private Integer endStock;
+
 	private boolean valid;//是否有效，可购买
 
 	private Goods goods;
@@ -123,5 +127,21 @@ public class GoodsAll extends DataEntity<GoodsAll> {
 
 	public void setValid(boolean valid) {
 		this.valid = valid;
+	}
+
+	public Integer getBeginStock() {
+		return beginStock;
+	}
+
+	public void setBeginStock(Integer beginStock) {
+		this.beginStock = beginStock;
+	}
+
+	public Integer getEndStock() {
+		return endStock;
+	}
+
+	public void setEndStock(Integer endStock) {
+		this.endStock = endStock;
 	}
 }
