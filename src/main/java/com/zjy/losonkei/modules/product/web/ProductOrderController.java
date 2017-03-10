@@ -11,6 +11,8 @@ import com.zjy.losonkei.modules.goods.entity.GoodsSpecification;
 import com.zjy.losonkei.modules.goods.service.GoodsSpecificationService;
 import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import com.zjy.losonkei.modules.act.service.ActivitiService;
+import com.zjy.losonkei.modules.sys.entity.User;
+import com.zjy.losonkei.modules.sys.utils.UserUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,9 +141,19 @@ public class ProductOrderController extends BaseController {
 	@RequiresPermissions("product:productOrder:edit")
 	@RequestMapping(value = "delete")
 	public String delete(ProductOrder productOrder, RedirectAttributes redirectAttributes) {
-		productOrderService.delete(productOrder);
-		addMessage(redirectAttributes, "删除生产订单成功");
-		return "redirect:"+Global.getAdminPath()+"/product/productOrder/?repage";
+		User user = UserUtils.getUser();
+		if (!user.getId().equals(productOrder.getCreateBy().getId())){
+			addMessage(redirectAttributes, "删除生产订单失败，该订单非您创建！");
+		}if (!ProductOrder.PRODUCT_STATE_INIT.equals(productOrder.getState())){
+			addMessage(redirectAttributes, "删除生产订单失败，不能删除已发布的生产订单！");
+		}else{
+			productOrderService.delete(productOrder);
+			addMessage(redirectAttributes, "删除生产订单成功");
+		}
+		if(ProductOrder.PRODUCT_TYPE_NEW.equals(productOrder.getProductType())){
+			return "redirect:"+Global.getAdminPath()+"/product/productOrder/listNew?repage";
+		}
+		return "redirect:"+Global.getAdminPath()+"/product/productOrder/listOld?repage";
 	}
 
 	@RequestMapping(value = "doTask")

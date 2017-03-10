@@ -61,15 +61,15 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li><a href="${ctx}/orders/orders/${role}/list">订单列表</a></li>
-		<li class="active"><a href="${ctx}/orders/orders/${role}/form?id=${orders.id}">订单<shiro:hasPermission name="orders:orders:edit">${not empty orders.id?'处理':'添加'}</shiro:hasPermission><shiro:lacksPermission name="orders:orders:edit">查看</shiro:lacksPermission></a></li>
+		<li><a href="${ctx}/orders/orders/list">订单列表</a></li>
+		<li class="active"><a href="${ctx}/orders/orders/form?id=${orders.id}">订单<shiro:hasPermission name="orders:orders:edit">${not empty orders.id?'处理':'添加'}</shiro:hasPermission><shiro:lacksPermission name="orders:orders:edit">查看</shiro:lacksPermission></a></li>
 	</ul><br/>
 
 	<div class="form-actions" style="margin-top: -28px;">
 		<h3>基本信息</h3>
 	</div>
 	<sys:message content="${message}"/>
-	<form:form id="inputForm" modelAttribute="orders" action="${ctx}/orders/orders/${role}/save" method="post" class="form-horizontal">
+	<form:form id="inputForm" modelAttribute="orders" action="${ctx}/orders/orders/save" method="post" class="form-horizontal">
 		<sys:message content="${message}"/>
 		<div class="control-group">
 			<label class="control-label">订单号：</label>
@@ -258,7 +258,7 @@
 		<div class="form-actions">
 			<h3>处理订单（${task.name}）</h3>
 		</div>
-		<form class="form-horizontal" method="post" action="${ctx}/orders/orders/${role}/doTask" id="act-form">
+		<form class="form-horizontal" method="post" action="${ctx}/orders/orders/doTask" id="act-form">
 			<input type="hidden" name="taskId" value="${task.id}">
 			<input type="hidden" name="ordersId" value="${orders.id}">
 			<div class="control-group">

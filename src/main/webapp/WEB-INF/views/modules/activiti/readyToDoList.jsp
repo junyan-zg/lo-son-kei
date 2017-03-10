@@ -82,19 +82,19 @@
 						<td>生产</td>
 						<td>${productOrder.id}</td>
 						<td>${productOrder.orderName}</td>
-						<td><a href="javascript:;" onclick="tracePhoto('${ctx}/act/trace/photo/${task.processDefinitionId}/${task.executionId}');">${task.name}</a></td>
+						<td><a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${task.processDefinitionId}&processInstanceId=${task.processInstanceId}">${task.name}</a>
+								<%--<a href="javascript:;" onclick="tracePhoto('${ctx}/act/trace/photo/${task.processDefinitionId}/${task.executionId}');">${task.name}</a>--%></td>
 						<td>${fns:getUserById(act.startUserId).name}</td>
 					</c:if>
 					<c:if test="${act.procDef.key != PROCESS_KEY_PRODUCT}">
 						<td>销售</td>
 						<td>${act.procIns.businessKey}</td>
 						<td></td>
-						<td><a href="${ctx}/act/trace/photo/${task.processDefinitionId}/${task.executionId}" target="_blank">${task.name}</a></td>
+						<td><a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${task.processDefinitionId}&processInstanceId=${task.processInstanceId}">${task.name}</a>
+								<%--<a href="${ctx}/act/trace/photo/${task.processDefinitionId}/${task.executionId}" target="_blank">${task.name}</a>--%></td>
 						<td>${fns:getMemberById(act.startUserId).memberAccount}</td>
 					</c:if>
-
 						<%--<td><a target="_blank" href="${pageContext.request.contextPath}/act/rest/diagram-viewer?processDefinitionId=${task.processDefinitionId}&processInstanceId=${task.processInstanceId}">${task.name}</a></td>--%>
-
 					<td>
 						<c:forEach items="${act.candidateUsers}" var="candidateUser" varStatus="status">
 							${fns:getUserById(candidateUser).name}<c:if test="${status.index < fn:length(act.candidateUsers)-1}">,</c:if>
@@ -107,6 +107,19 @@
 						</c:if>--%>
 						<c:if test="${act.procDef.key == PROCESS_KEY_PRODUCT}">
 							<a href="${ctx}/product/productOrder/view?id=${act.procIns.businessKey}" onclick="top.addTab($(this),true);return false;">办理任务</a>
+						</c:if>
+						<c:if test="${act.procDef.key != PROCESS_KEY_PRODUCT}">
+							<c:choose>
+								<c:when test="${fns:getUser().roleList.get(0).enname eq 'role_store'}">
+									<a href="${ctx}/orders/orders/send/form?id=${act.procIns.businessKey}" onclick="top.addTab($(this),true);return false;">办理任务</a>
+								</c:when>
+								<c:when test="${fns:getUser().roleList.get(0).enname eq 'role_audit'}">
+									<a href="${ctx}/orders/orders/audit/form?id=${act.procIns.businessKey}" onclick="top.addTab($(this),true);return false;">办理任务</a>
+								</c:when>
+								<c:when test="${fns:getUser().roleList.get(0).enname eq 'role_sale'}">
+									<a href="${ctx}/orders/orders/form?id=${act.procIns.businessKey}" onclick="top.addTab($(this),true);return false;">办理任务</a>
+								</c:when>
+							</c:choose>
 						</c:if>
 					</td>
 				</tr>

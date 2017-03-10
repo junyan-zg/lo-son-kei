@@ -133,6 +133,7 @@ public class ProductOrderService extends CrudService<ProductOrderDao, ProductOrd
 	@Transactional(readOnly = false)
 	public void delete(ProductOrder productOrder) {
 		super.delete(productOrder);
+		activitiService.getRuntimeService().deleteProcessInstance(productOrder.getProcessInstanceId(),"");
 	}
 
 	public void loadEntity(ProductOrder productOrder) {

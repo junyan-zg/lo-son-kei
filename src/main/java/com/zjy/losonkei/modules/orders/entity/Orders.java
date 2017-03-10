@@ -356,3 +356,10 @@ public class Orders extends DataEntity<Orders> {
 		this.ignoreFlag = ignoreFlag;
 	}
 }
+
+//浏览量
+//搜索量
+//销售量
+//生产情况
+//消费金额范围
+//按单个商品销售。

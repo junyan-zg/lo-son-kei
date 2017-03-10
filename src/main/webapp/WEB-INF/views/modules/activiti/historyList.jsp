@@ -77,13 +77,11 @@
 				<th>当前环节</th>
 				<th>发起人</th>
 				<th>执行人</th>
-				<th>创建时间</th>
 				<th>操作</th>
 			</tr>
 		</thead>
 		<tbody>
 			<c:forEach items="${act.page.list}" var="act">
-				<c:set var="task" value="${act.task}" />
 				<tr>
 					<c:if test="${act.procDef.key == PROCESS_KEY_PRODUCT}">
 						<c:set var="productOrder" value="${fns:getProductOrderById(act.businessId)}" />
@@ -110,10 +108,22 @@
 							${fns:getUserById(candidateUser).name}<c:if test="${status.index < fn:length(act.candidateUsers)-1}">,</c:if>
 						</c:forEach>
 					</td>
-					<td><fmt:formatDate value="${productOrder.createDate}" type="both"/></td>
 					<td>
 						<c:if test="${act.procDef.key == PROCESS_KEY_PRODUCT}">
 							<a href="${ctx}/product/productOrder/view?id=${act.businessId}&fromMyTask=yes" onclick="top.addTab($(this),true);return false;">查看任务</a>
+						</c:if>
+						<c:if test="${act.procDef.key != PROCESS_KEY_PRODUCT}">
+							<c:choose>
+								<c:when test="${fns:getUser().roleList.get(0).enname eq 'role_store'}">
+									<a href="${ctx}/orders/orders/sendOld/form?id=${act.businessId}" onclick="top.addTab($(this),true);return false;">查看任务</a>
+								</c:when>
+								<c:when test="${fns:getUser().roleList.get(0).enname eq 'role_audit'}">
+									<a href="${ctx}/orders/orders/auditOld/form?id=${act.businessId}" onclick="top.addTab($(this),true);return false;">查看任务</a>
+								</c:when>
+								<c:when test="${fns:getUser().roleList.get(0).enname eq 'role_sale'}">
+									<a href="${ctx}/orders/orders/form?id=${act.businessId}" onclick="top.addTab($(this),true);return false;">查看任务</a>
+								</c:when>
+							</c:choose>
 						</c:if>
 					</td>
 				</tr>
