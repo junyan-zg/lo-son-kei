@@ -28,6 +28,7 @@
 		a.refund AS "refund",
 		a.income AS "income",
 		a.reason AS "reason",
+		a.finish_date AS "finishDate",
 
 		a1.name AS "area.name",
 		a2.name AS "city.name",
@@ -241,6 +242,7 @@
 			goods_state = #{goodsState},
 			pay_state = #{payState},
 			flag = #{flag},
+			finish_date = #{finishDate},
 			remarks = #{remarks},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},

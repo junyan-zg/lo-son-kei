@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 import com.zjy.losonkei.modules.sys.entity.CountryArea;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import com.google.common.collect.Lists;
 
@@ -40,6 +41,7 @@ public class Orders extends DataEntity<Orders> {
 	private BigDecimal refund;		// 退款
 	private BigDecimal income;		// 收益，交易成功时price_all-cost_all-refund
 	private String reason;
+	private Date finishDate;//完成订单时间,即是完全完成时间,方便销售分析,出货前退货的就不要记录了
 	private BigDecimal beginPriceAll;		// 开始 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
 	private BigDecimal endPriceAll;		// 结束 总售价，该字段用于会员付款，付款前可以调整售价，例如打个折
 	private BigDecimal beginIncome;		// 开始 收益，交易成功时price_all-cost_all-refund
@@ -355,11 +357,18 @@ public class Orders extends DataEntity<Orders> {
 	public void setIgnoreFlag(String ignoreFlag) {
 		this.ignoreFlag = ignoreFlag;
 	}
+
+	public Date getFinishDate() {
+		return finishDate;
+	}
+
+	public void setFinishDate(Date finishDate) {
+		this.finishDate = finishDate;
+	}
 }
 
-//浏览量
-//搜索量
-//销售量
-//生产情况
-//消费金额范围
-//按单个商品销售。
+//浏览量1
+//搜索量日 月 年 表格1
+//销售量 交易量，销售额，盈利额
+//生产情况，直接写1
+//商品销售排序	表格1

@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -709,7 +710,7 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
         }
 
 
-
+		orders.setFinishDate(new Date());
 		orders.setProcessState(execution.getCurrentActivityId());
 		this.update(orders);
 	}

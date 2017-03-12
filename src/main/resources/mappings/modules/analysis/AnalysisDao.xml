@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjy.losonkei.modules.analysis.dao.ProductAnalysisDao">
+
+	<sql id="common-sql">
+		del_flag = #{productOrder.DEL_FLAG_NORMAL}
+		<choose>
+			<when test="productOrder.state != null and productOrder.state != ''">
+				AND state = #{productOrder.state}
+			</when>
+			<otherwise>
+				AND state != #{productOrder.PRODUCT_STATE_INIT}
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="beginDate != null and endDate != null">
+				AND create_date BETWEEN #{beginDate} AND #{endDate}
+			</when>
+			<when test="beginDate != null">
+				AND create_date &gt;= #{beginDate}
+			</when>
+			<when test="endDate != null">
+				AND create_date &lt;= #{endDate}
+			</when>
+		</choose>
+	</sql>
+
+	<select id="count" resultType="com.zjy.losonkei.modules.analysis.entity.Analysis">
+		(SELECT COUNT(id) AS "count" FROM product_order
+		<where>
+			<include refid="common-sql"/>
+			AND product_type = #{productOrder.PRODUCT_TYPE_NEW}
+		</where>)
+		UNION ALL
+		(SELECT COUNT(id) AS "count" FROM product_order
+		<where>
+			<include refid="common-sql"/>
+			AND product_type = #{productOrder.PRODUCT_TYPE_OLD}
+		</where>)
+		UNION ALL
+		(SELECT COUNT(id) AS "count" FROM product_order
+		<where>
+			<include refid="common-sql"/>
+		</where>)
+	</select>
+
+	<sql id="filed-sel">
+		SELECT COUNT(id) AS "count",
+		IFNULL(SUM(budget),0) AS "productOrder.budget",
+		IFNULL(SUM(cost_all),0) AS "productOrder.costAll",
+		CAST(IFNULL(SUM(success_rate) / COUNT(id) * 100,0) AS DECIMAL(10,2)) AS "productOrder.successRate"
+		FROM product_order
+	</sql>
+
+	<select id="countSuccess" resultType="com.zjy.losonkei.modules.analysis.entity.Analysis">
+		(<include refid="filed-sel"/>
+		<where>
+			<include refid="common-sql"/>
+			AND product_type = #{productOrder.PRODUCT_TYPE_NEW}
+		</where>)
+		UNION ALL
+		(<include refid="filed-sel"/>
+		<where>
+			<include refid="common-sql"/>
+			AND product_type = #{productOrder.PRODUCT_TYPE_OLD}
+		</where>)
+		UNION ALL
+		(<include refid="filed-sel"/>
+		<where>
+			<include refid="common-sql"/>
+		</where>)
+	</select>
+	
+</mapper>
