@@ -21,6 +21,14 @@ public class EndOrderTask implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        ordersService.endOrderTask(execution);
+        new MyThread(execution.getProcessBusinessKey(),execution.getCurrentActivityId()){
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(15 * 1000);
+                } catch (InterruptedException e) {}
+                ordersService.endOrderTask(this.getB(),this.getA());
+            }
+        }.start();
     }
 }

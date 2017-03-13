@@ -23,7 +23,45 @@
 			<include refid="searchRecordColumns"/>
 		FROM search_record a
 		<include refid="searchRecordJoins"/>
-		WHERE a.id = #{id}
+		<where>
+			<choose>
+				<when test="searchTime != null">
+					AND a.search_time = #{searchTime,jdbcType=DATE}
+				</when>
+				<when test="beginSearchTime != null and endSearchTime != null">
+					AND a.search_time BETWEEN #{beginSearchTime,jdbcType=DATE} AND #{endSearchTime,jdbcType=DATE}
+				</when>
+				<when test="beginSearchTime != null">
+					AND a.search_time &gt;= #{beginSearchTime,jdbcType=DATE}
+				</when>
+				<when test="endSearchTime != null">
+					AND a.search_time &lt;= #{endSearchTime,jdbcType=DATE}
+				</when>
+			</choose>
+		</where>
+	</select>
+
+	<select id="count" resultType="SearchRecord">
+		SELECT a.content AS "content",SUM(amount) as "amount"
+		FROM search_record a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<choose>
+				<when test="searchTime != null">
+					AND a.search_time = #{searchTime,jdbcType=DATE}
+				</when>
+				<when test="beginSearchTime != null and endSearchTime != null">
+					AND a.search_time BETWEEN #{beginSearchTime} AND #{endSearchTime}
+				</when>
+				<when test="beginSearchTime != null">
+					AND a.search_time &gt;= #{beginSearchTime}
+				</when>
+				<when test="endSearchTime != null">
+					AND a.search_time &lt;= #{endSearchTime}
+				</when>
+			</choose>
+		</where>
+		GROUP BY content ORDER BY amount DESC
 	</select>
 	
 	<select id="findList" resultType="SearchRecord">

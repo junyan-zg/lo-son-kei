@@ -150,6 +150,7 @@
                                                             if ($("#reason").val().trim() == ''){
                                                                 alert('请填写申请理由');
                                                                 $("#reason").focus();
+                                                                flag = true;
                                                                 return false;
                                                             }
                                                         </c:if>

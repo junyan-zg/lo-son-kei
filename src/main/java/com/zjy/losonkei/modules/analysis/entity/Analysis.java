@@ -1,11 +1,12 @@
 package com.zjy.losonkei.modules.analysis.entity;
 
+import com.zjy.losonkei.modules.goods.entity.Goods;
 import com.zjy.losonkei.modules.product.entity.ProductOrder;
 
 import java.util.Date;
 
 /**
- * Created by Administrator on 2017/3/12.
+ * Created by zjy on 2017/3/12.
  */
 public class Analysis {
 
@@ -16,6 +17,8 @@ public class Analysis {
     private Integer count;//总数
 
     private ProductOrder productOrder;
+
+    private Goods goods;
 
     public Date getBeginDate() {
         return beginDate;
@@ -47,5 +50,13 @@ public class Analysis {
 
     public void setProductOrder(ProductOrder productOrder) {
         this.productOrder = productOrder;
+    }
+
+    public Goods getGoods() {
+        return goods;
+    }
+
+    public void setGoods(Goods goods) {
+        this.goods = goods;
     }
 }

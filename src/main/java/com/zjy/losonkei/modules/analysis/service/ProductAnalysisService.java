@@ -5,6 +5,7 @@ import com.zjy.losonkei.modules.analysis.entity.Analysis;
 import com.zjy.losonkei.modules.product.entity.ProductOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 /**
  * Created by zjy on 2017/3/12.
  */
+@Transactional(readOnly = true)
 @Service
 public class ProductAnalysisService {
 

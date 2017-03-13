@@ -249,6 +249,7 @@
 			state = #{state},
 			thumb_img_url = #{thumbImgUrl},
 			img_url = #{imgUrl},
+			sales_amount = #{salesAmount},
 			remarks = #{remarks},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},

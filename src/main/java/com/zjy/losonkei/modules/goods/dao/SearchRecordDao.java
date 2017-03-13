@@ -7,6 +7,8 @@ import com.zjy.losonkei.common.persistence.CrudDao;
 import com.zjy.losonkei.common.persistence.annotation.MyBatisDao;
 import com.zjy.losonkei.modules.goods.entity.SearchRecord;
 
+import java.util.List;
+
 /**
  * 搜索记录DAO接口
  * @author zjy
@@ -14,5 +16,6 @@ import com.zjy.losonkei.modules.goods.entity.SearchRecord;
  */
 @MyBatisDao
 public interface SearchRecordDao extends CrudDao<SearchRecord> {
-	
+
+    public List<SearchRecord> count(SearchRecord searchRecord);
 }

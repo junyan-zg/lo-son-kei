@@ -614,11 +614,11 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 
 
 	@Transactional(readOnly = false)
-	public void endOrderTask(DelegateExecution execution){
-		String ordersId = execution.getProcessBusinessKey();
+	public void endOrderTask(String businessKey,String currentActivityId){
+		String ordersId = businessKey;
 		Orders orders = this.get(ordersId);
 		orders.setFlag(Orders.FLAG_FAILED);
-		orders.setProcessState(execution.getCurrentActivityId());
+		orders.setProcessState(currentActivityId);
 
 		if(Orders.PAY_STATE1.equals(orders.getPayState())){      //来自超时未支付
 			memberNoteService.save(new MemberNote(orders.getMemberId(),"您未在15分钟内完成支付，订单已被取消。",ordersId));
@@ -629,12 +629,12 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 
 
 	@Transactional(readOnly = false)
-	public void returnAllMoneyTask(DelegateExecution execution){
-		String ordersId = execution.getProcessBusinessKey();
+	public void returnAllMoneyTask(String businessKey,String currentActivityId){
+		String ordersId = businessKey;
 		Orders orders = this.get(ordersId);
 		orders.setPayState(Orders.PAY_STATE3);
 		orders.setFlag(Orders.FLAG_FAILED);
-		orders.setProcessState(execution.getCurrentActivityId());
+		orders.setProcessState(currentActivityId);
 		this.update(orders);
 
 
@@ -673,8 +673,8 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
 	}
 
 	@Transactional(readOnly = false)
-	public void finishOrderTask(DelegateExecution execution){
-		String ordersId = execution.getProcessBusinessKey();
+	public void finishOrderTask(String businessKey,String currentActivityId){
+		String ordersId = businessKey;
 		Orders orders = this.get(ordersId);
 
 		BigDecimal income = orders.getPriceAll().subtract(orders.getCostAll());
@@ -709,9 +709,8 @@ public class OrdersService extends CrudService<OrdersDao, Orders> {
             orders.setGoodsState(Orders.GOODS_STATE8);
         }
 
-
 		orders.setFinishDate(new Date());
-		orders.setProcessState(execution.getCurrentActivityId());
+		orders.setProcessState(currentActivityId);
 		this.update(orders);
 	}
 }

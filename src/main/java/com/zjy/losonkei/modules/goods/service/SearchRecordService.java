@@ -34,7 +34,11 @@ public class SearchRecordService extends CrudService<SearchRecordDao, SearchReco
 	public Page<SearchRecord> findPage(Page<SearchRecord> page, SearchRecord searchRecord) {
 		return super.findPage(page, searchRecord);
 	}
-	
+
+	public List<SearchRecord> count(SearchRecord searchRecord){
+		return dao.count(searchRecord);
+	}
+
 	@Transactional(readOnly = false)
 	public void save(SearchRecord searchRecord) {
 		super.save(searchRecord);
