@@ -26,7 +26,7 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li><a href="${ctx}/analysis/searchRecord">销售情况</a></li>
+		<li><a href="${ctx}/analysis/sale">销售情况</a></li>
 		<li class="active"><a href="${ctx}/analysis/searchRecord">搜索排行</a></li>
 		<li><a href="${ctx}/analysis/goodsCount">商品总计</a></li>
 	</ul>

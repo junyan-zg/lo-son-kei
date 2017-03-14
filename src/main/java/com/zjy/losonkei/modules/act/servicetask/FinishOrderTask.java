@@ -20,7 +20,7 @@ public class FinishOrderTask implements JavaDelegate {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(10 * 1000);
+                    Thread.sleep(15 * 1000);
                 } catch (InterruptedException e) {}
                 ordersService.finishOrderTask(this.getB(),this.getA());
             }

@@ -5,6 +5,7 @@
 <head>
 	<title>商品总计</title>
 	<meta name="decorator" content="default"/>
+	<script type="text/javascript" src="${ctxStatic}/echarts/echarts.min.js"></script>
 	<script type="text/javascript">
 		function page(n,s){
 			if(n) $("#pageNo").val(n);
@@ -33,9 +34,9 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li><a href="${ctx}/analysis/sale">销售情况</a></li>
+		<li class="active"><a href="${ctx}/analysis/sale">销售情况</a></li>
 		<li><a href="${ctx}/analysis/searchRecord">搜索排行</a></li>
-		<li class="active"><a href="${ctx}/analysis/goodsCount">商品总计</a></li>
+		<li><a href="${ctx}/analysis/goodsCount">商品总计</a></li>
 	</ul>
 	<form:form id="searchForm" modelAttribute="goods" action="${ctx}/analysis/goodsCount" method="post" class="breadcrumb form-search">
 		<div>
@@ -100,5 +101,148 @@
 		</tbody>
 	</table>
 	<div class="pagination">${page}</div>
+	<div class="row-fluid">
+		<div class="span6" id="main1" style="height: 300px;padding-left: 15px;">
+		</div>
+		<div class="span6" id="main2" style="height: 300px;padding-left: 15px;">
+		</div>
+	</div>
+	<div class="row-fluid">
+		<div class="span6" id="main3" style="height: 300px;padding-left: 15px;">
+		</div>
+		<div class="span6" id="main4" style="height: 300px;padding-left: 15px;">
+		</div>
+	</div>
+<script>
+	var commonOption =  {
+		title: {
+			padding:[5,20]
+		},
+		tooltip: {
+			trigger: 'axis',
+			formatter: function (params) {
+				return params[0].value;
+			},
+			axisPointer: {
+				animation: false
+			}
+		},
+		xAxis: {
+			type: 'category',
+			splitLine: {
+				show: false
+			},
+			name:'日',
+			data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+		},
+		yAxis: {
+			type: 'value',
+			splitLine: {
+				show: true
+			}
+		},
+		series: [{
+			type: 'line',
+			showSymbol: true,
+			hoverAnimation: false
+		}]
+	};
+
+
+	var myChart1 = echarts.init(document.getElementById('main1'));
+	var myChart2 = echarts.init(document.getElementById('main2'));
+	var myChart3 = echarts.init(document.getElementById('main3'));
+	var myChart4 = echarts.init(document.getElementById('main4'));
+
+	myChart1.setOption(commonOption);
+	myChart2.setOption(commonOption);
+	myChart3.setOption(commonOption);
+	myChart4.setOption(commonOption);
+
+	myChart1.setOption({title: { text: '订单交易量(笔)', textStyle:{color:'#c23531'}}});
+	myChart2.setOption({title: { text: '商品总销量(个)', textStyle:{color:'#c23531'}}});
+	myChart3.setOption({title: { text: '销售额(元)', textStyle:{color:'#c23531'}}});
+	myChart4.setOption({title: { text: '盈利额(元)', textStyle:{color:'#c23531'}}});
+
+	function randomData() {
+		value = value + Math.random() * 21 - 10;
+		return {
+			value:Math.round(value)
+
+		}
+	}
+
+	var data = [];
+
+	var value = Math.random() * 1000;
+
+	option = {
+		title: {
+			text: '订单交易量',
+			textStyle:{color:'#c23531'},
+			padding:[10,20]
+		},
+		tooltip: {
+			trigger: 'axis',
+			formatter: function (params) {
+				return params[0].value;
+			},
+			axisPointer: {
+				animation: false
+			}
+		},
+		xAxis: {
+			type: 'category',
+			splitLine: {
+				show: false
+			},
+			name:'日',
+			data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+		},
+		yAxis: {
+			type: 'value',
+			splitLine: {
+				show: true
+			}
+		},
+		series: [{
+			type: 'line',
+			showSymbol: true,
+			hoverAnimation: false,
+			data: data
+		}]
+	};
+//	myChart1.setOption(option)
+//	myChart2.setOption(option)
+//	myChart3.setOption(option)
+//	myChart4.setOption(option)
+
+	for (var i = 0; i < 7; i++) {
+	//	data.shift();
+		data.push(randomData());
+	}
+
+	myChart1.setOption({
+		series: [{
+			data: data
+		}]
+	});
+	myChart2.setOption({
+		series: [{
+			data: data
+		}]
+	});
+	myChart3.setOption({
+		series: [{
+			data: data
+		}]
+	});
+	myChart4.setOption({
+		series: [{
+			data: data
+		}]
+	});
+
+</script>
 </body>
 </html>

@@ -3,6 +3,10 @@ package com.zjy.losonkei.modules.act.servicetask;
 /**
  * Created by Administrator on 2017/3/14.
  */
+
+/**
+ * 重要！在compile完成后，同一个事务会顺便执行serviceTask，这样才是完成compile
+ */
 public abstract class MyThread extends Thread {
     private String b;
     private String a;

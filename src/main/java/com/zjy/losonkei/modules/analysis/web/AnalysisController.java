@@ -65,4 +65,13 @@ public class AnalysisController extends BaseController {
         return "modules/analysis/searchRecord";
     }
 
+
+    @RequiresPermissions("analysis:sale")
+    @RequestMapping("sale")
+    public String sale(Goods goods, Model model){
+
+
+        return "modules/analysis/sale";
+    }
+
 }
