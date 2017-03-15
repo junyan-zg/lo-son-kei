@@ -12,10 +12,15 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by zjy on 2017/3/12.
@@ -68,10 +73,16 @@ public class AnalysisController extends BaseController {
 
     @RequiresPermissions("analysis:sale")
     @RequestMapping("sale")
-    public String sale(Goods goods, Model model){
-
-
+    public String sale(){
         return "modules/analysis/sale";
     }
+
+    @RequiresPermissions("analysis:sale")
+    @RequestMapping("sale/{method}")
+    @ResponseBody
+    public Map<String,Object> sale(@PathVariable("method") String method, String type, Date date) throws ParseException {
+        return saleAnalysisService.getAnalysis(method, type, date);
+    }
+
 
 }

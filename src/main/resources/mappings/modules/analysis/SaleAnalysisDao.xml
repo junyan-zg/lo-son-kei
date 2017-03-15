@@ -2,29 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zjy.losonkei.modules.analysis.dao.SaleAnalysisDao">
 
-	<sql id="common-sql">
-		del_flag = #{productOrder.DEL_FLAG_NORMAL}
-		<choose>
-			<when test="productOrder.state != null and productOrder.state != ''">
-				AND state = #{productOrder.state}
-			</when>
-			<otherwise>
-				AND state != #{productOrder.PRODUCT_STATE_INIT}
-			</otherwise>
-		</choose>
-		<choose>
-			<when test="beginDate != null and endDate != null">
-				AND create_date BETWEEN #{beginDate} AND #{endDate}
-			</when>
-			<when test="beginDate != null">
-				AND create_date &gt;= #{beginDate}
-			</when>
-			<when test="endDate != null">
-				AND create_date &lt;= #{endDate}
-			</when>
-		</choose>
-	</sql>
-
 	<select id="goodsCount" resultType="com.zjy.losonkei.modules.goods.entity.Goods" parameterType="com.zjy.losonkei.modules.goods.entity.Goods">
 		SELECT
 		a.id AS "id",
@@ -49,4 +26,40 @@
 		</choose>
 	</select>
 
+	<select id="getOrdersCount" parameterType="com.zjy.losonkei.modules.analysis.entity.Analysis" resultType="java.lang.Integer">
+		SELECT COUNT(id) FROM orders
+		<where>
+			pay_state != #{orders.PAY_STATE1}
+			AND
+			create_date BETWEEN #{beginDate} AND #{endDate}
+		</where>
+		   ORDER BY create_date DESC
+	</select>
+
+	<select id="getPriceAllCount" parameterType="com.zjy.losonkei.modules.analysis.entity.Analysis" resultType="java.math.BigDecimal">
+		SELECT IFNULL(SUM(price_all),0) AS "priceAll" FROM orders
+		<where>
+			pay_state != #{orders.PAY_STATE1}
+			AND
+			create_date BETWEEN #{beginDate} AND #{endDate}
+		</where>
+		ORDER BY create_date DESC
+	</select>
+
+	<select id="getProfitCount" parameterType="com.zjy.losonkei.modules.analysis.entity.Analysis" resultType="java.math.BigDecimal">
+		SELECT IFNULL(SUM(price_all),0) - IFNULL(SUM(cost_all),0) - IFNULL(SUM(refund),0) AS "amount" FROM orders
+		<where>
+			finish_date BETWEEN #{beginDate} AND #{endDate}
+		</where>
+		ORDER BY finish_date DESC
+	</select>
+
+	<select id="getGoodsSaleCount" parameterType="com.zjy.losonkei.modules.analysis.entity.Analysis" resultType="java.lang.Integer">
+		SELECT IFNULL(SUM(d.goods_amount),0) - IFNULL(SUM(d.back_amount),0) AS "amount" FROM
+		orders_details d LEFT JOIN orders o ON o.id = d.orders_id
+		<where>
+			finish_date BETWEEN #{beginDate} AND #{endDate}
+		</where>
+		ORDER BY finish_date DESC
+	</select>
 </mapper>

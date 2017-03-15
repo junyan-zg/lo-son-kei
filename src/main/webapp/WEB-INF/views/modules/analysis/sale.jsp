@@ -6,31 +6,6 @@
 	<title>商品总计</title>
 	<meta name="decorator" content="default"/>
 	<script type="text/javascript" src="${ctxStatic}/echarts/echarts.min.js"></script>
-	<script type="text/javascript">
-		function page(n,s){
-			if(n) $("#pageNo").val(n);
-			if(s) $("#pageSize").val(s);
-			$("#searchForm").submit();
-			return false;
-		}
-		$(document).ready(function() {
-			$("#searchForm").validate({
-				submitHandler: function (form) {
-					loading('正在提交，请稍等...');
-					form.submit();
-				},
-				errorContainer: "#messageBox",
-				errorPlacement: function (error, element) {
-					$("#messageBox").text("输入有误，请先更正。");
-					if (element.is(":checkbox") || element.is(":radio") || element.parent().is(".input-append")) {
-						error.appendTo(element.parent().parent());
-					} else {
-						error.insertAfter(element);
-					}
-				}
-			});
-		});
-	</script>
 </head>
 <body>
 	<ul class="nav nav-tabs">
@@ -38,49 +13,21 @@
 		<li><a href="${ctx}/analysis/searchRecord">搜索排行</a></li>
 		<li><a href="${ctx}/analysis/goodsCount">商品总计</a></li>
 	</ul>
-	<form:form id="searchForm" modelAttribute="goods" action="${ctx}/analysis/goodsCount" method="post" class="breadcrumb form-search">
+	<form id="searchForm" onsubmit="return false;" class="breadcrumb form-search">
 		<div>
-			<label>选择商品：</label>
-			<form:hidden path="id"/>
-			<form:input path="goodsName" readonly="true"/>
-			<a href="javascript:chooseGoods('${ctx}/goods/goods/iframe/list/<%=ProductOrder.PRODUCT_TYPE_OLD%>');" class="btn"
-			   style="padding:4px 10px;">&nbsp;<i class="icon-search"></i>&nbsp;</a>&nbsp;&nbsp;
-			<input class="btn btn-primary" type="button" onclick="$('#searchForm').submit();" value="查询"/>
+			<label>选择时间：</label>
+			<select name="type" id="type" class="input-small" onchange="$('#time').html($('#input-' + this.value).html());">
+				<option value="1">日</option>
+				<option value="2">月</option>
+				<option value="3">年</option>
+			</select>
+			<span id="time"><input class="Wdate input-medium" name="date" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false,readOnly:true,maxDate:'%y-%M-%d'});"/></span>
+			<input class="btn btn-primary" type="button" onclick="subForm();" value="查询"/>
 		</div>
 		<sys:tableSort id="orderBy" name="orderBy" value="${page.orderBy}" callback="page();"/>
-	</form:form>
-	<script>
-		function chooseGoods(url) {
-			top.$.jBox("iframe:" + url, {
-				title: "商品选择",
-				width: 600,
-				height: 500,
-				buttons: {"确定": "ok","清除":"clear", "关闭": true},
-				submit: function (v, h, f) {
-					if (v == 'ok') {
-						h.find("iframe")[0].contentWindow.iframeChoose($("#id"), $("#goodsName"));
-
-						$(".required").each(function () {
-							$(this).removeClass("required");
-						});
-						$(".number").each(function () {
-							$(this).removeClass("number");
-						});
-						$(".digits").each(function () {
-							$(this).removeClass("digits");
-						});
-					}else if(v == 'clear'){
-						$("#id").val('');
-						$('#goodsName').val('');
-					}
-				}, loaded: function (h) {
-					$(".jbox-content", top.document).css("overflow-y", "hidden");
-				}
-			});
-		}
-	</script>
+	</form>
 	<sys:message content="${message}"/>
-	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+	<%--<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
 				<th>商品号</th>
@@ -100,7 +47,7 @@
 			</c:forEach>
 		</tbody>
 	</table>
-	<div class="pagination">${page}</div>
+	<div class="pagination">${page}</div>--%>
 	<div class="row-fluid">
 		<div class="span6" id="main1" style="height: 300px;padding-left: 15px;">
 		</div>
@@ -114,6 +61,7 @@
 		</div>
 	</div>
 <script>
+	var xAisName = '日';
 	var commonOption =  {
 		title: {
 			padding:[5,20]
@@ -132,8 +80,8 @@
 			splitLine: {
 				show: false
 			},
-			name:'日',
-			data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+			name:xAisName,
+			data: ['', '', '', '', '']
 		},
 		yAxis: {
 			type: 'value',
@@ -160,89 +108,65 @@
 	myChart4.setOption(commonOption);
 
 	myChart1.setOption({title: { text: '订单交易量(笔)', textStyle:{color:'#c23531'}}});
-	myChart2.setOption({title: { text: '商品总销量(个)', textStyle:{color:'#c23531'}}});
-	myChart3.setOption({title: { text: '销售额(元)', textStyle:{color:'#c23531'}}});
+	myChart2.setOption({title: { text: '销售额(元)', textStyle:{color:'#c23531'}}});
+	myChart3.setOption({title: { text: '商品总销量(个)', textStyle:{color:'#c23531'}}});
 	myChart4.setOption({title: { text: '盈利额(元)', textStyle:{color:'#c23531'}}});
 
-	function randomData() {
-		value = value + Math.random() * 21 - 10;
-		return {
-			value:Math.round(value)
-
+	var count = 0;
+	function setData(chart,xAxisData,data){
+		count++;
+		if (count == 4){
+			closeTip();
+			count = 0;
 		}
-	}
-
-	var data = [];
-
-	var value = Math.random() * 1000;
-
-	option = {
-		title: {
-			text: '订单交易量',
-			textStyle:{color:'#c23531'},
-			padding:[10,20]
-		},
-		tooltip: {
-			trigger: 'axis',
-			formatter: function (params) {
-				return params[0].value;
+		chart.setOption({
+			xAxis: {
+				name:xAisName,
+				data: xAxisData
 			},
-			axisPointer: {
-				animation: false
-			}
-		},
-		xAxis: {
-			type: 'category',
-			splitLine: {
-				show: false
-			},
-			name:'日',
-			data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-		},
-		yAxis: {
-			type: 'value',
-			splitLine: {
-				show: true
-			}
-		},
-		series: [{
-			type: 'line',
-			showSymbol: true,
-			hoverAnimation: false,
-			data: data
-		}]
-	};
-//	myChart1.setOption(option)
-//	myChart2.setOption(option)
-//	myChart3.setOption(option)
-//	myChart4.setOption(option)
-
-	for (var i = 0; i < 7; i++) {
-	//	data.shift();
-		data.push(randomData());
+			series: [{
+				data: data
+			}]
+		});
 	}
+	function subForm(){
+		if ($("#time input").val() == ''){
+			alertx('日期不能为空！');
+			return false;
+		}
+		var val = $("#type").val();
+		if (val == 1) { xAisName = '日';}
+		else if (val == 2) { xAisName = '月';}
+		else if (val == 3) { xAisName = '年';$("#time input").val($("#time input").val() + "-01");}
+		loading('正在提交，请稍等...');
 
-	myChart1.setOption({
-		series: [{
-			data: data
-		}]
-	});
-	myChart2.setOption({
-		series: [{
-			data: data
-		}]
-	});
-	myChart3.setOption({
-		series: [{
-			data: data
-		}]
-	});
-	myChart4.setOption({
-		series: [{
-			data: data
-		}]
-	});
+		var form = $('#searchForm').serialize();
 
+		if (val == 3){
+			$("#time input").val($("#time input").val().split("-")[0]);
+		}
+
+		sendRequest(myChart1,1,form)
+		sendRequest(myChart2,2,form)
+		sendRequest(myChart3,4,form)
+		sendRequest(myChart4,3,form)
+	}
+	function sendRequest(chart,method,form){
+		$.post('${ctx}/analysis/sale/' + method,form,function(data){
+			setData(chart,data.names,data.value);
+		});
+	}
 </script>
+<div style="display: none">
+	<div id="input-1">
+		<input class="Wdate input-medium" name="date" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false,readOnly:true,maxDate:'%y-%M-%d'});"/>
+	</div>
+	<div id="input-2">
+		<input class="Wdate input-medium" name="date" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM',isShowClear:false,readOnly:true,maxDate:'%y-%M-%d'});"/>
+	</div>
+	<div id="input-3">
+		<input class="Wdate input-medium" name="date" type="text" onclick="WdatePicker({dateFmt:'yyyy',isShowClear:false,readOnly:true,maxDate:'%y-%M-%d'});"/>
+	</div>
+</div>
 </body>
 </html>
