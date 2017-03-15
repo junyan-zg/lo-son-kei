@@ -5,8 +5,10 @@ import com.zjy.losonkei.modules.analysis.dao.SaleAnalysisDao;
 import com.zjy.losonkei.modules.analysis.entity.Analysis;
 import com.zjy.losonkei.modules.analysis.utils.DateUtils;
 import com.zjy.losonkei.modules.goods.entity.Goods;
+import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 import com.zjy.losonkei.modules.goods.entity.SearchRecord;
 import com.zjy.losonkei.modules.goods.service.SearchRecordService;
+import com.zjy.losonkei.modules.goods.utils.GoodsAllUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,10 +58,10 @@ public class SaleAnalysisService {
                 BigDecimal count = saleAnalysisDao.getPriceAllCount(new Analysis(DateUtils.getBetweenDate(type, descDate.getDate())));
                 list.add(count);
             }else if ("3".equals(method)){
-                BigDecimal count = saleAnalysisDao.getProfitCount(new Analysis(DateUtils.getBetweenDate(type, descDate.getDate())));
+                Integer count = saleAnalysisDao.getGoodsSaleCount(new Analysis(DateUtils.getBetweenDate(type, descDate.getDate())));
                 list.add(count);
             }else if ("4".equals(method)){
-                Integer count = saleAnalysisDao.getGoodsSaleCount(new Analysis(DateUtils.getBetweenDate(type, descDate.getDate())));
+                BigDecimal count = saleAnalysisDao.getProfitCount(new Analysis(DateUtils.getBetweenDate(type, descDate.getDate())));
                 list.add(count);
             }else{
                 return new HashMap<String, Object>();
@@ -69,5 +71,29 @@ public class SaleAnalysisService {
         map.put("names",names);
         map.put("value",list);
         return map;
+    }
+
+    public List<Map<String,Object>> getTop50GoodsSaleCount(String type, Date date) throws ParseException {
+        List<Map<String,Object>> list = new ArrayList<Map<String,Object>>();
+
+        DateUtils.DescDate descDate = DateUtils.getCloseDate(type,date,1).get(0);
+        List<GoodsAll> goodsAlls = saleAnalysisDao.getTop50GoodsSaleCount(new Analysis(DateUtils.getBetweenDate(type, descDate.getDate())));
+        for (GoodsAll goodsAll:goodsAlls){
+            Map<String,Object> map = new HashMap<String, Object>();
+            map.put("amount",goodsAll.getStock());//借用stock字段
+            map.put("id",goodsAll.getId());
+            map.put("sales",goodsAll.getPrice());//借用price字段
+
+            try {
+                goodsAll = GoodsAllUtils.getGoodAllById(goodsAll.getId());
+                GoodsAllUtils.fillProperty(goodsAll,true);
+
+                map.put("goodsName",goodsAll.getGoods().getGoodsName());
+                map.put("spec",GoodsAllUtils.getAllSpecificationDesc(goodsAll));
+            }catch (Exception e){}
+
+            list.add(map);
+        }
+        return list;
     }
 }

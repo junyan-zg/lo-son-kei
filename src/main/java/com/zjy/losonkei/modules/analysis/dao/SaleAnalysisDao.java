@@ -3,6 +3,7 @@ package com.zjy.losonkei.modules.analysis.dao;
 import com.zjy.losonkei.common.persistence.annotation.MyBatisDao;
 import com.zjy.losonkei.modules.analysis.entity.Analysis;
 import com.zjy.losonkei.modules.goods.entity.Goods;
+import com.zjy.losonkei.modules.goods.entity.GoodsAll;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -23,4 +24,7 @@ public interface SaleAnalysisDao {
     public BigDecimal getProfitCount(Analysis analysis);
 
     public Integer getGoodsSaleCount(Analysis analysis);
+
+    public List<GoodsAll> getTop50GoodsSaleCount(Analysis analysis);
+
 }

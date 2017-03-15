@@ -62,4 +62,17 @@
 		</where>
 		ORDER BY finish_date DESC
 	</select>
+
+	<select id="getTop50GoodsSaleCount" parameterType="com.zjy.losonkei.modules.analysis.entity.Analysis" resultType="com.zjy.losonkei.modules.goods.entity.GoodsAll">
+		SELECT IFNULL(SUM(d.goods_amount),0) - IFNULL(SUM(d.back_amount),0) AS "stock",
+		goods_no AS "id",
+		SUM(d.price_all) - (IFNULL(d.back_amount,0) * d.price) AS "price"
+		FROM
+		orders_details d LEFT JOIN orders o ON o.id = d.orders_id
+		<where>
+			finish_date BETWEEN #{beginDate} AND #{endDate}
+		</where>
+		GROUP BY goods_no
+		ORDER BY price DESC,stock DESC,finish_date DESC LIMIT 50
+	</select>
 </mapper>

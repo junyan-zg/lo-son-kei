@@ -27,27 +27,6 @@
 		<sys:tableSort id="orderBy" name="orderBy" value="${page.orderBy}" callback="page();"/>
 	</form>
 	<sys:message content="${message}"/>
-	<%--<table id="contentTable" class="table table-striped table-bordered table-condensed">
-		<thead>
-			<tr>
-				<th>商品号</th>
-				<th>商品名称</th>
-				<th class="sort-column visit_amount">浏览量</th>
-				<th class="sort-column sales_amount">销售量</th>
-			</tr>
-		</thead>
-		<tbody>
-			<c:forEach items="${page.list}" var="goods">
-				<tr>
-					<td>${goods.id}</td>
-					<td>${goods.goodsName}</td>
-					<td>${goods.visitAmount}</td>
-					<td>${goods.salesAmount}</td>
-				</tr>
-			</c:forEach>
-		</tbody>
-	</table>
-	<div class="pagination">${page}</div>--%>
 	<div class="row-fluid">
 		<div class="span6" id="main1" style="height: 300px;padding-left: 15px;">
 		</div>
@@ -60,6 +39,21 @@
 		<div class="span6" id="main4" style="height: 300px;padding-left: 15px;">
 		</div>
 	</div>
+	<fieldset><legend>商品销量Top50</legend></fieldset>
+	<table id="contentTable" class="table table-striped table-bordered table-condensed">
+		<thead>
+		<tr>
+			<th>商品号</th>
+			<th>商品名称</th>
+			<th>规格</th>
+			<th class="sort-column">销售量</th>
+			<th class="sort-column">销售额</th>
+		</tr>
+		</thead>
+		<tbody id="tbody">
+
+		</tbody>
+	</table>
 <script>
 	var xAisName = '日';
 	var commonOption =  {
@@ -146,16 +140,34 @@
 			$("#time input").val($("#time input").val().split("-")[0]);
 		}
 
-		sendRequest(myChart1,1,form)
-		sendRequest(myChart2,2,form)
-		sendRequest(myChart3,4,form)
-		sendRequest(myChart4,3,form)
+		sendRequest(myChart1,1,form);
+		sendRequest(myChart2,2,form);
+		sendRequest(myChart3,3,form);
+		sendRequest(myChart4,4,form);
+		saleTop50(form);
 	}
 	function sendRequest(chart,method,form){
 		$.post('${ctx}/analysis/sale/' + method,form,function(data){
 			setData(chart,data.names,data.value);
 		});
 	}
+	function saleTop50(form){
+		$.post('${ctx}/analysis/sale/saleTop50',form,function(data){
+			var html = template('row-tmp',{list:data});
+			$("#tbody").html(html);
+		});
+	}
+</script>
+<script type="text/html" id="row-tmp">
+	{{each list as value index}}
+		<tr>
+			<td>{{value.id}}</td>
+			<td>{{value.goodsName}}</td>
+			<td>{{value.spec}}</td>
+			<td>{{value.amount}}</td>
+			<td>{{value.sales}}</td>
+		</tr>
+	{{/each}}
 </script>
 <div style="display: none">
 	<div id="input-1">

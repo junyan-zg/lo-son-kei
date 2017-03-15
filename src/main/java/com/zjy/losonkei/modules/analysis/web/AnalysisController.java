@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -84,5 +85,11 @@ public class AnalysisController extends BaseController {
         return saleAnalysisService.getAnalysis(method, type, date);
     }
 
+    @RequiresPermissions("analysis:sale")
+    @RequestMapping("sale/saleTop50")
+    @ResponseBody
+    public List<Map<String,Object>> getTop50GoodsSaleCount(String type, Date date) throws ParseException {
+        return saleAnalysisService.getTop50GoodsSaleCount(type, date);
+    }
 
 }
