@@ -59,7 +59,7 @@ public class GoodsService extends CrudService<GoodsDao, Goods> {
 	public List<Goods> findListForIndex() {
 		Goods goods = new Goods();
 		goods.setState(Goods.STATE_ON_SALE);
-		Page<Goods> page = new Page<>();
+		Page<Goods> page = new Page<Goods>();
 		page.setPageNo(1);
 		page.setPageSize(8);
 		goods.setPage(page);

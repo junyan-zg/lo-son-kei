@@ -50,15 +50,16 @@ public class GoodsDetailsController extends BaseController{
         model.addAttribute("goods",goods);
 
         //url
-        String imgUrls = goods.getImgUrl();
-        List<String> imgUrlList = new ArrayList<String>();
-        for (String s : imgUrls.split("\\|")){
-            if (!"".equals(s.trim())){
-                imgUrlList.add(s);
+        try {
+            String imgUrls = goods.getImgUrl();
+            List<String> imgUrlList = new ArrayList<String>();
+            for (String s : imgUrls.split("\\|")) {
+                if (!"".equals(s.trim())) {
+                    imgUrlList.add(s);
+                }
             }
-        }
-        model.addAttribute("imgUrlList",imgUrlList);
-
+            model.addAttribute("imgUrlList", imgUrlList);
+        }catch (Exception e){}
 
         //规格
         Map<GoodsSpecification, List<String>> goodsSpecificationValueList = goodsSpecificationValueService.getGoodsSpecificationValueListByGoodsId(goodsId);

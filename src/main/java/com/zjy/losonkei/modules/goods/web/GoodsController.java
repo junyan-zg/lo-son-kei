@@ -73,21 +73,25 @@ public class GoodsController extends BaseController {
 	@RequiresPermissions("goods:goods:view")
 	@RequestMapping(value = "form")
 	public String form(Goods goods, Model model) {
+		//查询商品属性
 		List<GoodsAttr> goodsAttrs = goodsAttrService.findList(new GoodsAttr());
+		//查询商品属性值
 		Map<String,GoodsAttrValue> goodsAttrValuesMap = goodsAttrValueService.findMapByGoodId(goods.getId());
+		//将商品属性值对应到属性上
 		if (!Objects.equals(goodsAttrs,null)){
 			for (GoodsAttr goodsAttr:goodsAttrs){
 				goodsAttr.setGoodsAttrValue(goodsAttrValuesMap.get(goodsAttr.getId()));
 			}
 		}
+		//把实体装载到JSP视图
 		model.addAttribute("goodsAttrList",goodsAttrs);
 		model.addAttribute("goodsSpecificationList",goodsSpecificationService.findList(new GoodsSpecification()));
 
-		if (StringUtils.isNotBlank(goods.getId())){
+		if (StringUtils.isNotBlank(goods.getId())){		//如果是修改，需要进行回显数据
 			goods = goodsService.get(goods.getId());
 			List<GoodsAll> goodsAlls = GoodsAllUtils.getGoodsAllByGoodsId(goods.getId());
 			for(GoodsAll goodsAll:goodsAlls){
-				GoodsAllUtils.fillProperty(goodsAll,false);
+				GoodsAllUtils.fillProperty(goodsAll,false);//填充商品规格属性
 			}
 			goods.setGoodsAlls(goodsAlls);
 		}

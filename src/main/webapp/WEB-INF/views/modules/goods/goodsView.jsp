@@ -171,6 +171,7 @@
     <table id="contentTable" class="table table-striped table-bordered table-condensed">
         <thead>
         <tr>
+            <th>商品号</th>
             <c:forEach var="list" items="${goodsSpecificationList}">
                 <th>${list.specificationName}
                     <c:if test="${list.required eq requiredYes}">
